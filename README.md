@@ -1,6 +1,8 @@
 # AI Wings
 
-AI Wings is a complete AIoT Drone System, which enables users to build and control their own 4G/5G AI drones. We create a embedded system module to allow users to convert general small drones into AIoT drones easily.
+AI Wings is a complete AIoT Drone System that can command and control a group of 4G/5G AI drones. We have created an embedded software based on Android to allow users to convert general small drones into AIoT drones easily. A drone cloud based on node.js and vue.js have also been created.
+
+<img width=640 src="doc/img/ai_wings_arch.png"/>
 
 # Test Videos
 
