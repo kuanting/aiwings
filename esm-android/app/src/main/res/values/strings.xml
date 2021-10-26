@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AED Drone</string>
+
+    <string-array name='connect_type'>
+        <item>TCP</item>
+        <item>USB</item>
+    </string-array>
+
+</resources>
