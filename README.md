@@ -6,6 +6,7 @@ AI Wings is a complete AIoT Drone System that can command and control a group of
 
 # Test Videos
 
-[![AI Wings System Test](http://img.youtube.com/vi/ou2W5PuoimQ/0.jpg)](https://www.youtube.com/watch?v=ou2W5PuoimQ) | [![AI Wings AED Drone Demo](http://img.youtube.com/vi/jq7bbERNfHk/0.jpg)](https://www.youtube.com/watch?v=jq7bbERNfHk)
+AI Wings System Test | AED Delivery Test
 :-----------------------------------------:|:-------------------------------------------------------:
+[![AI Wings System Test](http://img.youtube.com/vi/ou2W5PuoimQ/0.jpg)](https://www.youtube.com/watch?v=ou2W5PuoimQ) | [![AI Wings AED Drone Demo](http://img.youtube.com/vi/jq7bbERNfHk/0.jpg)](https://www.youtube.com/watch?v=jq7bbERNfHk)
 
