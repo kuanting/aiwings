@@ -1,10 +1,4 @@
 <template>
-  <a-spin
-    v-if="isLoading"
-    class="map__spinner"
-    :spinning="isLoading"
-    tip="Loading map..."
-  />
   <div id="map">
     <a-popconfirm
       title="Press Start To Start Mission"
@@ -26,6 +20,12 @@
       </a-button>
     </a-tooltip>
   </div>
+  <a-spin
+    v-if="isLoading"
+    class="map__spinner"
+    :spinning="isLoading"
+    tip="Loading map..."
+  />
 </template>
 
 <script>
@@ -74,18 +74,17 @@ export default {
         lng,
         lat
       })
-      mapbox.map.zoomTo(17)
+      mapbox.flyTo([lng, lat])
       message.success('Start GOTO Mission')
     }
 
     const missionCancelHandler = () => {
       const { lng, lat } = destination.value
       if (lng !== 0 && lat !== 0) {
-        mapbox.flyTo([lng, lat], 17)
+        mapbox.flyTo([lng, lat])
         targetMarker.setLngLat([lng, lat])
         return
       }
-      mapbox.map.zoomTo(17)
     }
 
     const saveAndClearPathHandler = async () => {
@@ -125,7 +124,7 @@ export default {
       .finally(() => {
         mapbox = new CustomMap({ longitude, latitude })
         mapbox.initMapbox()
-
+        mapbox.map.dragRotate.disable()
         mapbox.map.on('load', () => {
           mapbox.createGeoJsonSource('real-time-record', geoJsonFormatData)
           mapbox.createLineLayer('real-time-path', 'real-time-record')
