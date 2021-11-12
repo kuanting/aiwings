@@ -15,7 +15,7 @@ export default class CustomMap {
     this.map = new mapboxgl.Map({
       style: mapStyle || MAPBOX.STYLE,
       center: [this.longitude, this.latitude],
-      zoom: 16,
+      zoom: 17,
       pitch: 0,
       bearing: 0,
       antialias: false,
@@ -73,17 +73,6 @@ export default class CustomMap {
       },
       labelLayerId
     )
-
-    // add sky layer
-    this.map.addLayer({
-      id: 'sky',
-      type: 'sky',
-      paint: {
-        'sky-type': 'atmosphere',
-        'sky-atmosphere-sun': [0.0, 60.0],
-        'sky-atmosphere-sun-intensity': 20
-      }
-    })
   }
 
   _addMapControls() {

@@ -147,27 +147,14 @@ export default {
     }
   }
   .stream {
-    position: absolute;
-    width: 200px;
-    aspect-ratio: 16 / 9;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    z-index: 100;
-    transition: all 0.5s ease-in-out 0.3ms;
-    border-radius: 10px;
-
-    @media (min-width: 676px) {
-      width: 250px;
-    }
+    position: relative;
+    visibility: hidden;
+    background-image: url('~@/assets/live-stream.png');
+    background-size: cover;
     @media (min-width: 800px) {
-      box-shadow: none;
-      width: 100%;
-      height: 100%;
-      position: static;
+      visibility: visible;
       grid-column: 1 / 2;
       grid-row: 2 / 3;
-      background-color: rgba(0, 0, 0, 0.1);
-      border-radius: 0;
     }
   }
 }

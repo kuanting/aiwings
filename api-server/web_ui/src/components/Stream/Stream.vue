@@ -1,45 +1,41 @@
 <template>
-  <div class="video__wrapper">
-    <video
-      ref="remoteVideoEl"
-      poster="../../assets/live-stream.png"
-      autoplay
-    ></video>
-    <div class="control__wrapper">
-      <a-tooltip placement="right" color="blue" title="Establish WEBRTC">
-        <a-button
-          class="button"
-          size="small"
-          shape="circle"
-          type="primary"
-          @click="startPeerNegotiation"
-        >
-          <ApiOutlined />
-        </a-button>
-      </a-tooltip>
-      <a-tooltip
-        placement="right"
-        color="blue"
-        :title="recordButton.isRecording ? 'Stop recording' : 'Start recording'"
+  <video ref="remoteVideoEl" autoplay></video>
+  <canvas ref="canvasEl" class="boundingBox"></canvas>
+  <div class="control__wrapper">
+    <a-tooltip placement="right" color="blue" title="Establish WEBRTC">
+      <a-button
+        class="button"
+        size="small"
+        shape="circle"
+        type="primary"
+        @click="startPeerNegotiation"
       >
-        <a-button
-          class="button"
-          size="small"
-          shape="circle"
-          type="primary"
-          :disabled="!recordButton.isReady"
-          :danger="recordButton.isRecording"
-          @click="handleRecording"
-        >
-          <CameraOutlined />
-        </a-button>
-      </a-tooltip>
-    </div>
+        <ApiOutlined />
+      </a-button>
+    </a-tooltip>
+    <a-tooltip
+      placement="right"
+      color="blue"
+      :title="recordButton.isRecording ? 'Stop recording' : 'Start recording'"
+    >
+      <a-button
+        class="button"
+        size="small"
+        shape="circle"
+        type="primary"
+        :disabled="!recordButton.isReady"
+        :danger="recordButton.isRecording"
+        @click="handleRecording"
+      >
+        <CameraOutlined />
+      </a-button>
+    </a-tooltip>
   </div>
 </template>
 
 <script>
 import socket from '../../lib/websocket'
+import detection from '../../lib/detection'
 import {
   createPeerConnection,
   createAnswerAndSetLocalSDP,
@@ -58,6 +54,7 @@ export default {
   },
   setup() {
     const remoteVideoEl = ref(null)
+    const canvasEl = ref(null)
     let pc
     let recorder
     let localStream
@@ -72,6 +69,7 @@ export default {
 
     const setLogs = (log) => store.dispatch('setLogs', log)
 
+    //handle ice candidate events
     const onIceCandidate = (event) => {
       if (event.candidate) {
         setTimeout(() => {
@@ -84,13 +82,17 @@ export default {
       }
     }
 
+    // handle receive media track event
     const onTrack = (event) => {
       setLogs('Received track')
       recordButton.isReady = true
       remoteStream = event.streams[0]
       remoteVideoEl.value.srcObject = remoteStream
+      detection.setupCanvasContainer(remoteVideoEl.value, canvasEl.value)
+      detection.start(remoteVideoEl.value, canvasEl.value)
     }
 
+    // handle connection change
     const onIceConnectionStateChange = () => {
       setLogs(`ICE connection Change: ${pc.iceConnectionState}`)
       if (pc.iceConnectionState === 'disconnected') {
@@ -102,6 +104,10 @@ export default {
         recordButton.isReady = false
         remoteStream.getTracks().forEach((track) => track.stop())
         remoteVideoEl.value.srcObject = new MediaStream()
+
+        // clean stream canvas
+        detection.cleanBoundingBox(canvasEl.value)
+        detection.stopDetection()
       }
     }
 
@@ -109,6 +115,7 @@ export default {
       setLogs(`ICE gathering Change: ${pc.iceGatheringState}`)
     }
 
+    // peer connection initialization
     const initPeerConnection = () => {
       if (pc?.connectionState) {
         setLogs('Close previous peer connection')
@@ -137,6 +144,10 @@ export default {
       setLogs('Send offer')
     }
 
+    //
+    // handle record events
+    //
+
     const recordStarted = () => {
       setLogs('Start recording')
       message.success('Start recording')
@@ -157,6 +168,7 @@ export default {
 
     const recordOccurError = (event) => setLogs(event.error.name)
 
+    // screen record
     const initMediaRecorder = async () => {
       try {
         localDisplayStream = await navigator.mediaDevices.getDisplayMedia({
@@ -190,6 +202,7 @@ export default {
       initMediaRecorder()
     }
 
+    // webRTC establish workflow
     getLocalStream()
       .then((mediaStream) => {
         localStream = mediaStream
@@ -198,10 +211,16 @@ export default {
         message.error(
           `Cannot add local stream to peer by reason of ${error.message}`
         )
+        // create dummy stream
         const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
         ctx.fillRect(0, 0, canvas.width, canvas.height)
         dummyStream = canvas.captureStream()
+
+        // setup bounding box poster
+        // const streamCtx = canvasEl.value.getContext('2d')
+        // streamCtx.font = '20pt Arial'
+        // streamCtx.fillText('Waiting Stream Signal', 20, 50)
       })
       .finally(() => {
         socket.on('webrtc-topic', async (data) => {
@@ -239,6 +258,7 @@ export default {
 
     return {
       remoteVideoEl,
+      canvasEl,
       startPeerNegotiation,
       handleRecording,
       recordButton
@@ -248,35 +268,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.video__wrapper {
-  height: 100%;
-  position: relative;
+video {
+  position: absolute;
+  top: 0;
+  left: 80px;
+}
 
-  video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 15px;
-  }
+.boundingBox {
+  position: absolute;
+  top: 0;
+  left: 80px;
+  z-index: 5;
+}
 
-  .control__wrapper {
-    position: absolute;
-    top: -25px;
-    left: 5px;
-    display: flex;
-    flex-direction: row;
-    @media (min-width: 800px) {
-      top: 5px;
-      flex-direction: column;
-    }
+.control__wrapper {
+  position: absolute;
+  z-index: 10;
+  top: 5px;
+  left: 5px;
+  display: flex;
+  flex-direction: column;
 
-    .button {
-      margin-right: 2px;
-      @media (min-width: 800px) {
-        margin-right: 0;
-        margin-bottom: 2px;
-      }
-    }
+  .button {
+    margin-right: 0;
+    margin-bottom: 2px;
   }
 }
 </style>
