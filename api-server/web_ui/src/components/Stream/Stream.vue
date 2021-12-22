@@ -271,13 +271,13 @@ export default {
 video {
   position: absolute;
   top: 0;
-  left: 80px;
+  left: 0;
 }
 
 .boundingBox {
   position: absolute;
   top: 0;
-  left: 80px;
+  left: 0;
   z-index: 5;
 }
 
