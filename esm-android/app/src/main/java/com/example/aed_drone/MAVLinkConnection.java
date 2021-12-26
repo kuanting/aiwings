@@ -20,8 +20,10 @@ public class MAVLinkConnection {
     MavlinkMessage message;
     Socket socket;
     Handler mHandler;
-    Drone_Message drone_message = new Drone_Message();
 
+    String server_address = "192.168.1.100";
+    int server_port = 5762;
+    Drone_Message drone_message = new Drone_Message();
     boolean isAskingFeedback = false;
 
     public MAVLinkConnection(Handler mHandler) {
@@ -35,8 +37,7 @@ public class MAVLinkConnection {
                 try {
                     // TCP connection
                     if(connect_num == 0) {
-                        socket = new Socket("192.168.2.118", 5762);
-//                        socket = new Socket("192.168.4.1", 6789);
+                        socket = new Socket(server_address, server_port);
                         connection = MavlinkConnection.create(socket.getInputStream(), socket.getOutputStream());
                     }
                     // USB connection

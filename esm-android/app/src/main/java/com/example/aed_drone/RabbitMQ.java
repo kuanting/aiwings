@@ -1,5 +1,6 @@
 package com.example.aed_drone;
 
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
 
@@ -20,6 +21,8 @@ import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
 
+import androidx.preference.PreferenceManager;
+
 import static java.lang.Thread.sleep;
 
 public class RabbitMQ {
@@ -32,6 +35,11 @@ public class RabbitMQ {
     String routingKey_WebRTC;
     String bindingKey_WebRTC;
     String[] bindingKeys;
+
+    String broker_address = "aiotlab-drone-cloud.ga";
+    String broker_username = "guest";
+    String broker_password = "guest";
+    int broker_port = 5672;
 
     private Callback callback;
     private static Handler mHandler = MainActivity.mHandler;
@@ -54,6 +62,14 @@ public class RabbitMQ {
         };
     }
 
+    public void loadSettings(SharedPreferences prefs) {
+        broker_address = prefs.getString("broker_address", "aiotlab-drone-cloud.ga");
+        String port = prefs.getString("broker_port", "5672");
+        broker_port = Integer.valueOf(port);
+        broker_username = prefs.getString("broker_username", "aiotlab");
+        broker_password = prefs.getString("broker_password", "aiotlab208");
+    }
+
     public interface Callback {
         void onCreateRoom();
         void onPeerJoined();
@@ -64,15 +80,15 @@ public class RabbitMQ {
         void onIceCandidateReceived(JSONObject data);
     }
 
-    public void RabbitMQ_Connection() {
+    public void connect() {
         new Thread(() -> {
             if(!isConnected) {
                 ConnectionFactory factory = new ConnectionFactory();
 
-                factory.setHost("aiotlab-drone-cloud.ga");
-                factory.setPort(5672);
-                factory.setUsername("aiotlab");
-                factory.setPassword("aiotlab208");
+                factory.setHost(broker_address);
+                factory.setPort(broker_port);
+                factory.setUsername(broker_username);
+                factory.setPassword(broker_password);
                 factory.setAutomaticRecoveryEnabled(true);
                 factory.setTopologyRecoveryEnabled(false);
                 factory.setNetworkRecoveryInterval(5);

@@ -2,7 +2,9 @@ package com.example.aed_drone;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -12,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 
@@ -23,6 +26,8 @@ import android.os.Message;
 
 import android.util.Log;
 
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -88,10 +93,11 @@ public class MainActivity extends AppCompatActivity implements RabbitMQ.Callback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // Hide title
-        getSupportActionBar().hide();
         // Get Permission
         getPermission();
         // Handle USB message
@@ -113,6 +119,13 @@ public class MainActivity extends AppCompatActivity implements RabbitMQ.Callback
         // RabbitMQ
         RabbitMQ = new RabbitMQ(device_ID);
         RabbitMQ.setCallback(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     // getPermission
@@ -147,17 +160,25 @@ public class MainActivity extends AppCompatActivity implements RabbitMQ.Callback
     }
 
     // Drone Control
-    public void connect(View view){
+    public void connect_all(View view) {
+        Pixhawk_connect(view);
+        RabbitMQ_connect(view);
+        WebRTC_connect(view);
+    }
+
+    public void Pixhawk_connect(View view) {
         MAVLinkConnection.Create_Connection(Spinner_connect_type);
     }
 
     // RabbitMQ Connection
-    public void RabbitMQ_connect(View view){
-        RabbitMQ.RabbitMQ_Connection();
+    public void RabbitMQ_connect(View view) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        RabbitMQ.loadSettings(prefs);
+        RabbitMQ.connect();
     }
 
     // WebRTC Connection
-    public void WebRTC_connect(View view){
+    public void WebRTC_connect(View view) {
         onSelfJoined();
     }
 
@@ -451,6 +472,18 @@ public class MainActivity extends AppCompatActivity implements RabbitMQ.Callback
                     data.optInt("label"),
                     data.optString("candidate")
             ));
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
