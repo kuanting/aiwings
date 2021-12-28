@@ -12,7 +12,7 @@ const {
   NODE_ENV
 } = process.env;
 
-export default async () => {
+export async function connectToDatabase() {
   try {
     await createConnection({
       type: 'mysql',
@@ -28,5 +28,6 @@ export default async () => {
     logger.info('Connect to database successfully');
   } catch (error) {
     logger.error(error);
+    setTimeout(connectToDatabase, 5000);
   }
-};
+}
