@@ -1,0 +1,39 @@
+version: '3.9'
+services:
+  rabbitmq:
+    image: rabbitmq:3.9.11-management
+    restart: always
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - type: bind
+        source: ./rabbitmq.conf
+        target: /etc/rabbitmq/rabbitmq.conf
+
+  mysql:
+    image: mysql:8.0.27
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: drone_cloud
+
+  backend:
+    image: waiting33118/drone-cloud-backend
+    restart: always
+    depends_on:
+      - rabbitmq
+      - mysql
+    ports:
+      - '3080:3080'
+    env_file:
+      - ./.docker.env
+
+  sitl:
+    image: waiting33118/ardupilot-sitl
+    ports:
+      - '5762:5762'
+    tty: true
+    stdin_open: true
