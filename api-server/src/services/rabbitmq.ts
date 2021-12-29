@@ -9,7 +9,7 @@ const {
   RABBITMQ_SERVICE_PASSWORD
 } = process.env;
 
-export default async () => {
+export async function connectToRabbitmq() {
   try {
     const connection = await amqp.connect({
       protocol: 'amqp',
@@ -22,7 +22,8 @@ export default async () => {
     logger.info('Connect to Rabbitmq successfully');
   } catch (error) {
     logger.error(error);
+    setTimeout(connectToRabbitmq, 5000);
   }
-};
+}
 
 export { channel };
