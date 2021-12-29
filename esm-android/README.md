@@ -1,4 +1,8 @@
-# AED Rescue Drone Project for Android
+# AI Wings Android APP for ArduPilot
+
+This is the embedded drone control software of AI Wings, which is based on Android. The APP connects to the drone cloud via internet and communicates with ArduPilot (Pixhawk) using MAVLINK protocol. It also includes WebRTC for video streamining.  
+
+## Test APP with ArduPilot software simulator
 
 - [Build ArduPilot SITL](#A)
 - [How to use](#B)
