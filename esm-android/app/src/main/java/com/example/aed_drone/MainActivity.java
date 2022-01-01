@@ -167,6 +167,8 @@ public class MainActivity extends AppCompatActivity implements RabbitMQ.Callback
     }
 
     public void Pixhawk_connect(View view) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        MAVLinkConnection.loadSettings(prefs);
         MAVLinkConnection.Create_Connection(Spinner_connect_type);
     }
 

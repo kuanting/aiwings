@@ -1,5 +1,6 @@
 package com.example.aed_drone;
 
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Spinner;
@@ -109,5 +110,11 @@ public class MAVLinkConnection {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void loadSettings(SharedPreferences prefs) {
+        server_address = prefs.getString("sitl_address", "192.168.1.100");
+        String port = prefs.getString("sitl_port", "5762");
+        server_port = Integer.valueOf(port);
     }
 }

@@ -66,8 +66,8 @@ public class RabbitMQ {
         broker_address = prefs.getString("broker_address", "aiotlab-drone-cloud.ga");
         String port = prefs.getString("broker_port", "5672");
         broker_port = Integer.valueOf(port);
-        broker_username = prefs.getString("broker_username", "aiotlab");
-        broker_password = prefs.getString("broker_password", "aiotlab208");
+        broker_username = prefs.getString("broker_username", "guest");
+        broker_password = prefs.getString("broker_password", "guest");
     }
 
     public interface Callback {

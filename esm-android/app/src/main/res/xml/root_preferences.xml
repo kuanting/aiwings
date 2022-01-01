@@ -17,15 +17,29 @@
         <EditTextPreference
             app:key="broker_username"
             app:title="Broker username"
-            app:defaultValue="aiotlab"
+            app:defaultValue="guest"
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
             app:key="broker_password"
             app:title="Broker password"
-            app:defaultValue="aiotlab208"
+            app:defaultValue="guest"
             app:useSimpleSummaryProvider="true" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="MAVLink SITL Simulator">
+        <EditTextPreference
+            app:key="sitl_address"
+            app:title="SITL address"
+            app:defaultValue="192.168.1.100"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="sitl_port"
+            app:title="SITL port"
+            app:defaultValue="5762"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
 </PreferenceScreen>
