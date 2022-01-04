@@ -61,7 +61,7 @@ public class Drone_Command {
 
     public static void CHANGE_YAW_FUNCTION(float angle) {
         new Thread(() -> {
-            CommandLong cmd = new CommandLong.Builder().command(MavCmd.MAV_CMD_CONDITION_YAW).param1(angle).param2(1).param3(-1).build();
+            CommandLong cmd = new CommandLong.Builder().command(MavCmd.MAV_CMD_CONDITION_YAW).param1(angle).param2(45).param3(1).param4(0).build();
             MAVLinkConnection.Send(cmd);
         }).start();
     }

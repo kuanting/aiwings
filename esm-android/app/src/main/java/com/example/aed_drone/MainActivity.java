@@ -339,10 +339,10 @@ public class MainActivity extends AppCompatActivity implements RabbitMQ.Callback
         }
         else {
             // create VideoCapturer (Built-in Camera) / createCameraCapturer(true) <true for Front Camera, false for Rear Camera>
-            VideoCapturer videoCapturer = createCameraCapturer(true);
+            VideoCapturer videoCapturer = createCameraCapturer(false);
             videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
             videoCapturer.initialize(surfaceTextureHelper, getApplicationContext(), videoSource.getCapturerObserver());
-            videoCapturer.startCapture(480, 640, 30);
+            videoCapturer.startCapture(1080, 1920, 60);
         }
 
         // Create VideoTrack
