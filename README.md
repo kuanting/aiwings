@@ -27,6 +27,6 @@ The steps to create your own AIoT drone fleet are
 1. Assemble an ArduPilot-based drone. We recommend [Pixhawk AutoPilot](https://docs.px4.io/v1.9.0/en/getting_started/)
 2. Get an Android phone and install our Android control APP. Refer to our [esm-android page](/esm-android)
 3. Install our [cloud server](/api-server)
-4. Connect APP to the cloud.
+4. Connect APP to your server.
 5. Attach the phone to the drone and connect it to Pixhawk MCU
 6. Ready to fly! 
