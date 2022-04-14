@@ -22,11 +22,35 @@ AI Wings supports Microsoft AirSim, which allows users to simulate drone functti
 
 ## Getting Started
 
-The steps to create your own AIoT drone fleet are
+### Table of Contents 
+
+The major steps to create your own AIoT drone fleet are:
+
+[Drone Hardware](#hardware)  
+[Embedded Software](#software)  
+[Cloud Server](#cloud)
+
+More details of each step are in the following:
+
+### Drone Hardware
+<a name="hardware"/>
 
 1. Assemble an ArduPilot-based drone. We recommend [Pixhawk AutoPilot](https://docs.px4.io/v1.9.0/en/getting_started/)
-2. Get an Android phone and install our Android control APP. Refer to our [esm-android page](/esm-android)
-3. Install our [cloud server](/api-server)
-4. Connect APP to your server.
-5. Attach the phone to the drone and connect it to Pixhawk MCU
-6. Ready to fly! 
+
+### Embedded Software
+<a name="software"/>
+
+1. Get an Android phone and install our Android control APP. Refer to our [esm-android page](/esm-android)
+2. Connect APP to your server. (Bind your phone to the server if you are using multi-user server)
+3. Attach the phone to the drone and connect it to Pixhawk MCU
+
+
+### Cloud Server
+<a name="cloud"/>
+
+1. Install our [cloud server](/api-server). We provide docker files.
+2. Read the user's manual of Web UI (/web_ui)
+3. Check the web UI to see if the drone appears on the map
+4. Ready to fly! 
+
+This project is under active development and will be updated frequently.
