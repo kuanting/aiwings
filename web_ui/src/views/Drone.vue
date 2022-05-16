@@ -29,17 +29,20 @@ export default {
     const user = computed(() => store.getters.getUserInfo)
     const saveLogs = (log) => store.dispatch('setLogs', log)
 
+    // RabbitMQ queues establishment
     const rabbitmqInit = () => {
       saveLogs(`Websocket connected: ${socket.id}`)
       saveLogs(`Drone ID: ${user.value.droneId}`)
       socket.emit('establish-rabbitmq-connection', user.value.droneId)
     }
 
+    // Trigger RabbitMQ when the first come or refresh pages
     if (!rabbitmqIsInit.value) {
       rabbitmqInit()
       store.dispatch('setRabbitmqIsInit', true)
     }
 
+    // Websocket event listening
     socket.on('connect', () => rabbitmqInit())
     socket.on('disconnect', (reason) => {
       saveLogs(`Websocket disconnected: ${reason}`)
@@ -108,6 +111,7 @@ export default {
       }
     })
 
+    // Remove listener to prevent multiple listening
     onBeforeUnmount(() => {
       socket.off('connect')
       socket.off('disconnect')
