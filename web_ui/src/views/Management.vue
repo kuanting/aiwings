@@ -27,10 +27,13 @@ export default {
       speed: ''
     })
 
+    // Create RabbitMQ admin queues
     if (!rabbitmqAdminIsInit.value) {
       socket.emit('drone-admin')
       store.dispatch('setRabbitmqAdminIsInit', true)
     }
+
+    // Websocket event listening
     socket.on('admin-drone-topic', (data) => {
       if (data.type === 'message') {
         const {

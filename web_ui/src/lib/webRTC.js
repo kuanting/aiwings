@@ -1,4 +1,5 @@
 /**
+ * Initial peer connection instance
  * @returns {RTCPeerConnection}
  */
 export const createPeerConnection = () => {
@@ -8,6 +9,7 @@ export const createPeerConnection = () => {
 }
 
 /**
+ * Callee create answer and set as local SDP
  * @param {RTCPeerConnection} pc
  * @returns {Promise<RTCSessionDescriptionInit>} answer
  */
@@ -17,12 +19,21 @@ export const createAnswerAndSetLocalSDP = async (pc) => {
   return answer
 }
 
+/**
+ * Caller create offer and set as local SDP
+ * @param {RTCPeerConnection} pc
+ * @returns {Promise<RTCSessionDescriptionInit>} offer
+ */
 export const createOfferAndSetLocalSDP = async (pc) => {
   const offer = await pc.createOffer()
   await pc.setLocalDescription(offer)
   return offer
 }
 
+/**
+ * Get media stream
+ * @returns {Promise<MediaStream>}
+ */
 export const getLocalStream = () => {
   return navigator.mediaDevices.getUserMedia({
     video: {

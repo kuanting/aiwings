@@ -6,10 +6,13 @@ import auth from '../services/auth'
 import user from '../services/user'
 import store from '../store'
 
+// refresh token timer
 let intervalTimer
 const refreshToken = () => {
   return setInterval(async () => await auth.refreshToken(), 4 * 60000)
 }
+
+// Clean state funtion for logout
 const cleanState = async () => {
   await auth.logout()
   clearInterval(intervalTimer)
@@ -39,6 +42,7 @@ const cleanState = async () => {
   store.dispatch('clearLogs')
 }
 
+// Page routes list
 const routes = [
   {
     path: '/',
@@ -95,6 +99,9 @@ const router = createRouter({
   routes
 })
 
+/**
+ * Router guard
+ */
 const whiteListRoute = ['/signup']
 const isAuth = computed(() => store.getters.getIsAuth)
 
