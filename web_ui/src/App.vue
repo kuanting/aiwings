@@ -1,3 +1,4 @@
+<!-- Root App -->
 <template>
   <Header />
   <main>
