@@ -1,3 +1,9 @@
+/**
+ * Auth APIs
+ *
+ * - User info
+ * - Edit drone ID
+ */
 import axios from '../lib/axios'
 
 export default {
