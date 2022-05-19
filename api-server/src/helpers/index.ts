@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 const SECRET = process.env.JWT_TOKEN_SECRET || '';
 
@@ -23,13 +23,16 @@ const signJwtToken = (
   });
 };
 
-const verifyJwtToken = (token: string): Promise<JwtPayload> => {
-  return new Promise((resolve, reject) => {
+const verifyJwtToken = (token: string) => {
+  return new Promise((resolve, reject) =>
     jwt.verify(token, SECRET, (err, payload) => {
-      if (err) reject(err);
-      if (payload) resolve(payload);
-    });
-  });
+      if (err) {
+        reject('');
+        return;
+      }
+      resolve(payload);
+    })
+  );
 };
 
 export { encryptPlaintext, compareEncryption, signJwtToken, verifyJwtToken };
