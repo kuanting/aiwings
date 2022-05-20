@@ -11,6 +11,7 @@ const RABBITMQ = {
 };
 
 export default () => {
+  // When establish connection
   io.on('connection', (socket: Socket) => {
     logger.info(`Websocket connected: ${socket.id}`);
     let droneId: string;
@@ -18,20 +19,25 @@ export default () => {
     let consumers: Replies.Consume[] = [];
     let adminQueue: Replies.AssertQueue;
 
+    // Inital RabbitMQ
     socket.on('establish-rabbitmq-connection', async (receiveId: string) => {
       droneId = receiveId;
       try {
+        // 1. Create exchange
         await channel.assertExchange(
           RABBITMQ.EXCHANGE_NAME,
           RABBITMQ.EXCHANGE_TYPE,
           { durable: false }
         );
-
+        // 2. Create topic queue
         await assertTopicQueue();
+        // 3. Bind topic queue (phone)
         await bindTopicQueue();
+        // 4. Started to recieved message
         await consumeTopicQueue();
 
         queues.forEach((queue) => {
+          // Telling frontend that queues have been created
           socket.emit('queue-created', queue.queue);
         });
       } catch (error) {
@@ -80,6 +86,7 @@ export default () => {
       }
     });
 
+    // For management used
     socket.on('drone-admin', async () => {
       try {
         adminQueue = await channel.assertQueue('admin-drone', {
@@ -109,6 +116,7 @@ export default () => {
       }
     });
 
+    // Drone-related
     socket.on('send-drone', (command: Command) => {
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
@@ -117,6 +125,7 @@ export default () => {
       );
     });
 
+    // WebRTC-related
     socket.on('send-webrtc', (data) => {
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
@@ -125,6 +134,7 @@ export default () => {
       );
     });
 
+    // Terminate receiving message
     socket.on('cancel-consume', async () => {
       try {
         if (consumers.length) {
@@ -138,6 +148,7 @@ export default () => {
       }
     });
 
+    // Handle WebSocket disconnect
     socket.on('disconnect', async (reason) => {
       logger.info(`Websocket disconnected:${socket.id} Reason:${reason}`);
       try {
