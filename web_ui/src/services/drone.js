@@ -1,3 +1,10 @@
+/**
+ * Drone record APIs
+ *
+ * - Save flight record
+ * - Get flight records
+ * - Get specific flight mission record
+ */
 import axios from '../lib/axios'
 
 export default {

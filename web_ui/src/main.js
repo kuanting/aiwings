@@ -1,3 +1,9 @@
+/**
+ * Entry point
+ *
+ * - Mount third-party UI component
+ * - Register vue-router, vuex
+ */
 import { createApp } from 'vue'
 import App from './App.vue'
 import './registerServiceWorker'

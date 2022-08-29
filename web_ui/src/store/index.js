@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 import drone from './drone'
 
+// Global states
 export default createStore({
   state: {
     logs: [],
@@ -81,6 +82,7 @@ export default createStore({
     }
   },
   modules: {
+    // Dedicate modules for drone-related
     drone
   }
 })

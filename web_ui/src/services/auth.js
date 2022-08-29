@@ -1,3 +1,11 @@
+/**
+ * Auth APIs
+ *
+ * - Sign up
+ * - Sign in
+ * - Refresh token (every 4 minutes)
+ * - Log out
+ */
 import axios from '../lib/axios'
 
 export default {

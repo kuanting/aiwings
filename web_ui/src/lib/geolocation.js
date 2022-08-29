@@ -1,4 +1,5 @@
 /**
+ * Get user's current geolocation
  * @returns {Promise<[number,number]}
  */
 export const getUserCurrentLocation = () => {

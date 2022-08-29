@@ -5,7 +5,7 @@ import * as cocoSsd from '@tensorflow-models/coco-ssd'
 let requestAnimationId
 
 /**
- *
+ * Object detection canvas initialization
  * @param {HTMLVideoElement} video
  * @param {HTMLCanvasElement} canvas
  */
@@ -21,6 +21,11 @@ const setupCanvasContainer = (video, canvas) => {
   })
 }
 
+/**
+ * Load model and started to draw bounding boxes
+ * @param {HTMLVideoElement} video
+ * @param {HTMLCanvasElement} canvas
+ */
 const start = async (video, canvas) => {
   const model = await cocoSsd.load({ base: 'mobilenet_v2' })
   requestAnimationId = window.requestAnimationFrame(
@@ -54,7 +59,7 @@ const drawBoundingBox = async (detections, canvas) => {
 }
 
 /**
- *
+ * Clean canvas
  * @param {HTMLCanvasElement} canvas
  */
 const cleanBoundingBox = (canvas) => {
