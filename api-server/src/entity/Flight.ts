@@ -3,24 +3,24 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm';
-import { User } from './User';
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity({ name: 'Flight' })
+import { Drone } from "./Drone";
+@Entity({ name: "Flight" })
 export class Flight {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: "json", nullable: true })
   record!: string;
 
-  @ManyToOne(() => User, (user) => user.flights, { cascade: true })
-  user!: User;
+  @ManyToOne(() => Drone, (drone) => drone.flights, { cascade: true })
+  drone!: Drone;
 
   @UpdateDateColumn({
-    name: 'update_timestamp',
-    type: 'datetime'
+    name: "update_timestamp",
+    type: "datetime",
   })
   update!: Date;
 }
