@@ -2,7 +2,6 @@ export interface SignupField {
   email: string;
   password: string;
   checkPassword: string;
-  droneId: string;
 }
 
 export interface LoginField {

@@ -1,36 +1,35 @@
-import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
-import { User } from '../entity/User';
-import { compareEncryption, encryptPlaintext, signJwtToken } from '../helpers';
-import { LoginField, SignupField } from '../types';
-import { logger } from '../server';
+import { Request, Response } from "express";
+import { getRepository } from "typeorm";
+import { User } from "../entity/User";
+import { compareEncryption, encryptPlaintext, signJwtToken } from "../helpers";
+import { LoginField, SignupField } from "../types";
+import { logger } from "../server";
 
 export default {
   /**
    * User signup
    */
   async signup(req: Request, res: Response) {
-    const { email, password, checkPassword, droneId }: SignupField = req.body;
+    const { email, password, checkPassword }: SignupField = req.body;
 
     if (
-      email.trim() === '' ||
-      password.trim() === '' ||
-      checkPassword.trim() === '' ||
-      droneId.trim() === ''
+      email.trim() === "" ||
+      password.trim() === "" ||
+      checkPassword.trim() === ""
     ) {
-      res.status(400).json({ msg: 'Required field is empty' });
+      res.status(400).json({ msg: "Required field is empty" });
       return;
     }
 
     if (password !== checkPassword) {
-      res.status(400).json({ msg: 'Password & check password not match' });
+      res.status(400).json({ msg: "Password & check password not match" });
       return;
     }
 
     if (password.length < 8) {
       res
         .status(400)
-        .json({ msg: 'Password must equal or longer than 8 character' });
+        .json({ msg: "Password must equal or longer than 8 character" });
       return;
     }
 
@@ -38,7 +37,7 @@ export default {
       const userRepo = getRepository(User);
       const user = await userRepo.findOne({ where: { email } });
       if (user) {
-        res.status(400).json({ msg: 'Email exist' });
+        res.status(400).json({ msg: "Email exist" });
         return;
       }
 
@@ -46,13 +45,12 @@ export default {
       const newUser = userRepo.create({
         email,
         password: encryptPassword,
-        droneId
       });
       await userRepo.save(newUser);
-      res.status(201).json({ msg: 'User created' });
+      res.status(201).json({ msg: "User created" });
     } catch (error) {
       logger.error(error);
-      res.status(500).json({ msg: 'Internal server error' });
+      res.status(500).json({ msg: "Internal server error" });
     }
   },
 
@@ -62,8 +60,8 @@ export default {
   async login(req: Request, res: Response) {
     const { email, password }: LoginField = req.body;
 
-    if (email.trim() === '' || password.trim() === '') {
-      res.status(400).json({ msg: 'Required field is empty' });
+    if (email.trim() === "" || password.trim() === "") {
+      res.status(400).json({ msg: "Required field is empty" });
       return;
     }
 
@@ -71,35 +69,35 @@ export default {
       const userRepo = getRepository(User);
       const user = await userRepo.findOne({ where: { email } });
       if (!user) {
-        res.status(401).json({ msg: 'Account not found' });
+        res.status(401).json({ msg: "Account not found" });
         return;
       }
 
       if (!(await compareEncryption(password, user.password))) {
-        res.status(401).json({ msg: 'Invalid password ' });
+        res.status(401).json({ msg: "Invalid password " });
         return;
       }
 
-      const accessToken = await signJwtToken('5m', { uuid: user.id });
-      const refreshToken = await signJwtToken('30d', { uuid: user.id });
+      const accessToken = await signJwtToken("5m", { uuid: user.id });
+      const refreshToken = await signJwtToken("30d", { uuid: user.id });
 
       res
-        .cookie('access_token', accessToken, {
+        .cookie("access_token", accessToken, {
           httpOnly: true,
           maxAge: 1000 * 60 * 5,
-          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-          secure: process.env.NODE_ENV === 'production'
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          secure: process.env.NODE_ENV === "production",
         })
-        .cookie('refresh_token', refreshToken, {
+        .cookie("refresh_token", refreshToken, {
           httpOnly: true,
           maxAge: 1000 * 60 * 60 * 24 * 7,
-          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-          secure: process.env.NODE_ENV === 'production'
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          secure: process.env.NODE_ENV === "production",
         })
-        .json({ msg: 'User login' });
+        .json({ msg: "User login" });
     } catch (error) {
       logger.error(error);
-      res.status(500).json({ msg: 'Internal server error' });
+      res.status(500).json({ msg: "Internal server error" });
     }
   },
 
@@ -108,13 +106,13 @@ export default {
    */
   refreshToken(req: Request, res: Response) {
     res
-      .cookie('access_token', res.locals.accessToken, {
+      .cookie("access_token", res.locals.accessToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 5,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        secure: process.env.NODE_ENV === 'production'
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        secure: process.env.NODE_ENV === "production",
       })
-      .json({ msg: 'refreshed' });
+      .json({ msg: "refreshed" });
   },
 
   /**
@@ -122,16 +120,16 @@ export default {
    */
   logout(req: Request, res: Response) {
     res
-      .clearCookie('access_token', {
+      .clearCookie("access_token", {
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        secure: process.env.NODE_ENV === 'production'
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        secure: process.env.NODE_ENV === "production",
       })
-      .clearCookie('refresh_token', {
+      .clearCookie("refresh_token", {
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        secure: process.env.NODE_ENV === 'production'
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        secure: process.env.NODE_ENV === "production",
       })
-      .send('logout');
-  }
+      .send("logout");
+  },
 };
