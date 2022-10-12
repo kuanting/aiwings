@@ -2,7 +2,7 @@ import mapboxgl from 'mapbox-gl'
 
 const MAPBOX = {
   STYLE: 'mapbox://styles/waiting33118/ckdfkx3t10k9w1irkp8anuy39',
-  TOKEN: process.env.VUE_APP_MAPBOX_TOKEN
+  TOKEN: import.meta.env.VUE_APP_MAPBOX_TOKEN
 }
 export default class CustomMap {
   constructor({ longitude, latitude }) {

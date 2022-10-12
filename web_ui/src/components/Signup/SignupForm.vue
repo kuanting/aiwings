@@ -16,13 +16,13 @@
         placeholder="email"
       />
     </a-form-item>
-    <a-form-item label="Drone ID" name="droneId">
+    <!-- <a-form-item label="Drone ID" name="droneId">
       <a-input
         v-model:value="formState.droneId"
         type="text"
         placeholder="Drone ID"
       />
-    </a-form-item>
+    </a-form-item> -->
     <a-form-item required has-feedback label="Password" name="password">
       <a-input-password
         v-model:value="formState.password"
@@ -73,7 +73,6 @@ export default {
     const isSubmmited = ref(false)
     const formState = reactive({
       email: '',
-      droneId: '',
       password: '',
       checkPassword: ''
     })
@@ -83,7 +82,6 @@ export default {
       return (
         formState.email === '' ||
         !formState.email.includes('@') ||
-        formState.droneId === '' ||
         formState.password === '' ||
         formState.password.length < 8 ||
         formState.checkPassword === '' ||
@@ -127,13 +125,6 @@ export default {
 
     const rules = {
       email: [{ validator: validateEmail, trigger: ['change', 'blur'] }],
-      droneId: [
-        {
-          required: true,
-          message: 'Please input drone ID',
-          trigger: ['change', 'blur']
-        }
-      ],
       password: [
         {
           validator: validatePassword,
@@ -152,6 +143,8 @@ export default {
       isSubmmited.value = true
       try {
         const { data } = await auth.signup(formData)
+        //FIX
+        console.log('singupform: ', data)
         notification.success({
           message: data.msg
         })

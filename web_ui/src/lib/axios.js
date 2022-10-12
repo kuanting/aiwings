@@ -2,9 +2,9 @@ import axios from 'axios'
 import { notification } from 'ant-design-vue'
 
 axios.defaults.baseURL =
-  process.env.NODE_ENV === 'production'
+  import.meta.env.NODE_ENV === 'production'
     ? 'https://ai-wings.ga:30110/api/v1'
-    : `${process.env.VUE_APP_BACKEND_SERVICE_PROTOCOL}://${process.env.VUE_APP_BACKEND_SERVICE_SERVICE_HOST}:${process.env.VUE_APP_BACKEND_SERVICE_SERVICE_PORT}/api/v1`
+    : `${import.meta.env.VUE_APP_BACKEND_SERVICE_PROTOCOL}://${import.meta.env.VUE_APP_BACKEND_SERVICE_SERVICE_HOST}:${import.meta.env.VUE_APP_BACKEND_SERVICE_SERVICE_PORT}/api/v1`
 axios.defaults.withCredentials = true
 
 axios.interceptors.response.use(
