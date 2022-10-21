@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import { User } from '../entity/User';
+import { connectToDatabase as db } from '../services/database';
 import { logger } from '../server';
 import { EditIDPayload } from '../types';
 
@@ -10,8 +11,15 @@ export default {
    */
   async getUserInfo(req: Request, res: Response) {
     try {
-      const userRepo = getRepository(User);
-      const user = await userRepo.findOne({ where: { id: res.locals.uuid } });
+      //FIXME
+      // const userRepo = getRepository(User);
+      // const user = await userRepo.findOne({ where: { id: res.locals.uuid } });
+      const q = 'SELECT * FROM users'
+      const user = db.query(q, function(err: any, results: any){
+        if (err) throw err;
+        console.log(results);
+        res.send(results)
+      });
       if (user) {
         res
           .cookie('access_token', res.locals.accessToken, {
@@ -22,7 +30,7 @@ export default {
           })
           .json({
             email: user.email,
-            droneId: user.droneId,
+            // droneId: user.droneId,
             isAdmin: user.isAdmin
           });
       }
@@ -38,6 +46,7 @@ export default {
   async editUserDroneId(req: Request, res: Response) {
     const { droneId }: EditIDPayload = req.body;
     try {
+      //FIXME
       const userRepo = getRepository(User);
       const user = await userRepo.findOne({ where: { id: res.locals.uuid } });
       await userRepo.save({
@@ -51,3 +60,5 @@ export default {
     }
   }
 };
+
+

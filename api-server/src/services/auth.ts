@@ -11,6 +11,7 @@ export default {
    */
   async signup(req: Request, res: Response) {
     const { email, password, checkPassword }: SignupField = req.body;
+    console.log(email, password, checkPassword);
 
     if (
       email.trim() === "" ||

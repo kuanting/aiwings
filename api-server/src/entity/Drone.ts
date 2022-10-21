@@ -10,6 +10,6 @@ export class Drone {
   @ManyToOne(() => User, (user) => user.drones)
   user!: User;
 
-  @OneToMany(() => Flight, (flight) => flight.drone)
-  flights!: Flight[];
+  // @OneToMany(() => Flight, (flight) => flight.drone)
+  // flights!: Flight[];
 }

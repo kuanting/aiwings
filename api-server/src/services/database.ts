@@ -1,34 +1,32 @@
 import "reflect-metadata";
-import { createConnection } from "typeorm";
-import { Flight } from "../entity/Flight";
-import { User } from "../entity/User";
-import { Drone } from "../entity/Drone";
 import { logger } from "../server";
+const mysql = require('mysql');
 
 const {
   MYSQL_SERVICE_SERVICE_HOST,
   MYSQL_SERVICE_SERVICE_PORT = "3306",
   MYSQL_SERVICE_USER,
   MYSQL_SERVICE_PASSWORD,
-  NODE_ENV,
 } = process.env;
+
+// CREATE TABLE drones( id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, user_id INT NOT NULL,  FOREIGN KEY(user_id) REFERENCES user(id));
+// CREATE TABLE drones(   id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, user_id INT NOT NULL, drone_id VARCHAR(100) , FOREIGN KEY(user_id) REFERENCES user(id));
+
 
 export async function connectToDatabase() {
   try {
-    await createConnection({
-      type: "mysql",
+    let db = await mysql.createConnection({
       host: MYSQL_SERVICE_SERVICE_HOST,
       port: +MYSQL_SERVICE_SERVICE_PORT,
-      username: MYSQL_SERVICE_USER,
+      user: MYSQL_SERVICE_USER,
       password: MYSQL_SERVICE_PASSWORD,
-      database: "drone_cloud",
-      entities: [User, Drone, Flight],
-      synchronize: NODE_ENV !== "production",
-      logging: process.env.NODE_ENV === "production" ? false : "all",
+      database: "drone_cloud_test",
     });
-    logger.info("Connect to database successfully");
-  } catch (error) {
-    logger.error(error);
+    logger.info("Connect to database successfully!");
+    return db;
+  } catch (err) {
+    logger.error(err);
     setTimeout(connectToDatabase, 5000);
   }
 }
+

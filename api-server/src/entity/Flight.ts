@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-import { Drone } from "./Drone";
+// import { Drone } from "./Drone";
 @Entity({ name: "Flight" })
 export class Flight {
   @PrimaryGeneratedColumn()
@@ -15,8 +15,8 @@ export class Flight {
   @Column({ type: "json", nullable: true })
   record!: string;
 
-  @ManyToOne(() => Drone, (drone) => drone.flights, { cascade: true })
-  drone!: Drone;
+  // @ManyToOne(() => Drone, (drone) => drone.flights, { cascade: true })
+  // drone!: Drone;
 
   @UpdateDateColumn({
     name: "update_timestamp",
