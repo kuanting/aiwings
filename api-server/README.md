@@ -26,8 +26,8 @@
 ## Production Cloud Infrastructure
 ![infra](docs/images/backend%20architecture.png)
 
-- Infra as a Service(IaaS)
-  - Google Coompute Engine (Ubuntu 20.04)
+- Infrastructure as a Service(IaaS)
+  - Google Compute Engine (Ubuntu 20.04)
 - Platform as a Service (PaaS)
   - Cloud SQL (MySQL)
 - Container Orchestration Platform
@@ -35,7 +35,7 @@
     ![kubectl](docs/images/kubectl.png)
 - Message Broker
   - RabbitMQ AMQP server
-## Gihub Action CI/CD pipeline
+## Github Action CI/CD pipeline
 ![cicd](docs/images/cicd%20pipeline.png)
 
 ## Multi-drone Simulation
@@ -46,7 +46,7 @@ docker run -p 5671:5672 -it --name sitl_1 waiting33118/ardupilot-sitl  # 1st
 docker run -p 5672:5672 -it --name sitl_2 waiting33118/ardupilot-sitl  # 2nd
 docker run -p 5673:5672 -it --name sitl_3 waiting33118/ardupilot-sitl  # 3rd
 ```
-After enter the terminal, execute the script
+After entering the terminal, execute the script
 ```bash
 ./start
 ```
@@ -65,7 +65,6 @@ After enter the terminal, execute the script
 1. MySQL server ([Install locally](https://dev.mysql.com/downloads/)/ [Docker Image](https://hub.docker.com/_/mysql))
 1. RabbitMQ server ([Install locally](https://www.rabbitmq.com/download.html)/[Docker Image](https://hub.docker.com/_/rabbitmq))
 
-> Recommend to install locally for more stable
 ## Install dependencies
 
 ```bash
