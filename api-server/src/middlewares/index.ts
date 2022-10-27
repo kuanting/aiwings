@@ -1,16 +1,18 @@
-import { Request, Response, NextFunction } from 'express';
-import { signJwtToken, verifyJwtToken } from '../helpers';
-import { CookiePayload, TokenPayload } from '../types';
+import { Request, Response, NextFunction } from "express";
+import { signJwtToken, verifyJwtToken } from "../helpers";
+import { CookiePayload, TokenPayload } from "../types";
 
 const renewTokenAndPassToNext = async (
   res: Response,
   next: NextFunction,
   token: string
 ) => {
+  // console.log("middlewares/index-> res, token", res, token);
   const { uuid } = (await verifyJwtToken(token)) as TokenPayload;
-  const accessToken = await signJwtToken('5m', { uuid });
+  const accessToken = await signJwtToken("5m", { uuid });
   res.locals.uuid = uuid;
   res.locals.accessToken = accessToken;
+  // console.log("uuid: ", res.locals.uuid);
   next();
 };
 
@@ -26,7 +28,7 @@ export const verifyTokens = async (
     try {
       await renewTokenAndPassToNext(res, next, refresh_token);
     } catch (error) {
-      res.status(401).json({ msg: 'Unauthorize, Please login' });
+      res.status(401).json({ msg: "Unauthorize, Please login" });
     }
   }
 };

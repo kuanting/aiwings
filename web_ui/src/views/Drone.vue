@@ -32,6 +32,8 @@ export default {
     // RabbitMQ queues establishment
     const rabbitmqInit = () => {
       saveLogs(`Websocket connected: ${socket.id}`)
+
+      //FIXME
       saveLogs(`Drone ID: ${user.value.droneId}`)
       socket.emit('establish-rabbitmq-connection', user.value.droneId)
     }
@@ -153,7 +155,7 @@ export default {
   .stream {
     position: relative;
     visibility: hidden;
-    background-image: url('~@/assets/live-stream.png');
+    background-image: url('../assets/live-stream.png');
     background-size: cover;
     @media (min-width: 800px) {
       visibility: visible;

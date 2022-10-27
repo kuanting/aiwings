@@ -1,6 +1,5 @@
-import { Request, Response } from "express";
-import { getRepository } from "typeorm";
-import { User } from "../entity/User";
+import e, { Request, Response } from "express";
+import { connectToDatabase as db } from "../services/database";
 import { compareEncryption, encryptPlaintext, signJwtToken } from "../helpers";
 import { LoginField, SignupField } from "../types";
 import { logger } from "../server";
@@ -11,7 +10,8 @@ export default {
    */
   async signup(req: Request, res: Response) {
     const { email, password, checkPassword }: SignupField = req.body;
-    console.log(email, password, checkPassword);
+    console.log(req.body);
+    // console.log(email, password, checkPassword);
 
     if (
       email.trim() === "" ||
@@ -33,22 +33,29 @@ export default {
         .json({ msg: "Password must equal or longer than 8 character" });
       return;
     }
-
     try {
-      const userRepo = getRepository(User);
-      const user = await userRepo.findOne({ where: { email } });
-      if (user) {
-        res.status(400).json({ msg: "Email exist" });
-        return;
-      }
+      let conn = await db();
+      const findEmail = "SELECT email FROM user WHERE email=?";
+      conn.query(findEmail, [email], function (err: any, results: any) {
+        if (err) throw err;
+        //if entered email is existed
+        if (results.length > 0) {
+          res.status(400).json({ msg: "Email exist" });
+          return;
+        }
+      });
 
       const encryptPassword = await encryptPlaintext(password);
-      const newUser = userRepo.create({
-        email,
-        password: encryptPassword,
-      });
-      await userRepo.save(newUser);
-      res.status(201).json({ msg: "User created" });
+      let insertNewUser = "INSERT INTO user(email, password) VALUES(?, ?);";
+      conn.query(
+        insertNewUser,
+        [email, encryptPassword],
+        function (err: any, results: any) {
+          if (err) throw err;
+          console.log(results);
+          res.status(201).json({ msg: "User created" });
+        }
+      );
     } catch (error) {
       logger.error(error);
       res.status(500).json({ msg: "Internal server error" });
@@ -58,6 +65,7 @@ export default {
   /**
    * User login
    */
+
   async login(req: Request, res: Response) {
     const { email, password }: LoginField = req.body;
 
@@ -67,21 +75,80 @@ export default {
     }
 
     try {
-      const userRepo = getRepository(User);
-      const user = await userRepo.findOne({ where: { email } });
-      if (!user) {
-        res.status(401).json({ msg: "Account not found" });
-        return;
-      }
+      //FIXME
+      let conn = await db();
 
+      // const findUser = "SELECT id, email, password FROM user WHERE email=?";
+
+      //ORIGIN IN MYSQL DOC
+
+      // conn.query(findUser, [email], function (err: any, results: any) {
+      //   if (err) throw err;
+      //   //if entered email is not existed
+      //   if (results.length === 0) {
+      //     res.status(401).json({ msg: "Account not found" });
+      //     return;
+      //   }
+      //   console.log(results);
+      // });
+
+      //use primise to get password from SQL-select
+      const select_user = async function () {
+        return new Promise(function (resolve, reject) {
+          let sql = "SELECT id, email, password FROM user WHERE email=?";
+          conn.query(sql, [email], function (err: any, result: any) {
+            if (err) {
+              reject(err);
+              return;
+            }
+            // console.log("promise: ", result);
+            let dataSTring = JSON.stringify(result);
+            let data = JSON.parse(dataSTring);
+            // console.log("data", data);
+            resolve(data[0]);
+            return;
+          });
+        });
+      };
+
+      const user: any = await select_user();
       if (!(await compareEncryption(password, user.password))) {
         res.status(401).json({ msg: "Invalid password " });
         return;
       }
 
+      //SEELCT DRONEID is enrolled or not
+      const select_drone = async function () {
+        return new Promise(function (resolve, reject) {
+          let sql =
+            "SELECT drone_id from user, drones WHERE user_id = user.id;";
+          conn.query(sql, [email], function (err: any, result: any) {
+            if (err) {
+              reject(err);
+              return;
+            }
+            // console.log("promise: ", result);
+
+            let dataSTring = JSON.stringify(result);
+            let data = JSON.parse(dataSTring);
+            resolve(data[0]);
+            return;
+          });
+        });
+      };
+      let drone: any = await select_drone();
+
+      if (drone === undefined) {
+        drone = false;
+        console.log(drone);
+      } else {
+        drone = true;
+        console.log(drone);
+      }
+
       const accessToken = await signJwtToken("5m", { uuid: user.id });
       const refreshToken = await signJwtToken("30d", { uuid: user.id });
-
+      // console.log(accessToken, refreshToken);
       res
         .cookie("access_token", accessToken, {
           httpOnly: true,
@@ -95,7 +162,7 @@ export default {
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           secure: process.env.NODE_ENV === "production",
         })
-        .json({ msg: "User login" });
+        .json({ msg: "User login", isEnrolled: drone });
     } catch (error) {
       logger.error(error);
       res.status(500).json({ msg: "Internal server error" });

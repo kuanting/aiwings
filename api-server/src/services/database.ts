@@ -1,17 +1,17 @@
 import "reflect-metadata";
 import { logger } from "../server";
-const mysql = require('mysql');
+const mysql = require("mysql");
 
 const {
   MYSQL_SERVICE_SERVICE_HOST,
   MYSQL_SERVICE_SERVICE_PORT = "3306",
   MYSQL_SERVICE_USER,
   MYSQL_SERVICE_PASSWORD,
+  NODE_ENV,
 } = process.env;
 
-// CREATE TABLE drones( id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, user_id INT NOT NULL,  FOREIGN KEY(user_id) REFERENCES user(id));
-// CREATE TABLE drones(   id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, user_id INT NOT NULL, drone_id VARCHAR(100) , FOREIGN KEY(user_id) REFERENCES user(id));
-
+// CREATE TABLE drones(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, user_id INT NOT NULL, drone_id VARCHAR(100) , FOREIGN KEY(user_id) REFERENCES user(id));
+// CREATE TABLE user(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL,drone_id INT);
 
 export async function connectToDatabase() {
   try {
@@ -29,4 +29,3 @@ export async function connectToDatabase() {
     setTimeout(connectToDatabase, 5000);
   }
 }
-

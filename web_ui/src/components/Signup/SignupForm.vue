@@ -139,8 +139,9 @@ export default {
       ]
     }
 
-    const submitFromHandler = async (formData) => {
+    const submitFromHandler = async function (formData) {
       isSubmmited.value = true
+      // console.log(formData)
       try {
         const { data } = await auth.signup(formData)
         //FIX

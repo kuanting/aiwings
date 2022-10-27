@@ -78,6 +78,11 @@ const routes = [
     }
   },
   {
+    path: '/enroll',
+    name: 'Enroll',
+    component: () => import('../views/Enroll.vue')
+  },
+  {
     path: '/account',
     name: 'Account',
     component: () => import('../views/Account.vue')
