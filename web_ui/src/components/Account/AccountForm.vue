@@ -36,6 +36,7 @@
         :click-handler="handleDroneIdEditCancel"
       />
     </div>
+    <button class="drone_add" html-type="button">ADD DRONEID</button>
   </div>
 </template>
 
@@ -125,6 +126,10 @@ export default {
     .droneId__button {
       margin-left: 5px;
     }
+  }
+
+  .drone_add {
+    margin-top: 10px;
   }
 }
 </style>

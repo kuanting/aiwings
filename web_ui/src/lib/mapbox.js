@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl'
 
 const MAPBOX = {
-  STYLE: 'mapbox://styles/waiting33118/ckdfkx3t10k9w1irkp8anuy39',
+  STYLE: 'mapbox://styles/lcylcy66666/cl9s2rfhi000b14o5la6bm1q7',
   TOKEN: import.meta.env.VITE_APP_MAPBOX_TOKEN
 }
 export default class CustomMap {

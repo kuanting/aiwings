@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
-import { User } from "../entity/User";
 import { connectToDatabase as db } from "../services/database";
 import { logger } from "../server";
 import { EditIDPayload } from "../types";
@@ -78,12 +76,36 @@ export default {
     try {
       //FIXME
       //add select here
-      const userRepo = getRepository(User);
-      const user = await userRepo.findOne({ where: { id: res.locals.uuid } });
-      await userRepo.save({
-        ...user,
-        droneId,
-      });
+      // const userRepo = getRepository(User);
+      // const user = await userRepo.findOne({ where: { id: res.locals.uuid } });
+
+      //MYSQL
+      const update_droneID = async function () {
+        let conn = await db();
+        return new Promise(function (resolve, reject) {
+          // console.log(res.locals.uuid);
+          let sql =
+            " UPDATE drones SET drones.drone_id = ? WHERE drones.user_id = (SELECT id FROM user WHERE id = ?);";
+          conn.query(
+            sql,
+            [droneId, res.locals.uuid],
+            function (err: any, result: any) {
+              if (err) {
+                reject(err);
+                console.log('[ERROR IN update_droneID]')
+                return;
+              }
+              let dataSTring = JSON.stringify(result);
+              let data = JSON.parse(dataSTring);
+              resolve(data[0]);
+              return;
+            }
+          );
+        });
+      };
+
+      await update_droneID();
+
       res.json({ msg: "Drone ID updated" });
     } catch (error) {
       logger.error(error);
