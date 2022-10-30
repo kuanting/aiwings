@@ -1,5 +1,3 @@
-//enroll view
-
 <template>
   <div class="container">
     <Enroll />
@@ -7,9 +5,9 @@
 </template>
 
 <script>
-import Enroll from'../components/Enroll_drones/Enroll.vue'
+import Enroll from '../components/Enroll_drones/Enroll.vue'
 export default {
-  name: 'Login',
+  name: 'enroll',
   components: { Enroll }
 }
 </script>
@@ -17,7 +15,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 10px);
   display: flex;
   justify-content: center;
   align-items: center;

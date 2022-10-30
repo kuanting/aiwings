@@ -83,7 +83,6 @@ export default {
       const update_droneID = async function () {
         let conn = await db();
         return new Promise(function (resolve, reject) {
-          // console.log(res.locals.uuid);
           let sql =
             " UPDATE drones SET drones.drone_id = ? WHERE drones.user_id = (SELECT id FROM user WHERE id = ?);";
           conn.query(
@@ -92,7 +91,7 @@ export default {
             function (err: any, result: any) {
               if (err) {
                 reject(err);
-                console.log('[ERROR IN update_droneID]')
+                console.log("[ERROR IN update_droneID]");
                 return;
               }
               let dataSTring = JSON.stringify(result);
@@ -105,11 +104,16 @@ export default {
       };
 
       await update_droneID();
-
       res.json({ msg: "Drone ID updated" });
     } catch (error) {
       logger.error(error);
       res.status(500).json({ msg: "Internal server error" });
     }
+  },
+
+  //New feature: Add new drones
+  async addNewDrone(req: Request, res: Response) {
+    const { droneId }: EditIDPayload = req.body;
+    console.log(droneId);
   },
 };
