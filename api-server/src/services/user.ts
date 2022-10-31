@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { connectToDatabase as db } from "../services/database";
 import { logger } from "../server";
-import { EditIDPayload } from "../types";
+import { AddIDPayload, EditIDPayload } from "../types";
 
 export default {
   /**
@@ -56,6 +56,8 @@ export default {
           })
           .json({
             email: user.email,
+            //FIXME
+            //user table裡面沒有droneID，這邊要改
             // droneId: user.droneId,
             isAdmin: user.isAdmin,
           });
@@ -113,7 +115,39 @@ export default {
 
   //New feature: Add new drones
   async addNewDrone(req: Request, res: Response) {
-    const { droneId }: EditIDPayload = req.body;
-    console.log(droneId);
+    const { droneId }: AddIDPayload = req.body;
+    try {
+      //preprocessor
+      let insertData: string[][] = [];
+      droneId.forEach((element: string) => {
+        let tmp = [res.locals.uuid, element];
+        insertData.push(tmp);
+      });
+      
+      //MySQL
+      const enroll_droneId = async function () {
+        let conn = await db();
+        return new Promise(function (resolve, reject) {
+          let sql = " INSERT INTO drones(user_id, drone_id) VALUES ?;";
+          conn.query(sql, [insertData], function (err: any, result: any) {
+            if (err) {
+              reject(err);
+              console.log("[ERROR IN add_droneID]");
+              return;
+            }
+            let dataSTring = JSON.stringify(result);
+            let data = JSON.parse(dataSTring);
+            resolve(data[0]);
+            return;
+          });
+        });
+      };
+
+      await enroll_droneId();
+      res.json({ msg: "Drone ID added!" });
+    } catch (error) {
+      logger.error(error);
+      res.status(500).json({ msg: "Internal server error" });
+    }
   },
 };

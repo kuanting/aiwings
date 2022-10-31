@@ -21,3 +21,7 @@ export interface CookiePayload {
 export interface EditIDPayload {
   droneId: string;
 }
+
+export interface AddIDPayload {
+  droneId: array;
+}

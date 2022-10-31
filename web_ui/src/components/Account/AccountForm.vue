@@ -36,7 +36,6 @@
         :click-handler="handleDroneIdEditCancel"
       />
     </div>
-    <button class="drone_add" html-type="button">ADD DRONEID</button>
   </div>
 </template>
 

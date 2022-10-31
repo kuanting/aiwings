@@ -36,7 +36,7 @@
       </a-button>
     </a-form-item>
     <a-form-item v-bind="formItemLayoutWithOutLabel">
-      <a-button type="primary" html-type="submit" @click="submitFormTest"
+      <a-button type="primary" html-type="submit" @click="submitForm"
         >Submit</a-button
       >
       <a-button style="margin-left: 30px" @click="resetForm">Reset</a-button>
@@ -44,6 +44,7 @@
   </a-form>
 </template>
 <script>
+import { notification } from 'ant-design-vue'
 import user from '../../services/user'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { defineComponent, reactive, ref } from 'vue'
@@ -89,27 +90,15 @@ export default defineComponent({
       drones: []
     })
 
-    const submitForm = () => {
-      // console.log(formRef.value.validate())
-      formRef.value
-        .validate()
-        .then(() => {
-          // console.log('form: ', dynamicValidateForm)
-          console.log('values: ', dynamicValidateForm.drones[0])
-        })
-        .catch((error) => {
-          console.log('error', error)
-        })
-    }
-
-    const submitFormTest = async function () {
+    const submitForm = async function () {
       formRef.value
         .validate()
         .then(async function () {
-          let form = dynamicValidateForm.drones
-          console.log(form)
-          console.log(dynamicValidateForm.drones)
-          const { data } = await user.enrollDroneId({ droneId: form })
+          let droneId = []
+          dynamicValidateForm.drones.forEach((element) => {
+            droneId.push(element.value)
+          })
+          const { data } = await user.enrollDroneId({ droneId: droneId })
           notification.success({
             message: data.msg
           })
@@ -163,8 +152,7 @@ export default defineComponent({
       submitForm,
       resetForm,
       removeDrone,
-      addDrone,
-      submitFormTest
+      addDrone
     }
   }
 })
