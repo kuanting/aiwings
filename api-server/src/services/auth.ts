@@ -1,4 +1,4 @@
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { connectToDatabase as db } from "../services/database";
 import { compareEncryption, encryptPlaintext, signJwtToken } from "../helpers";
 import { LoginField, SignupField } from "../types";
@@ -44,18 +44,30 @@ export default {
           return;
         }
       });
-
       const encryptPassword = await encryptPlaintext(password);
-      let insertNewUser = "INSERT INTO user(email, password) VALUES(?, ?);";
-      conn.query(
-        insertNewUser,
-        [email, encryptPassword],
-        function (err: any, results: any) {
-          if (err) throw err;
-          console.log(results);
-          res.status(201).json({ msg: "User created" });
-        }
-      );
+
+      const insert_user = async function () {
+        return new Promise(function (resolve, reject) {
+          let insertNewUser =
+            "INSERT INTO user(id, email, password) VALUES(UUID_TO_BIN(UUID()),?, ?);";
+          conn.query(
+            insertNewUser,
+            [email, encryptPassword],
+            function (err: any, result: any) {
+              if (err) {
+                reject(err);
+                return;
+              }
+              res.status(201).json({ msg: "User created" });
+              return;
+            }
+          );
+        });
+      };
+      await insert_user();
+      //   let insertNewUserDrones =
+      //   "INSERT INTO drones(id, user_id, drone_id) VALUES(UUID_TO_BIN(UUID()),?, ?);";
+      // conn.query(insertNewUserDrones, []);
     } catch (error) {
       logger.error(error);
       res.status(500).json({ msg: "Internal server error" });
@@ -75,27 +87,14 @@ export default {
     }
 
     try {
-      //FIXME
       let conn = await db();
-
-      // const findUser = "SELECT id, email, password FROM user WHERE email=?";
-
-      //ORIGIN IN MYSQL DOC
-
-      // conn.query(findUser, [email], function (err: any, results: any) {
-      //   if (err) throw err;
-      //   //if entered email is not existed
-      //   if (results.length === 0) {
-      //     res.status(401).json({ msg: "Account not found" });
-      //     return;
-      //   }
-      //   console.log(results);
-      // });
-
-      //use primise to get password from SQL-select
+      //use promise to get password from SQL-select
       const select_user = async function () {
         return new Promise(function (resolve, reject) {
-          let sql = "SELECT id, email, password FROM user WHERE email=?";
+          // let sql = "SELECT BIN_TO_UUID(id) id, email, password FROM user WHERE email=?";
+          let sql =
+            "SELECT BIN_TO_UUID(id) id, email, password FROM user WHERE email=?";
+
           conn.query(sql, [email], function (err: any, result: any) {
             if (err) {
               reject(err);
@@ -112,43 +111,44 @@ export default {
       };
 
       const user: any = await select_user();
+      console.log("login user: ", user);
       if (!(await compareEncryption(password, user.password))) {
         res.status(401).json({ msg: "Invalid password " });
         return;
       }
 
       //SEELCT DRONEID is enrolled or not
-      const select_drone = async function () {
-        return new Promise(function (resolve, reject) {
-          let sql =
-            "SELECT drone_id from user, drones WHERE user_id = user.id;";
-          conn.query(sql, [email], function (err: any, result: any) {
-            if (err) {
-              reject(err);
-              return;
-            }
-            // console.log("promise: ", result);
+      // const select_drone = async function (user: any) {
+      //   return new Promise(function (resolve, reject) {
+      //     let sql =
+      //       "SELECT BIN_TO_UUID(drones.id) AS droneId from drones WHERE drones.user_id = UUID_TO_BIN(?);";
+      //     conn.query(sql, [user.id], function (err: any, result: any) {
+      //       if (err) {
+      //         reject(err);
+      //         return;
+      //       }
 
-            let dataSTring = JSON.stringify(result);
-            let data = JSON.parse(dataSTring);
-            resolve(data[0]);
-            return;
-          });
-        });
-      };
-      let drone: any = await select_drone();
+      //       let dataSTring = JSON.stringify(result);
+      //       let data = JSON.parse(dataSTring);
+      //       resolve(data[0]);
+      //       return;
+      //     });
+      //   });
+      // };
+      // let drone: any = await select_drone(user);
+      // console.log("drone: ", drone);
 
-      if (drone === undefined) {
-        drone = false;
-        console.log(drone);
-      } else {
-        drone = true;
-        console.log(drone);
-      }
+      // if (drone === undefined) {
+      //   drone = false;
+      //   console.log(drone);
+      // } else {
+      //   drone = true;
+      //   console.log(drone);
+      // }
 
       const accessToken = await signJwtToken("5m", { uuid: user.id });
       const refreshToken = await signJwtToken("30d", { uuid: user.id });
-      // console.log(accessToken, refreshToken);
+
       res
         .cookie("access_token", accessToken, {
           httpOnly: true,
@@ -162,7 +162,8 @@ export default {
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           secure: process.env.NODE_ENV === "production",
         })
-        .json({ msg: "User login", isEnrolled: drone });
+        // .json({ msg: "User login", isEnrolled: drone });
+        .json({ msg: "User login" });
     } catch (error) {
       logger.error(error);
       res.status(500).json({ msg: "Internal server error" });

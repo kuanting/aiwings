@@ -21,6 +21,7 @@ export async function connectToDatabase() {
       user: MYSQL_SERVICE_USER,
       password: MYSQL_SERVICE_PASSWORD,
       database: "drone_cloud_test",
+      multipleStatements: true 
     });
     logger.info("Connect to database successfully!");
     return db;

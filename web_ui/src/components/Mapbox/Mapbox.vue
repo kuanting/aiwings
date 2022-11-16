@@ -144,6 +144,13 @@ export default {
           draggable: true
         })
 
+        // droneElement.src = '../../assets/drone1.gif'
+        // droneMarkerTest = new mapboxgl.Marker({
+        //   element: a
+        // })
+        //   .setLngLat([121.5364948, 25.0432282])
+        //   .addTo(mapbox.map)
+
         targetMarker.on('dragend', () => {
           if (isTakeoff.value) {
             const lngLat = targetMarker.getLngLat()
@@ -165,6 +172,8 @@ export default {
           )
         }
 
+
+        //Fixme
         watch(
           () => store.getters['drone/getDroneCoords'],
           (coords) => {
@@ -173,7 +182,7 @@ export default {
 
               if (!isEqualPreviousCoords(coords)) {
                 geoJsonFormatData.geometry.coordinates.push(coords)
-                mapbox.updateGeoJsonSource(
+                mapbox.updateGeoJsosnSource(
                   'real-time-record',
                   geoJsonFormatData
                 )
@@ -181,7 +190,6 @@ export default {
             }
           }
         )
-
         isLoading.value = false
       })
 

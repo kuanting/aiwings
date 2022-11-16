@@ -10,7 +10,7 @@ export default createStore({
     rabbitmqAdminIsInit: false,
     user: {
       email: '',
-      // droneId: '',
+      droneId: [],
       isAdmin: false
     }
   },
@@ -65,7 +65,10 @@ export default createStore({
     getUserInfo(state) {
       return state.user
     },
-    getUsername(state) {
+    Info(state) {
+      return state.user
+    },
+    name(state) {
       return state.user.email.substr(0, state.user.email.indexOf('@'))
     },
     getIsAuth(state) {

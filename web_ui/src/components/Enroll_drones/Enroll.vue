@@ -48,6 +48,7 @@ import { notification } from 'ant-design-vue'
 import user from '../../services/user'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { defineComponent, reactive, ref } from 'vue'
+import store from '../../store'
 export default defineComponent({
   components: {
     MinusCircleOutlined,
@@ -98,7 +99,9 @@ export default defineComponent({
           dynamicValidateForm.drones.forEach((element) => {
             droneId.push(element.value)
           })
+          console.log('enroll.vue: ', droneId)
           const { data } = await user.enrollDroneId({ droneId: droneId })
+          store.commit(droneId)
           notification.success({
             message: data.msg
           })
@@ -107,24 +110,6 @@ export default defineComponent({
           console.log('error', error)
         })
     }
-
-    //   try {
-    //   const { data } = await auth.signup(formData)
-    //   //FIX
-    //   console.log('singupform: ', data)
-    //   notification.success({
-    //     message: data.msg
-    //   })
-    //   isSubmmited.value = false
-    //   router.push({ path: '/login' })
-    // } catch ({ response }) {
-    //   notification.error({
-    //     message: response.data.msg
-    //   })
-    //   formState.password = ''
-    //   formState.checkPassword = ''
-    //   isSubmmited.value = false
-    // }
 
     const resetForm = () => {
       formRef.value.resetFields()

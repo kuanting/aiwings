@@ -131,10 +131,13 @@ router.beforeEach(async (to) => {
     }
   }
 
+
+  //FIXEME
   if (!isAuth.value) {
     if (to.path === '/') return true
     try {
       const { data } = await user.getUserInfo()
+      console.log('router/index.js',data)
       store.dispatch('setIsAuth', true)
       store.dispatch('setUserInfo', data)
       intervalTimer = refreshToken()

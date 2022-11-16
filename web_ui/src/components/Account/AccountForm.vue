@@ -10,10 +10,10 @@
       :disabled="true"
       type="email"
     />
-    <div class="droneId__wrapper">
+    <div v-for="(value, key) in droneId" :key="key" class="droneId__wrapper">
       <a-input
         ref="droneIdEl"
-        v-model:value="droneId"
+        v-model:value="droneId[key]"
         size="large"
         addon-before="Drone ID"
         :disabled="!isEditing"
@@ -28,19 +28,12 @@
         :button-name="buttonState"
         :click-handler="handleDroneIdEdit"
       />
-      <Button
-        v-show="isEditing"
-        class="droneId__button"
-        html-type="button"
-        button-name="Cancel"
-        :click-handler="handleDroneIdEditCancel"
-      />
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from '@vue/reactivity'
+import { reactive, ref } from '@vue/reactivity'
 import { useStore } from 'vuex'
 import { computed, nextTick } from '@vue/runtime-core'
 import socket from '../../lib/websocket'
@@ -56,11 +49,11 @@ export default {
     const droneIdEl = ref(null)
     const store = useStore()
     const userInfo = computed(() => store.getters.getUserInfo)
-    const buttonState = computed(() => (isEditing.value ? 'Save' : 'Edit'))
+    const buttonState = computed(() => (isEditing.value ? 'Save' : 'DEL'))
     const isEditing = ref(false)
-    const isSubmitting = ref(false)
-    const droneId = ref(userInfo.value.droneId)
-
+    const isSubmitting = reactive(false)
+    const droneId = reactive(userInfo.value.droneId)
+    console.log('Account form: ', droneId)
     const handleDroneIdEdit = async () => {
       if (!isEditing.value) {
         isEditing.value = true
@@ -77,7 +70,10 @@ export default {
         })
         store.dispatch('setRabbitmqIsInit', false)
         socket.emit('cancel-consume')
-        const { data } = await user.editUserDroneId({ droneId: droneId.value })
+        const { data } = await user.editUserDroneId({
+          droneId: droneId.value,
+          originDroneId: userInfo.value.droneId
+        })
         notification.success({ message: data.msg })
       }
       isEditing.value = false
@@ -121,14 +117,11 @@ export default {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
+    margin: 5px;
 
     .droneId__button {
       margin-left: 5px;
     }
-  }
-
-  .drone_add {
-    margin-top: 10px;
   }
 }
 </style>

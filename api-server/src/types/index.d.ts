@@ -25,3 +25,8 @@ export interface EditIDPayload {
 export interface AddIDPayload {
   droneId: array;
 }
+
+export interface droneId {
+  [key: string]: any;
+  name: string;
+}

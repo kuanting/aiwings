@@ -1,7 +1,7 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-const SECRET = process.env.JWT_TOKEN_SECRET || '';
+const SECRET = process.env.JWT_TOKEN_SECRET || "";
 
 const encryptPlaintext = async (plainText: string) => {
   return await bcrypt.hash(plainText, 10);
@@ -27,9 +27,10 @@ const verifyJwtToken = (token: string) => {
   return new Promise((resolve, reject) =>
     jwt.verify(token, SECRET, (err, payload) => {
       if (err) {
-        reject('');
+        reject("");
         return;
       }
+      console.log("payload in helpers: ", payload);
       resolve(payload);
     })
   );

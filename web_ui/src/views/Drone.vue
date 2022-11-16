@@ -31,11 +31,15 @@ export default {
 
     // RabbitMQ queues establishment
     const rabbitmqInit = () => {
+      // console.log('user: ', user.value.droneId[0])
       saveLogs(`Websocket connected: ${socket.id}`)
 
       //FIXME
       saveLogs(`Drone ID: ${user.value.droneId}`)
-      socket.emit('establish-rabbitmq-connection', user.value.droneId)
+
+      //FIXME
+      // console.log('drone.vue: ', user.value.droneId);
+      socket.emit('establish-rabbitmq-connection', user.value.droneId[0])
     }
 
     // Trigger RabbitMQ when the first come or refresh pages

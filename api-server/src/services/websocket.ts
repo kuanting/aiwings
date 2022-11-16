@@ -1,18 +1,18 @@
-import { io, logger } from '../server';
-import { Replies } from 'amqplib';
-import { Socket } from 'socket.io';
-import { channel } from '../services/rabbitmq';
-import { Command } from '../types/drone';
+import { io, logger } from "../server";
+import { Replies } from "amqplib";
+import { Socket } from "socket.io";
+import { channel } from "../services/rabbitmq";
+import { Command } from "../types/drone";
 
 const RABBITMQ = {
-  EXCHANGE_NAME: 'drone',
-  EXCHANGE_TYPE: 'topic',
-  QUEUE_TOPICS: ['drone', 'webrtc']
+  EXCHANGE_NAME: "drone",
+  EXCHANGE_TYPE: "topic",
+  QUEUE_TOPICS: ["drone", "webrtc"],
 };
 
 export default () => {
   // When establish connection
-  io.on('connection', (socket: Socket) => {
+  io.on("connection", (socket: Socket) => {
     logger.info(`Websocket connected: ${socket.id}`);
     let droneId: string;
     let queues: Replies.AssertQueue[] = [];
@@ -20,7 +20,8 @@ export default () => {
     let adminQueue: Replies.AssertQueue;
 
     // Inital RabbitMQ
-    socket.on('establish-rabbitmq-connection', async (receiveId: string) => {
+    socket.on("establish-rabbitmq-connection", async (receiveId: string) => {
+      console.log(receiveId);
       droneId = receiveId;
       try {
         // 1. Create exchange
@@ -38,30 +39,35 @@ export default () => {
 
         queues.forEach((queue) => {
           // Telling frontend that queues have been created
-          socket.emit('queue-created', queue.queue);
+          socket.emit("queue-created", queue.queue);
         });
       } catch (error) {
         logger.error(error);
       }
 
+      //assert queue 是創建queue 等待exchange後的結果
+      //創建queue，如果沒有的話會自動生成
       async function assertTopicQueue() {
         for (let topic of RABBITMQ.QUEUE_TOPICS) {
           const queue = await channel.assertQueue(
             `${socket.id}-${receiveId}-${topic}`,
             {
               autoDelete: true,
-              durable: false
+              durable: false,
             }
           );
           queues.push(queue);
         }
       }
 
+      //Assert a routing path from an exchange to a queue: the exchange named by source will relay messages to the queue named,
+      // according to the type of the exchange and the pattern given. 
       async function bindTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
           await channel.bindQueue(
             queues[i].queue,
             RABBITMQ.EXCHANGE_NAME,
+            //pattern
             `${receiveId}.phone.${RABBITMQ.QUEUE_TOPICS[i]}`
           );
         }
@@ -86,12 +92,13 @@ export default () => {
       }
     });
 
-    // For management used
-    socket.on('drone-admin', async () => {
+    // For management used(in views/Management.vue)
+    socket.on("drone-admin", async () => {
       try {
-        adminQueue = await channel.assertQueue('admin-drone', {
+        console.log('drone-admin: ')
+        adminQueue = await channel.assertQueue("admin-drone", {
           autoDelete: true,
-          durable: false
+          durable: false,
         });
         await channel.bindQueue(
           adminQueue.queue,
@@ -117,7 +124,8 @@ export default () => {
     });
 
     // Drone-related
-    socket.on('send-drone', (command: Command) => {
+    socket.on("send-drone", (command: Command) => {
+      console.log('socket-> send-drone: ', command)
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
         `${droneId}.web.drone`,
@@ -126,7 +134,8 @@ export default () => {
     });
 
     // WebRTC-related
-    socket.on('send-webrtc', (data) => {
+    socket.on("send-webrtc", (data) => {
+      console.log('socket-> send-webrtc: ', data)
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
         `${droneId}.web.webrtc`,
@@ -135,7 +144,7 @@ export default () => {
     });
 
     // Terminate receiving message
-    socket.on('cancel-consume', async () => {
+    socket.on("cancel-consume", async () => {
       try {
         if (consumers.length) {
           await cancelConsuming();
@@ -149,7 +158,7 @@ export default () => {
     });
 
     // Handle WebSocket disconnect
-    socket.on('disconnect', async (reason) => {
+    socket.on("disconnect", async (reason) => {
       logger.info(`Websocket disconnected:${socket.id} Reason:${reason}`);
       try {
         if (consumers.length) {

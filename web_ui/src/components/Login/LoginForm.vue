@@ -91,12 +91,12 @@ export default {
       isSubmmited.value = true
       try {
         const { data } = await auth.login(formData)
-        // console.log(data)
+        console.log('login: ', data)
         notification.success({
           message: data.msg
         })
         isSubmmited.value = false
-        //FIXEDME:
+        //FIXME:
         // 如果已經註冊droneID, 那就直接進入操作介面， 如果沒有那就跳出提示，然後進入註冊畫面
         // if (data.isEnrolled === true) {
         router.push({ path: '/drone' })

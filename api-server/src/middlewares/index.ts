@@ -7,12 +7,11 @@ const renewTokenAndPassToNext = async (
   next: NextFunction,
   token: string
 ) => {
-  // console.log("middlewares/index-> res, token", res, token);
+  // console.log("middlewares/index-> res: ", res);
   const { uuid } = (await verifyJwtToken(token)) as TokenPayload;
   const accessToken = await signJwtToken("5m", { uuid });
   res.locals.uuid = uuid;
   res.locals.accessToken = accessToken;
-  // console.log("uuid: ", res.locals.uuid);
   next();
 };
 
