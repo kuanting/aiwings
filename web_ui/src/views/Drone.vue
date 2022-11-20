@@ -39,7 +39,7 @@ export default {
 
       //FIXME
       // console.log('drone.vue: ', user.value.droneId);
-      socket.emit('establish-rabbitmq-connection', user.value.droneId[0])
+      socket.emit('establish-rabbitmq-connection', user.value.droneId)
     }
 
     // Trigger RabbitMQ when the first come or refresh pages

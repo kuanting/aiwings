@@ -35,6 +35,7 @@ export default {
 
     // Websocket event listening
     socket.on('admin-drone-topic', (data) => {
+      console.log('admin-drone-topic in views/management: ', data)
       if (data.type === 'message') {
         const {
           battery: { voltage },

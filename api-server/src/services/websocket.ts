@@ -10,19 +10,23 @@ const RABBITMQ = {
   QUEUE_TOPICS: ["drone", "webrtc"],
 };
 
+// binding key design: {user_uuid}.{drone_uuid}.{mavlink}, {user_uuid}.{drone_uuid}.{webrtc}
 export default () => {
   // When establish connection
   io.on("connection", (socket: Socket) => {
     logger.info(`Websocket connected: ${socket.id}`);
-    let droneId: string;
+    let droneId: object;
     let queues: Replies.AssertQueue[] = [];
     let consumers: Replies.Consume[] = [];
     let adminQueue: Replies.AssertQueue;
 
     // Inital RabbitMQ
-    socket.on("establish-rabbitmq-connection", async (receiveId: string) => {
-      console.log(receiveId);
+    socket.on("establish-rabbitmq-connection", async (receiveId: object) => {
+      console.log("DroneID List: ", receiveId);
+      // console.log(Object.keys(receiveId).length);
+      // console.log(Object.keys(receiveId));
       droneId = receiveId;
+      // console.log(droneId);
       try {
         // 1. Create exchange
         await channel.assertExchange(
@@ -48,46 +52,79 @@ export default () => {
       //assert queue 是創建queue 等待exchange後的結果
       //創建queue，如果沒有的話會自動生成
       async function assertTopicQueue() {
-        for (let topic of RABBITMQ.QUEUE_TOPICS) {
-          const queue = await channel.assertQueue(
-            `${socket.id}-${receiveId}-${topic}`,
-            {
-              autoDelete: true,
-              durable: false,
-            }
-          );
-          queues.push(queue);
+        for (let key in droneId) {
+          for (let topic of RABBITMQ.QUEUE_TOPICS) {
+            // console.log("droneId in assertQueue: ", key);
+            const queue = await channel.assertQueue(
+              `${socket.id}-${(droneId as any)[key]}-${topic}`,
+              {
+                autoDelete: true,
+                durable: false,
+              }
+            );
+            queues.push(queue);
+          }
         }
       }
 
       //Assert a routing path from an exchange to a queue: the exchange named by source will relay messages to the queue named,
-      // according to the type of the exchange and the pattern given. 
+      // according to the type of the exchange and the pattern given.
       async function bindTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
-          await channel.bindQueue(
-            queues[i].queue,
-            RABBITMQ.EXCHANGE_NAME,
-            //pattern
-            `${receiveId}.phone.${RABBITMQ.QUEUE_TOPICS[i]}`
-          );
+          // console.log(queues[i].queue);
+          //FIXED ME：
+          //還要解決的問題： 要如何處理binding-key裡droneID的問題，e.g. 第一個queue是for: 1ee52ca0171e4978， 第二個queue是for: testtesttest1
+          //第0 第1個 queue 是要綁定 1ee52ca0171e4978.phone.drone 1ee52ca0171e4978.phone.webrtc
+
+          if (i % 2 == 0) {
+            await channel.bindQueue(
+              queues[i].queue,
+              RABBITMQ.EXCHANGE_NAME,
+              `${(droneId as any)[i / 2]}.phone.drone`
+            );
+          } else {
+            let id = Math.floor(i / 2);
+            await channel.bindQueue(
+              queues[i].queue,
+              RABBITMQ.EXCHANGE_NAME,
+              `${(droneId as any)[id]}.phone.webrtc`
+            );
+          }
         }
       }
 
       async function consumeTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
-          const consume = await channel.consume(
-            queues[i].queue,
-            (msg) => {
-              if (msg) {
-                socket.emit(
-                  `${RABBITMQ.QUEUE_TOPICS[i]}-topic`,
-                  JSON.parse(msg.content.toString())
-                );
-              }
-            },
-            { noAck: true }
-          );
-          consumers.push(consume);
+          //if divisible means the topic is "drone" else means "webrtc"
+          if (i % 2) {
+            const consume = await channel.consume(
+              queues[i].queue,
+              (msg) => {
+                if (msg) {
+                  socket.emit(
+                    `${RABBITMQ.QUEUE_TOPICS[0]}-topic`,
+                    JSON.parse(msg.content.toString())
+                  );
+                }
+              },
+              { noAck: true }
+            );
+            consumers.push(consume);
+          } else {
+            const consume = await channel.consume(
+              queues[i].queue,
+              (msg) => {
+                if (msg) {
+                  socket.emit(
+                    `${RABBITMQ.QUEUE_TOPICS[1]}-topic`,
+                    JSON.parse(msg.content.toString())
+                  );
+                }
+              },
+              { noAck: true }
+            );
+            consumers.push(consume);
+          }
         }
       }
     });
@@ -95,7 +132,6 @@ export default () => {
     // For management used(in views/Management.vue)
     socket.on("drone-admin", async () => {
       try {
-        console.log('drone-admin: ')
         adminQueue = await channel.assertQueue("admin-drone", {
           autoDelete: true,
           durable: false,
@@ -124,8 +160,9 @@ export default () => {
     });
 
     // Drone-related
+    //如果要操作多台，前端需要回傳droneID， 因為要知道是誰傳過來的，這樣就可以知道要傳給誰
     socket.on("send-drone", (command: Command) => {
-      console.log('socket-> send-drone: ', command)
+      console.log("socket-> send-drone: ", command);
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
         `${droneId}.web.drone`,
@@ -134,8 +171,9 @@ export default () => {
     });
 
     // WebRTC-related
+    //這邊也要改成多台來進行操作，所以前端要傳droneID近來
     socket.on("send-webrtc", (data) => {
-      console.log('socket-> send-webrtc: ', data)
+      console.log("socket-> send-webrtc: ", data);
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
         `${droneId}.web.webrtc`,

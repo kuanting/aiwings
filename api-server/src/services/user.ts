@@ -36,7 +36,6 @@ export default {
               email: result[0].email,
               droneId: drone,
             };
-            console.log(userInfo);
             let dataSTring = JSON.stringify(userInfo);
             let data = JSON.parse(dataSTring);
             resolve(data);
@@ -93,8 +92,8 @@ export default {
                 reject(err);
                 return;
               }
-              console.log("result[0]: ", result[0]);
-              console.log("resulr[1]: ", result[1]);
+              // console.log("result[0]: ", result[0]);
+              // console.log("resulr[1]: ", result[1]);
               if (result[0].length == 0) {
                 //if user haven't enrolled droneID
                 let drone: droneId = new Object();
@@ -118,7 +117,7 @@ export default {
                   email: result[0][0].email,
                   droneId: drone,
                 };
-                console.log("else: ", userInfo);
+                // console.log("else: ", userInfo);
                 let dataSTring = JSON.stringify(userInfo);
                 let data = JSON.parse(dataSTring);
                 resolve(data);
