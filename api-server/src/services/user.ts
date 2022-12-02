@@ -81,7 +81,7 @@ export default {
           console.log("uuid: ", res.locals.uuid);
           //fixed me
           let sql =
-            "SELECT email,drone_id FROM drones LEFT JOIN user ON user.id=drones.user_id WHERE user.id=UUID_TO_BIN(?);SELECT email FROM user  WHERE user.id=UUID_TO_BIN(?);";
+            "SELECT email,drone_id, isAdmin FROM drones LEFT JOIN user ON user.id=drones.user_id WHERE user.id=UUID_TO_BIN(?);SELECT email FROM user  WHERE user.id=UUID_TO_BIN(?);";
           // let sql = " SELECT email FROM user  WHERE user.id=UUID_TO_BIN(?);";
 
           conn.query(
@@ -100,6 +100,7 @@ export default {
                 let userInfo = {
                   email: result[1][0].email,
                   droneId: drone,
+                  isAdmin: result[1][0].isAdmin
                 };
                 let dataSTring = JSON.stringify(userInfo);
                 let data = JSON.parse(dataSTring);
@@ -116,6 +117,7 @@ export default {
                 let userInfo = {
                   email: result[0][0].email,
                   droneId: drone,
+                  isAdmin: result[0][0].isAdmin
                 };
                 // console.log("else: ", userInfo);
                 let dataSTring = JSON.stringify(userInfo);
@@ -128,8 +130,8 @@ export default {
         });
       };
       const user: any = await select_user();
-
       console.log("user.ts: ", user);
+
       if (user) {
         res
           .cookie("access_token", res.locals.accessToken, {
@@ -158,11 +160,6 @@ export default {
   async editUserDroneId(req: Request, res: Response) {
     const { droneId }: EditIDPayload = req.body;
     try {
-      //FIXME
-      //add select here
-      // const userRepo = getRepository(User);
-      // const user = await userRepo.findOne({ where: { id: res.locals.uuid } });
-
       //MYSQL
       const update_droneID = async function () {
         let conn = await db();

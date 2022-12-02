@@ -128,7 +128,10 @@ export default {
       }
       sendDroneCommand({ cmd: 'ARM' })
       setTimeout(() => {
-        sendDroneCommand({ cmd: 'TAKEOFF', altitude: altitude.value })
+        sendDroneCommand({
+          cmd: 'TAKEOFF',
+          altitude: altitude.value
+        })
         message.success('TAKEOFF')
       }, 2000)
     }

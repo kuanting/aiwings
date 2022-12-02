@@ -78,7 +78,7 @@
       &copy; 2021 NTUT AiotLab 208 - Drone Cloud Platform. All Rights Reserved
     </small>
     <small>
-      Designed by Tony Chung
+      Designed by NTUT AiotLab Group
       <a
         class="link__github"
         target="_blank"
@@ -91,6 +91,7 @@
 </template>
 
 <script>
+import Header from '../components/Header/Header.vue'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { GithubFilled } from '@ant-design/icons-vue'
@@ -98,7 +99,8 @@ import { onMounted } from '@vue/runtime-core'
 export default {
   name: 'Introduction',
   components: {
-    GithubFilled
+    GithubFilled,
+    Header
   },
   setup() {
     onMounted(() => {

@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl'
 
 const MAPBOX = {
-  STYLE: 'mapbox://styles/lcylcy66666/cl9s2rfhi000b14o5la6bm1q7',
+  STYLE: 'mapbox://styles/mapbox/outdoors-v11',
   TOKEN: import.meta.env.VITE_APP_MAPBOX_TOKEN
 }
 export default class CustomMap {
@@ -15,7 +15,7 @@ export default class CustomMap {
     this.map = new mapboxgl.Map({
       style: mapStyle || MAPBOX.STYLE,
       center: [this.longitude, this.latitude],
-      zoom: 17,
+      zoom: 16,
       pitch: 0,
       bearing: 0,
       antialias: false,
@@ -80,7 +80,7 @@ export default class CustomMap {
       new mapboxgl.NavigationControl({
         visualizePitch: true,
         showZoom: true,
-        showCompass: true
+        showCompass: true,
       }),
       'top-right'
     )

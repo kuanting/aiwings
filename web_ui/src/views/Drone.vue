@@ -159,7 +159,7 @@ export default {
   .stream {
     position: relative;
     visibility: hidden;
-    background-image: url('../assets/live-stream.png');
+    background-image: url('@/assets/live-stream.png');
     background-size: cover;
     @media (min-width: 800px) {
       visibility: visible;

@@ -65,10 +65,7 @@ export default createStore({
     getUserInfo(state) {
       return state.user
     },
-    Info(state) {
-      return state.user
-    },
-    name(state) {
+    getUsername(state) {
       return state.user.email.substr(0, state.user.email.indexOf('@'))
     },
     getIsAuth(state) {

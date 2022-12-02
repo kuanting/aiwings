@@ -1,6 +1,9 @@
 <template>
-  <video ref="remoteVideoEl" autoplay></video>
-  <canvas ref="canvasEl" class="boundingBox"></canvas>
+  <div class="rtc-video">
+    <video ref="remoteVideoEl" autoplay></video>
+    <canvas ref="canvasEl" class="boundingBox"></canvas>
+  </div>
+  
   <div class="control__wrapper">
     <a-tooltip placement="right" color="blue" title="Establish WEBRTC">
       <a-button
@@ -70,6 +73,7 @@ export default {
     const setLogs = (log) => store.dispatch('setLogs', log)
 
     //handle ice candidate events
+    //要看一下
     const onIceCandidate = (event) => {
       if (event.candidate) {
         setTimeout(() => {
@@ -268,23 +272,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.boundingBox {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 5;
-}
-
 .control__wrapper {
   position: absolute;
+  
   z-index: 10;
-  top: 5px;
+  top: 200px;
   left: 5px;
   display: flex;
   flex-direction: column;
@@ -293,5 +285,25 @@ video {
     margin-right: 0;
     margin-bottom: 2px;
   }
+    .rtc-video{
+      position: relative;
+      width: 80%;
+      height: 80%;
+      align-items: center;
+
+      video {
+        position: relative;
+        
+      }
+      .boundingBox {
+        position: absolute;
+        
+        top: 0;
+        left: 0;
+        z-index: 5;
+      }
+    }
 }
+
+
 </style>

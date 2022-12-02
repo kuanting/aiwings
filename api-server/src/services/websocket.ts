@@ -161,6 +161,8 @@ export default () => {
 
     // Drone-related
     //如果要操作多台，前端需要回傳droneID， 因為要知道是誰傳過來的，這樣就可以知道要傳給誰
+    //droneID 可以用array來傳，這樣在操作多台可以一次傳入多台相同的cmd
+
     socket.on("send-drone", (command: Command) => {
       console.log("socket-> send-drone: ", command);
       channel.publish(
@@ -170,8 +172,9 @@ export default () => {
       );
     });
 
-    // WebRTC-related
+    
     //這邊也要改成多台來進行操作，所以前端要傳droneID近來
+    // WebRTC-related
     socket.on("send-webrtc", (data) => {
       console.log("socket-> send-webrtc: ", data);
       channel.publish(

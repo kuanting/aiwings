@@ -52,7 +52,7 @@ const routes = [
   {
     path: '/drone',
     name: 'Drone',
-    component: () => import('../views/Drone.vue')
+    component: () => import('../views/Drone01.vue')
   },
   {
     path: '/records',
@@ -137,7 +137,7 @@ router.beforeEach(async (to) => {
     if (to.path === '/') return true
     try {
       const { data } = await user.getUserInfo()
-      console.log('router/index.js',data)
+      // console.log('router/index.js',data)
       store.dispatch('setIsAuth', true)
       store.dispatch('setUserInfo', data)
       intervalTimer = refreshToken()

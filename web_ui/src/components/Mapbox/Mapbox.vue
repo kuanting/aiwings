@@ -8,7 +8,7 @@
       @cancel="missionCancelHandler"
       ><a ref="popEl" class="confirm__dialog"
     /></a-popconfirm>
-    <DroneDashBoard />
+    <!-- <DroneDashBoard /> -->
     <a-tooltip placement="left" color="blue" title="Save & Clear Path">
       <a-button
         class="save-btn"
@@ -171,7 +171,6 @@ export default {
             newCoords[1] === coordinateRecords[coordinateRecords.length - 1][1]
           )
         }
-
 
         //Fixme
         watch(
