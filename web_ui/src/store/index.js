@@ -10,7 +10,7 @@ export default createStore({
     rabbitmqAdminIsInit: false,
     user: {
       email: '',
-      droneId: [],
+      droneId: '',
       isAdmin: false
     }
   },

@@ -38,22 +38,25 @@ import socket from '../../lib/websocket'
 import { useStore } from 'vuex'
 import { message, notification } from 'ant-design-vue'
 import { SaveOutlined } from '@ant-design/icons-vue'
+
 export default {
   name: 'Mapbox',
   components: { DroneDashBoard, SaveOutlined },
   setup() {
     const popEl = ref(null)
     const isLoading = ref(true)
+    let drones_marker = {}
+    let flydrone = ''
     let cacheTarget
     let droneMarker
-    let targetMarker
     let longitude = 0
     let latitude = 0
     let mapbox
     const store = useStore()
-    const isTakeoff = computed(() => store.getters['drone/getTakeoffStatus'])
-    const altitude = computed(() => store.getters['drone/getAltitude'])
-    const destination = computed(() => store.getters['drone/getDestination'])
+
+    const drone = computed(() => store.getters['drone/getDroneInfo'])
+    const user = computed(() => store.getters.getUserInfo)
+    
     const geoJsonFormatData = {
       type: 'Feature',
       geometry: {
@@ -64,10 +67,14 @@ export default {
 
     const missionConfirmHandler = () => {
       const { lng, lat } = cacheTarget
-      store.dispatch('drone/updateDestination', {
-        lng,
-        lat
+            store.dispatch('drone/updateDestination', {
+        "droneID": flydrone,
+        "lng": lng,
+        "lat": lat
       })
+      //FIXEDME: send-drone之後都要傳droneID，後端還沒改
+      const altitude = computed(() => store.getters['drone/getAltitude'](flydrone))
+
       socket.emit('send-drone', {
         cmd: 'GOTO',
         altitude: altitude.value,
@@ -79,10 +86,11 @@ export default {
     }
 
     const missionCancelHandler = () => {
+      const destination = computed(() => store.getters['drone/getDestination'](flydrone))
       const { lng, lat } = destination.value
       if (lng !== 0 && lat !== 0) {
         mapbox.flyTo([lng, lat])
-        targetMarker.setLngLat([lng, lat])
+        drones_marker[flydrone].setLngLat([lng, lat])
         return
       }
     }
@@ -111,6 +119,7 @@ export default {
       }
     }
 
+    //FIXEDME: 這邊要改
     getUserCurrentLocation()
       .then(([lng, lat]) => {
         longitude = lng
@@ -122,6 +131,7 @@ export default {
         )
       })
       .finally(() => {
+        //CustomMap 是 lib/mapbox.js
         mapbox = new CustomMap({ longitude, latitude })
         mapbox.initMapbox()
         mapbox.map.dragRotate.disable()
@@ -135,32 +145,42 @@ export default {
           latitude,
           map: mapbox.map
         })
-        targetMarker = mapbox.createMarker({
-          color: 'red',
-          scale: '0.7',
-          longitude,
-          latitude,
-          map: mapbox.map,
-          draggable: true
-        })
 
-        // droneElement.src = '../../assets/drone1.gif'
-        // droneMarkerTest = new mapboxgl.Marker({
-        //   element: a
-        // })
-        //   .setLngLat([121.5364948, 25.0432282])
-        //   .addTo(mapbox.map)
+        //動態增加drone marker
+        //這邊位置不對這邊的經緯度是user所在的經緯度，要改成抓drone原本位置的經緯度
+        //現在這個寫法，如果還沒有drone.value的時候會一直loading map
+        for (let i in user.value.droneId) {
+          // console.log(i)
+          // console.log('drone.value: ', drone.value)
+          let droneID = user.value.droneId[i]
+          drones_marker[droneID] = mapbox.createMarker({
+            color: 'red',
+            scale: '0.7',
+            longitude,
+            latitude,
+            map: mapbox.map,
+            draggable: true
+          }) 
+          drones_marker[droneID].on('dragend', () => {
+            // const isTakeoff = computed(() => store.getters['drone/getTakeoffStatus']('1ee52ca0171e4978'))
+            // console.log('drone.value: ', drone.value[user.value.droneId[i]])
+            let selectedDroneID = user.value.droneId[i]
+            flydrone = selectedDroneID
+            let isTakeoff = drone.value[selectedDroneID].status.isTakeoff
+            
+            if (isTakeoff) {
+              const lngLat = drones_marker[droneID].getLngLat()
 
-        targetMarker.on('dragend', () => {
-          if (isTakeoff.value) {
-            const lngLat = targetMarker.getLngLat()
-            cacheTarget = lngLat
-            mapbox.flyTo([lngLat.lng, lngLat.lat])
-            popEl.value.click()
-            return
-          }
-          message.error('Please TAKEOFF the drone first')
-        })
+              cacheTarget = lngLat
+              mapbox.flyTo([lngLat.lng, lngLat.lat])
+              popEl.value.click()
+              return
+            }
+            message.error('Please TAKEOFF the drone first')
+          })
+        }
+        /////////////////////////////////////////////
+        ////////////
 
         const isEqualPreviousCoords = (newCoords) => {
           const coordinateRecords = geoJsonFormatData.geometry.coordinates
@@ -219,6 +239,10 @@ export default {
     right: 0.8rem;
     top: 6.5rem;
     z-index: 150;
+  }
+  .mapboxgl-marker{
+    background-image: url('../../assets/drone1.gif');
+    background-color: aqua;
   }
 }
 .map__spinner {

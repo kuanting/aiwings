@@ -95,25 +95,25 @@ export default {
   .top-center {
     position: absolute;
     left: 50%;
-    top: 20%;
+    top: 10%;
     transform: translateX(-50%);
   }
   .middle-end {
     position: absolute;
-    right: 20%;
-    top: 50%;
+    right: 15%;
+    top: 40%;
     transform: translateY(-50%);
   }
   .middle-start {
     position: absolute;
-    left: 20%;
-    top: 50%;
+    left: 15%;
+    top: 40%;
     transform: translateY(-50%);
   }
   .buttom-center {
     position: absolute;
     left: 50%;
-    bottom: 20%;
+    bottom: 30%;
     transform: translateX(-50%);
   }
 }

@@ -1,7 +1,7 @@
 <template>
       <a-menu class="link" :selected-keys="current" mode="horizontal">
         <a-menu-item v-if="isAuth" key="video">
-          <router-link to="/enroll">
+          <router-link to="/monitor">
             <VideoCameraOutlined style="color: rgba(240, 255, 255, 1)" />
           </router-link>
         </a-menu-item>
@@ -10,7 +10,7 @@
             <ControlOutlined style="color: rgba(240, 255, 255, 1)" />
           </router-link>
         </a-menu-item>
-        <a-menu-item v-if="isAuth" key="video">
+        <a-menu-item v-if="isAuth" key="add">
           <router-link to="/enroll">
             <PlusCircleOutlined style="color: rgba(240, 255, 255, 1)" />
           </router-link>
@@ -25,7 +25,6 @@
           <template #title>
             <span>
               <UserOutlined style="color: rgba(240, 255, 255, 1)" />
-              <!-- {{ username }} -->
             </span>
           </template>
           <a-menu-item-group>

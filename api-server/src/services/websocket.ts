@@ -41,6 +41,7 @@ export default () => {
         // 4. Started to recieved message
         await consumeTopicQueue();
 
+        //這邊要再看一下
         queues.forEach((queue) => {
           // Telling frontend that queues have been created
           socket.emit("queue-created", queue.queue);
@@ -72,10 +73,6 @@ export default () => {
       async function bindTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
           // console.log(queues[i].queue);
-          //FIXED ME：
-          //還要解決的問題： 要如何處理binding-key裡droneID的問題，e.g. 第一個queue是for: 1ee52ca0171e4978， 第二個queue是for: testtesttest1
-          //第0 第1個 queue 是要綁定 1ee52ca0171e4978.phone.drone 1ee52ca0171e4978.phone.webrtc
-
           if (i % 2 == 0) {
             await channel.bindQueue(
               queues[i].queue,
@@ -96,11 +93,13 @@ export default () => {
       async function consumeTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
           //if divisible means the topic is "drone" else means "webrtc"
-          if (i % 2) {
+          if (i % 2==0) {
             const consume = await channel.consume(
               queues[i].queue,
               (msg) => {
                 if (msg) {
+                  //現在的問題是如果有多台傳到後端，要怎麼區分是哪台drone的資訊
+                  console.log('drone-topic messages: ', JSON.parse(msg.content.toString()))
                   socket.emit(
                     `${RABBITMQ.QUEUE_TOPICS[0]}-topic`,
                     JSON.parse(msg.content.toString())
@@ -115,6 +114,7 @@ export default () => {
               queues[i].queue,
               (msg) => {
                 if (msg) {
+                  console.log('webrtc messages: ', msg)
                   socket.emit(
                     `${RABBITMQ.QUEUE_TOPICS[1]}-topic`,
                     JSON.parse(msg.content.toString())

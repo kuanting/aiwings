@@ -13,6 +13,8 @@ const refreshToken = () => {
 }
 
 // Clean state funtion for logout
+
+//FIXEDME： 改成多台後，這邊的狀態清除也要更改
 const cleanState = async () => {
   await auth.logout()
   clearInterval(intervalTimer)
@@ -93,6 +95,11 @@ const routes = [
     component: () => import('../views/Management.vue')
   },
   {
+    path: '/monitor',
+    name: 'Monitor',
+    component: () => import('../views/Monitor.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue')
@@ -132,7 +139,7 @@ router.beforeEach(async (to) => {
   }
 
 
-  //FIXEME
+
   if (!isAuth.value) {
     if (to.path === '/') return true
     try {

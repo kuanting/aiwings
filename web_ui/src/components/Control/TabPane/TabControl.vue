@@ -90,17 +90,24 @@ export default {
     const store = useStore()
     const drone = computed(() => store.getters['drone/getDroneInfo'])
     const destination = computed(() => store.getters['drone/getDestination'])
+    //這邊要新增從user/state取得droneID，放在畫面上做選擇，然後再把選擇的droneID傳到vuex的getDroneInfo取得資訊
+    const userInfo = computed(() => store.getters.getUserInfo)
+    const droneObj = userInfo.value.droneId
 
     const confirmText = computed(
       () => `Are you sure to ${isTakeoff.value ? 'LAND' : 'TAKEOFF'}?`
     )
 
+    console.log("DRONE: ", drone)
+
+    //這邊要監視的是drone下的所有droneID的object
     watch(drone, (drone) => {
       /*
         When fulfill below situations, mode will change into GUIDED:
 
         1. In LAND mode and the drone is DISARM
        */
+      console.log("TabControl: ", drone)
       if (typeof drone.mode === 'undefined') return
       if (drone.isArmed === 'DISARM' && drone.mode === 'LAND') {
         flightModeChangeHandler('GUIDED')
@@ -218,7 +225,8 @@ export default {
       speedChangeHandler,
       speedEnterHandler,
       emergencyStopHandler,
-      flightModeChangeHandler
+      flightModeChangeHandler,
+      
     }
   }
 }
@@ -242,6 +250,6 @@ export default {
 .ant-col {
   text-align: center;
   padding-top: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 30px;
 }
 </style>

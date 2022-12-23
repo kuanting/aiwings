@@ -99,8 +99,9 @@ export default defineComponent({
           dynamicValidateForm.drones.forEach((element) => {
             droneId.push(element.value)
           })
-          console.log('enroll.vue: ', droneId)
+          // console.log('enroll.vue: ', droneId)
           const { data } = await user.enrollDroneId({ droneId: droneId })
+          //here
           store.commit(droneId)
           notification.success({
             message: data.msg
