@@ -15,6 +15,7 @@ type DroneRemoteAction =
   | 'GIMBAL_FRONT_BACK';
 
 export interface Command {
+  droneID: string;
   cmd: DroneRemoteAction;
   altitude?: number;
   lng?: number;

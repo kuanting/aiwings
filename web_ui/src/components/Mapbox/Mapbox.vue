@@ -72,10 +72,10 @@ export default {
         "lng": lng,
         "lat": lat
       })
-      //FIXEDME: send-drone之後都要傳droneID，後端還沒改
       const altitude = computed(() => store.getters['drone/getAltitude'](flydrone))
 
       socket.emit('send-drone', {
+        droneID: flydrone,
         cmd: 'GOTO',
         altitude: altitude.value,
         lng,

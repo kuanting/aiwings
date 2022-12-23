@@ -167,7 +167,7 @@ export default () => {
       console.log("socket-> send-drone: ", command);
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
-        `${droneId}.web.drone`,
+        `${command.droneID}.web.drone`,
         Buffer.from(JSON.stringify(command))
       );
     });
