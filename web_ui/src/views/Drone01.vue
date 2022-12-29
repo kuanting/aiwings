@@ -86,8 +86,8 @@ export default {
 
     socket.on('drone-topic', (data) => {
       if (data.type === 'message') {
-        console.log('Here: ', data.drone_info.drone_id)
-        console.log('droneInfo from backend: ', data)
+        // console.log('Here: ', data.drone_info.drone_id)
+        // console.log('droneInfo from backend: ', data)
         const {
           drone_info: {
             drone_id: drone_id,

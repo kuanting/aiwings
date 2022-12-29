@@ -13,7 +13,7 @@ export default {
 
 
   setFlightStatus(state, payload) {
-    state.status = payload
+    state.drone[payload.droneID].status = payload.status
   },
   setDestination(state, payload) {
     // droneid = payload.droneID

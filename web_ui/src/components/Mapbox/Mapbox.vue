@@ -38,6 +38,7 @@ import socket from '../../lib/websocket'
 import { useStore } from 'vuex'
 import { message, notification } from 'ant-design-vue'
 import { SaveOutlined } from '@ant-design/icons-vue'
+import mapboxgl from 'mapbox-gl'
 
 export default {
   name: 'Mapbox',
@@ -56,7 +57,7 @@ export default {
 
     const drone = computed(() => store.getters['drone/getDroneInfo'])
     const user = computed(() => store.getters.getUserInfo)
-    
+
     const geoJsonFormatData = {
       type: 'Feature',
       geometry: {
@@ -67,12 +68,14 @@ export default {
 
     const missionConfirmHandler = () => {
       const { lng, lat } = cacheTarget
-            store.dispatch('drone/updateDestination', {
-        "droneID": flydrone,
-        "lng": lng,
-        "lat": lat
+      store.dispatch('drone/updateDestination', {
+        droneID: flydrone,
+        lng: lng,
+        lat: lat
       })
-      const altitude = computed(() => store.getters['drone/getAltitude'](flydrone))
+      const altitude = computed(() =>
+        store.getters['drone/getAltitude'](flydrone)
+      )
 
       socket.emit('send-drone', {
         droneID: flydrone,
@@ -86,7 +89,9 @@ export default {
     }
 
     const missionCancelHandler = () => {
-      const destination = computed(() => store.getters['drone/getDestination'](flydrone))
+      const destination = computed(() =>
+        store.getters['drone/getDestination'](flydrone)
+      )
       const { lng, lat } = destination.value
       if (lng !== 0 && lat !== 0) {
         mapbox.flyTo([lng, lat])
@@ -153,21 +158,39 @@ export default {
           // console.log(i)
           // console.log('drone.value: ', drone.value)
           let droneID = user.value.droneId[i]
+
+          const droneElement = document.createElement('img')
+          droneElement.width = 100
+          droneElement.src = '../../../img/drone2.gif'
+
           drones_marker[droneID] = mapbox.createMarker({
             color: 'red',
             scale: '0.7',
             longitude,
             latitude,
             map: mapbox.map,
-            draggable: true
-          }) 
+            draggable: true,
+            element:droneElement,
+            popup: new mapboxgl.Popup({ offset: 25 }).setHTML(
+              `<p style="color:blue; font-weight: bold;">${droneID}</p>`
+            )
+          })
+          
           drones_marker[droneID].on('dragend', () => {
             // const isTakeoff = computed(() => store.getters['drone/getTakeoffStatus']('1ee52ca0171e4978'))
             // console.log('drone.value: ', drone.value[user.value.droneId[i]])
             let selectedDroneID = user.value.droneId[i]
+
+            //FIXEDME: 要做一個錯誤處理，如果還沒連到drone，要返回到原點
+            // console.log(drone.value[selectedDroneID])
+            // if (drone.value[selectedDroneID] === 'undefined') {
+            //   mapbox.flyTo([lng, lat])
+            //   drones_marker[flydrone].setLngLat([lng, lat])
+            //   return
+            // }
             flydrone = selectedDroneID
             let isTakeoff = drone.value[selectedDroneID].status.isTakeoff
-            
+
             if (isTakeoff) {
               const lngLat = drones_marker[droneID].getLngLat()
 
@@ -240,10 +263,10 @@ export default {
     top: 6.5rem;
     z-index: 150;
   }
-  .mapboxgl-marker{
-    background-image: url('../../assets/drone1.gif');
-    background-color: aqua;
-  }
+  // .marker {
+  //   background-image: url('../../assets/drone1.gif');
+  //   background-color: aqua;
+  // }
 }
 .map__spinner {
   position: absolute;

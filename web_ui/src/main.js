@@ -26,7 +26,8 @@ import {
   Input,
   Result,
   Divider,
-  Tooltip
+  Tooltip,
+  Select
 } from 'ant-design-vue'
 
 createApp(App)
@@ -48,6 +49,7 @@ createApp(App)
   .use(Tooltip)
   .use(store)
   .use(router)
+  .use(Select)
   .mount('#app')
 
 

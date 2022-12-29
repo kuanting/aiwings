@@ -31,6 +31,9 @@ export default class CustomMap {
 
   _loadBuildingLayer() {
     // Get label layer ID
+    
+
+
     const layers = this.map.getStyle().layers
     let labelLayerId
     for (let i = 0; i < layers.length; i++) {
@@ -157,20 +160,25 @@ export default class CustomMap {
     this.map.getSource(sourceId)?.setData(geoJsonData)
   }
 
+  
   createMarker({
     color = 'blue',
     scale = '1',
     longitude,
     latitude,
     draggable = false,
-    map
+    map,
+    popup,
+    element
   }) {
     return new mapboxgl.Marker({
+      element,
       color,
       scale,
       draggable
     })
       .setLngLat([longitude, latitude])
+      .setPopup(popup)
       .addTo(map)
   }
 

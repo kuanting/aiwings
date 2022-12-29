@@ -9,7 +9,7 @@ export default {
   //change
 
   setDroneInfo({ commit }, payload) {
-    console.log("payload in droneInfo: ", payload)
+    // console.log("payload in droneInfo: ", payload)
     commit('setDroneInfo', payload)
   },
 

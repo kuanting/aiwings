@@ -20,7 +20,7 @@ export default {
       ...state.drone,
 
       //改成在 drone["id"].isArmed 做操作
-
+      
       // isArmed:
       //   state.drone.isArmed === '' || state.drone.isArmed === 'null'
       //     ? ''
@@ -30,13 +30,12 @@ export default {
     }
   },
 
-  //更改後
-  // getDroneCoords(state) {
-  //   // return [state.drone[droneId].longitude, state.drone[droneId].latitude]
-  //   return function(droneId){
-  //     return [state.drone[droneId].longitude, state.drone[droneId].latitude]
-  //   }
-  // },
+  //特定drone的INFO
+  getSpecificDroneInfo(state){
+    return function(droneID){
+      return state.drone[droneID]
+    }
+  },
 
   //origin
   getDroneCoords(state) {
