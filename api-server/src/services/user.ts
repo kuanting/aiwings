@@ -75,6 +75,7 @@ export default {
       type droneId = {
         [key: string]: any;
       };
+
       //Promise
       const select_user = async function () {
         return new Promise(function (resolve, reject) {
@@ -96,7 +97,8 @@ export default {
               // console.log("resulr[1]: ", result[1]);
               if (result[0].length == 0) {
                 //if user haven't enrolled droneID
-                let drone: droneId = new Object();
+                // let drone: droneId = new Object();
+                let drone:  { id: string }[] = []
                 let userInfo = {
                   email: result[1][0].email,
                   droneId: drone,
@@ -109,10 +111,13 @@ export default {
               } else {
                 // handle object for userInfo
                 // user has enrolled droneID
-                let drone: droneId = new Object();
+                let drone:  { id: string }[] = []
 
+                //把它key改成都是id
+                //應該要改成array然後append，變成[{ID:XXXX}, {ID:XXXXX}, {ID:XXXXX}]
                 for (const index in result[0]) {
-                  drone[index] = result[0][index]['drone_id'];
+                  // drone[index] = result[0][index]['drone_id'];
+                  drone.push({id: result[0][index]['drone_id']})
                 }
                 let userInfo = {
                   email: result[0][0].email,

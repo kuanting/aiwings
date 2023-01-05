@@ -101,16 +101,16 @@ export default {
     const destination = computed(() => store.getters['drone/getDestination'])
     //這邊要新增從user/state取得droneID，放在畫面上做選擇，然後再把選擇的droneID傳到vuex的getDroneInfo取得資訊
     const userInfo = computed(() => store.getters.getUserInfo)
-    const droneObj = userInfo.value.droneId
+    const droneArr = userInfo.value.droneId
     const confirmText = computed(
       () => `Are you sure to ${isTakeoff.value ? 'LAND' : 'TAKEOFF'}?`
     )
     // new add
-    let defaultSelected = userInfo.value.droneId[0]
+    let defaultSelected = userInfo.value.droneId[0].id
 
     let droneList = []
-    for (let i in droneObj) {
-      let droneID = droneObj[i]
+    for (let i in droneArr) {
+      let droneID = droneArr[i].id
       droneList.push({ value: droneID, label: droneID })
     }
     const options = ref(droneList)

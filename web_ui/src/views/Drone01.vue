@@ -54,6 +54,38 @@ export default {
     const user = computed(() => store.getters.getUserInfo)
     const saveLogs = (log) => store.dispatch('setLogs', log)
 
+    const droneList = user.value.droneId
+    for (let i in droneList){
+      const droneInfo = {
+          [droneList[i].id]: {
+            timeStamp:'',
+            roll: '',
+            yaw: '',
+            pitch: '',
+            voltage: '',
+            percentage: '',
+            hpop: '',
+            gpsCount: '',
+            mode: '',
+            isArmed: '',
+            heading: '',
+            latitude: '',
+            longitude: '',
+            altitude: '',
+            speed: '',
+            status: {
+              altitude: 3,
+              //isTakeoff 預設要改成false
+              isTakeoff: false
+            },
+            destination: {
+              lng: 0,
+              lat: 0
+            }
+          }
+        }      
+        store.dispatch('drone/setDroneInfo', droneInfo)
+    }
     const rabbitmqInit = () => {
       // console.log('user: ', user.value.droneId[0])
       saveLogs(`Websocket connected: ${socket.id}`)
@@ -135,6 +167,7 @@ export default {
             }
           }
         }
+        // console.log(droneInfo)
         // const droneInfo_origin = {
         //     timeStamp,
         //     roll,

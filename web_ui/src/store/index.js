@@ -12,7 +12,7 @@ export default createStore({
       email: '',
       droneId: '',
       isAdmin: false
-    }
+    },
   },
   actions: {
     setLogs({ commit }, payload) {
@@ -56,6 +56,12 @@ export default createStore({
     },
     setRabbitmqAdminIsInit(state, payload) {
       state.rabbitmqAdminIsInit = payload
+    },
+    setUserDroneID(state, payload){
+      state.user.droneId = payload
+    },
+    setMapboxInfo(state, payload){
+      state.mapbox = payload
     }
   },
   getters: {
@@ -79,7 +85,7 @@ export default createStore({
     },
     getRabbitmqAdminIsInit(state) {
       return state.rabbitmqAdminIsInit
-    }
+    },
   },
   modules: {
     // Dedicate modules for drone-related

@@ -22,24 +22,24 @@ const cleanState = async () => {
   store.dispatch('setRabbitmqIsInit', false)
   store.dispatch('setIsAuth', false)
   store.dispatch('setUserInfo', { email: '', droneId: '', isAdmin: false })
-  store.dispatch('drone/updateFlightStatus', { altitude: 3, isTakeoff: false })
-  store.dispatch('drone/updateDestination', { lng: 0, lat: 0 })
+  // store.dispatch('drone/updateFlightStatus', { altitude: 3, isTakeoff: false })
+  // store.dispatch('drone/updateDestination', { lng: 0, lat: 0 })
   store.dispatch('drone/setDroneInfo', {
-    timeStamp: '',
-    roll: '',
-    yaw: '',
-    pitch: '',
-    voltage: '',
-    percentage: '',
-    hpop: '',
-    gpsCount: '',
-    mode: '',
-    isArmed: '',
-    heading: '',
-    latitude: '',
-    longitude: '',
-    altitude: '',
-    speed: ''
+    // timeStamp: '',
+    // roll: '',
+    // yaw: '',
+    // pitch: '',
+    // voltage: '',
+    // percentage: '',
+    // hpop: '',
+    // gpsCount: '',
+    // mode: '',
+    // isArmed: '',
+    // heading: '',
+    // latitude: '',
+    // longitude: '',
+    // altitude: '',
+    // speed: ''
   })
   store.dispatch('clearLogs')
 }

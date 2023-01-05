@@ -15,14 +15,14 @@ export default () => {
   // When establish connection
   io.on("connection", (socket: Socket) => {
     logger.info(`Websocket connected: ${socket.id}`);
-    let droneId: object;
+    let droneId: { id: string }[];
     let queues: Replies.AssertQueue[] = [];
     let consumers: Replies.Consume[] = [];
     let adminQueue: Replies.AssertQueue;
 
     // Inital RabbitMQ
-    socket.on("establish-rabbitmq-connection", async (receiveId: object) => {
-      console.log("DroneID List: ", receiveId);
+    socket.on("establish-rabbitmq-connection", async (receiveId: { id: string }[]) => {
+      console.log("DroneID List(webSocket): ", receiveId);
       // console.log(Object.keys(receiveId).length);
       // console.log(Object.keys(receiveId));
       droneId = receiveId;
@@ -57,7 +57,7 @@ export default () => {
           for (let topic of RABBITMQ.QUEUE_TOPICS) {
             // console.log("droneId in assertQueue: ", key);
             const queue = await channel.assertQueue(
-              `${socket.id}-${(droneId as any)[key]}-${topic}`,
+              `${socket.id}-${droneId[key].id}-${topic}`,
               {
                 autoDelete: true,
                 durable: false,
@@ -77,14 +77,14 @@ export default () => {
             await channel.bindQueue(
               queues[i].queue,
               RABBITMQ.EXCHANGE_NAME,
-              `${(droneId as any)[i / 2]}.phone.drone`
+              `${droneId[i / 2]}.phone.drone`
             );
           } else {
             let id = Math.floor(i / 2);
             await channel.bindQueue(
               queues[i].queue,
               RABBITMQ.EXCHANGE_NAME,
-              `${(droneId as any)[id]}.phone.webrtc`
+              `${droneId[id]}.phone.webrtc`
             );
           }
         }

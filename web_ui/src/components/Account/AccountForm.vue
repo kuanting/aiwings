@@ -10,10 +10,12 @@
       :disabled="true"
       type="email"
     />
-    <div v-for="(value, key) in droneId" :key="key" class="droneId__wrapper">
+    <div v-for="drone in droneId" :key="drone.id" class="droneId__wrapper">
+      <!-- {{ drone.id }} -->
       <a-input
         ref="droneIdEl"
-        v-model:value="droneId[key]"
+        v-model:value= "drone.id"
+        
         size="large"
         addon-before="Drone ID"
         :disabled="!isEditing"
@@ -53,7 +55,7 @@ export default {
     const isEditing = ref(false)
     const isSubmitting = reactive(false)
     const droneId = reactive(userInfo.value.droneId)
-    console.log('Account form: ', droneId)
+    // console.log('Account form: ',   droneId instanceof Array)
     const handleDroneIdEdit = async () => {
       if (!isEditing.value) {
         isEditing.value = true

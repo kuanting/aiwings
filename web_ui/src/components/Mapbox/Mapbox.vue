@@ -30,6 +30,9 @@
 
 <script>
 import CustomMap from '../../lib/mapbox'
+//update 
+// import useMapbox from '../../hooks/useMapbox'
+// console.log(a)
 import DroneDashBoard from './DroneDashBoard.vue'
 import { computed, ref, watch } from '@vue/runtime-core'
 import { getUserCurrentLocation } from '../../lib/geolocation'
@@ -53,6 +56,7 @@ export default {
     let longitude = 0
     let latitude = 0
     let mapbox
+    // let map_instnace = useMapbox()
     const store = useStore()
 
     const drone = computed(() => store.getters['drone/getDroneInfo'])
@@ -137,7 +141,10 @@ export default {
       })
       .finally(() => {
         //CustomMap 是 lib/mapbox.js
+        // mapbox = new CustomMap({ longitude, latitude })
         mapbox = new CustomMap({ longitude, latitude })
+        // map_instnace = mapbox
+        // console.log("here: ", map_instnace)
         mapbox.initMapbox()
         mapbox.map.dragRotate.disable()
         mapbox.map.on('load', () => {
@@ -154,15 +161,13 @@ export default {
         //動態增加drone marker
         //這邊位置不對這邊的經緯度是user所在的經緯度，要改成抓drone原本位置的經緯度
         //現在這個寫法，如果還沒有drone.value的時候會一直loading map
-        for (let i in user.value.droneId) {
-          // console.log(i)
-          // console.log('drone.value: ', drone.value)
-          let droneID = user.value.droneId[i]
 
+        for (let i in user.value.droneId) {
+          let droneID = user.value.droneId[i].id
           const droneElement = document.createElement('img')
           droneElement.width = 100
           droneElement.src = '../../../img/drone2.gif'
-
+          droneElement.id = droneID          
           drones_marker[droneID] = mapbox.createMarker({
             color: 'red',
             scale: '0.7',
@@ -170,16 +175,16 @@ export default {
             latitude,
             map: mapbox.map,
             draggable: true,
-            element:droneElement,
+            element: droneElement,
             popup: new mapboxgl.Popup({ offset: 25 }).setHTML(
               `<p style="color:blue; font-weight: bold;">${droneID}</p>`
             )
           })
-          
           drones_marker[droneID].on('dragend', () => {
             // const isTakeoff = computed(() => store.getters['drone/getTakeoffStatus']('1ee52ca0171e4978'))
             // console.log('drone.value: ', drone.value[user.value.droneId[i]])
-            let selectedDroneID = user.value.droneId[i]
+            droneElement.width = 100
+            let selectedDroneID = user.value.droneId[i].id
 
             //FIXEDME: 要做一個錯誤處理，如果還沒連到drone，要返回到原點
             // console.log(drone.value[selectedDroneID])

@@ -38,7 +38,7 @@ export default {
 .info__wrapper {
   width: 220px;
   height: 110px;
-  background-color: rgba(143, 137, 137, 0.5);
+  background-color:#545353ca;
   overflow-y: auto;
   top: 0.5rem;
   left: 0.5rem;

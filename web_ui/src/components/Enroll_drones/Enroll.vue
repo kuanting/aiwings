@@ -102,7 +102,17 @@ export default defineComponent({
           // console.log('enroll.vue: ', droneId)
           const { data } = await user.enrollDroneId({ droneId: droneId })
           //here
-          store.commit(droneId)
+          console.log("here: ", droneId)
+          //這邊有問題
+          //update
+          for (let drone of droneId){
+            console.log(drone)
+          store.commit('setUserDroneID', droneId)
+          }
+          //origin
+          // store.commit(droneId)
+          // store.commit('setUserDroneID', droneId)
+
           notification.success({
             message: data.msg
           })
