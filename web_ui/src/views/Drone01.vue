@@ -282,12 +282,12 @@ export default {
       }
 
       .bottomleft-box {
-        width: 25%;
+        width: 30%;
         height: 400px;
         background-color: #545353ec;
 
         background-image: url('../assets/live-stream.png');
-        background-size: 400px 400px;
+        background-size: 100% 100%;
         @media (min-width: 300px) {
           visibility: visible;
         }
@@ -298,6 +298,7 @@ export default {
         height: 60%;
         // align-items: center;
         background-color: #545353ec;
+        overflow: scroll;
       }
 
       .bottomright-box {
