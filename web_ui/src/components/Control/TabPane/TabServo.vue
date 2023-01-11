@@ -1,5 +1,14 @@
 <template>
   <div class="container">
+    <!-- new added select tool -->
+    <a-select
+      v-model:value="value"
+      label-in-value
+      style="width: 120px"
+      :options="options"
+      @change="handleChange"
+    ></a-select>
+    <!--  -->
     <Button
       button-name="SERVO UP"
       type="primary"
@@ -40,6 +49,9 @@ import {
 import Button from '../../UI/Button.vue'
 import socket from '../../../lib/websocket'
 import { message } from 'ant-design-vue'
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { computed } from '@vue/runtime-core'
 export default {
   name: 'TabServo',
   components: {
@@ -48,25 +60,51 @@ export default {
     PauseCircleOutlined,
     DownCircleOutlined
   },
+
   setup() {
+    const store = useStore()
+    const userInfo = computed(() => store.getters.getUserInfo)
+    const droneArr = userInfo.value.droneId
+    let defaultSelected = userInfo.value.droneId[0].id
+    let droneList = []
+    for (let i in droneArr) {
+      let droneID = droneArr[i].id
+      droneList.push({ value: droneID, label: droneID })
+    }
+    const options = ref(droneList)
+
+    const handleChange = (value) => {
+      let defaultSelected = value
+      const drone_selected = computed(() =>
+        store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
+      )
+      //dronechange表示選擇的droneID的data，drone變數表示的是全部的drone data
+      console.log('changeDroneInfo', drone_selected.value)
+    }
+
     const sendDroneCommand = (command) => socket.emit('send-drone', command)
     const servoUpHandler = () => {
-      sendDroneCommand({ cmd: 'SERVO_UP' })
+      sendDroneCommand({ droneID: defaultSelected, cmd: 'SERVO_UP' })
       message.success('SERVO UP')
     }
     const servoStopHandler = () => {
-      sendDroneCommand({ cmd: 'SERVO_STOP' })
+      sendDroneCommand({ droneID: defaultSelected, cmd: 'SERVO_STOP' })
       message.success('SERVO STOP')
     }
     const servoDownHandler = () => {
-      sendDroneCommand({ cmd: 'SERVO_DOWN' })
+      sendDroneCommand({ droneID: defaultSelected, cmd: 'SERVO_DOWN' })
       message.success('SERVO DOWN')
     }
 
     return {
       servoUpHandler,
       servoStopHandler,
-      servoDownHandler
+      servoDownHandler,
+      value: ref({
+        value: defaultSelected
+      }),
+      options,
+      handleChange
     }
   }
 }

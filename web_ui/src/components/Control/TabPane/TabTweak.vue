@@ -1,5 +1,12 @@
 <template>
   <div class="container">
+    <a-select
+      v-model:value="value"
+      label-in-value
+      style="width: 120px"
+      :options="options"
+      @change="handleChange"
+    ></a-select>
     <Button
       class="top-center"
       button-name="FORWARD"
@@ -37,6 +44,8 @@ import Button from '../../UI/Button.vue'
 import { useStore } from 'vuex'
 import socket from '../../../lib/websocket'
 import { message } from 'ant-design-vue'
+import { ref } from 'vue'
+
 export default {
   name: 'TabTweak',
   components: { Button },
@@ -45,7 +54,24 @@ export default {
     const coords = computed(() => store.getters['drone/getDroneCoords'])
     const altitude = computed(() => store.getters['drone/getAltitude'])
     const isTakeoff = computed(() => store.getters['drone/getTakeoffStatus'])
+    const userInfo = computed(() => store.getters.getUserInfo)
+    const droneArr = userInfo.value.droneId
+    let defaultSelected = userInfo.value.droneId[0].id
+    let droneList = []
+    for (let i in droneArr) {
+      let droneID = droneArr[i].id
+      droneList.push({ value: droneID, label: droneID })
+    }
+    const options = ref(droneList)
 
+    const handleChange = (value) => {
+      let defaultSelected = value
+      const drone_selected = computed(() =>
+        store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
+      )
+      //dronechange表示選擇的droneID的data，drone變數表示的是全部的drone data
+      console.log('changeDroneInfo', drone_selected.value)
+    }
     const newLatitide = (direction) => {
       const latitude = +coords.value[1]
       return latitude + direction * 0.00001
@@ -74,6 +100,7 @@ export default {
         latitude = newLatitide(direction)
       }
       socket.emit('send-drone', {
+        droneID: defaultSelected,
         cmd: 'GOTO',
         altitude: altitude.value,
         lng: longitude,
@@ -81,7 +108,14 @@ export default {
       })
     }
 
-    return { sendDroneCommand }
+    return {
+      sendDroneCommand,
+      value: ref({
+        value: defaultSelected
+      }),
+      options,
+      handleChange
+    }
   }
 }
 </script>
@@ -116,5 +150,42 @@ export default {
     bottom: 30%;
     transform: translateX(-50%);
   }
+  .ant-select {
+    border-radius: 5%;
+  }
 }
+</style>
+
+<style lang="scss">
+
+  .ant-select-dropdown {
+    border-radius: 0 0 10px 10px; /* 圆角 */
+    overflow: hidden;
+    .ant-select-dropdown-menu,
+    .ant-select-dropdown-menu-root,
+    .ant-select-dropdown-menu-vertical {
+      li:hover {
+        /* // 鼠标 hover 效果 */
+        background-color: rgba(132, 63, 255, 0.4);
+      }
+      background-color: #fff; /* 背景色 */
+    }
+    .ant-select-dropdown-menu-item-active {
+      background-color: rgba(
+        132,
+        63,
+        255,
+        0.4
+      );
+       /* // 展开时。默认选中option的背景色 */
+    }
+  }
+  /* // 聚焦时 边线颜色为背景色   失焦时蓝色高亮颜色替换成紫色 */
+  .ant-select-focused .ant-select-selection,
+  .ant-select-selection:focus,
+  .ant-select-selection:active {
+    border-color: transparent;
+    box-shadow: 0 0 2px rgba(132, 63, 255, 1);
+  }
+
 </style>

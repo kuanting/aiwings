@@ -32,8 +32,6 @@ export default class CustomMap {
   _loadBuildingLayer() {
     // Get label layer ID
     
-
-
     const layers = this.map.getStyle().layers
     let labelLayerId
     for (let i = 0; i < layers.length; i++) {

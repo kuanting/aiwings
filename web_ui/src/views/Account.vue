@@ -20,5 +20,6 @@ export default {
   height: calc(100vh - 60px);
   display: flex;
   justify-content: center;
+  overflow: scroll;
 }
 </style>

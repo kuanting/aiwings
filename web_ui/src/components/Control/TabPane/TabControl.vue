@@ -8,6 +8,7 @@
         style="width: 120px"
         :options="options"
         @change="handleChange"
+        dropdownClassName=""
       ></a-select>
       <!-- end -->
       <a-row justify="space-around">
@@ -200,7 +201,6 @@ export default {
 
     console.log(isTakeoff.value, isLanding.value)
 
-
     const sendDroneCommand = (command) => socket.emit('send-drone', command)
 
     const flightHandler = () => {
@@ -260,7 +260,11 @@ export default {
 
     const speedEnterHandler = () => {
       if (isTakeoff.value) {
-        sendDroneCommand({droneID: 'e27d4dacf11f9cd5', cmd: 'CHANGE_SPEED', speed: speed.value })
+        sendDroneCommand({
+          droneID: 'e27d4dacf11f9cd5',
+          cmd: 'CHANGE_SPEED',
+          speed: speed.value
+        })
         message.success(`Change SPEED to ${speed.value}m/s`)
         return
       }
@@ -330,6 +334,10 @@ export default {
   .container__vertical {
     width: 100%;
   }
+  .test{
+    background-color: #111;
+  }
+  
 }
 .ant-col {
   text-align: center;

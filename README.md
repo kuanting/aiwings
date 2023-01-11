@@ -4,7 +4,11 @@ AI Wings is a complete AIoT Drone System for commanding AIoT drone fleets via th
 
 <img width=640 src="doc/img/ai_wings_arch.jpg" />
 
-## Test Videos
+# New generation UI
+
+Ai wings now focus on updating the newer website UI, we will provide the multi-drone(multi-UAV) control through our platform.
+
+<img width=640 src="doc/img/new_web_ui.png" />
 
 AI Wings System Test | AED Delivery Test
 :-----------------------------------------:|:-------------------------------------------------------:
