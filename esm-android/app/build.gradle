@@ -4,6 +4,7 @@ plugins {
 
 android {
     compileSdkVersion 29
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.example.aed_drone"

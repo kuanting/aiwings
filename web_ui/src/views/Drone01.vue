@@ -13,9 +13,9 @@
         </div>
       </div>
       <div class="bottom-box">
-        <div class="bottomleft-box">
+        <!-- <div class="bottomleft-box">
           <Stream />
-        </div>
+        </div> -->
         <div class="bottomcenter-box">
           <DroneInfoDashBoardVue />
         </div>
@@ -55,36 +55,36 @@ export default {
     const saveLogs = (log) => store.dispatch('setLogs', log)
 
     const droneList = user.value.droneId
-    for (let i in droneList){
+    for (let i in droneList) {
       const droneInfo = {
-          [droneList[i].id]: {
-            timeStamp:'',
-            roll: '',
-            yaw: '',
-            pitch: '',
-            voltage: '',
-            percentage: '',
-            hpop: '',
-            gpsCount: '',
-            mode: '',
-            isArmed: '',
-            heading: '',
-            latitude: '',
-            longitude: '',
-            altitude: '',
-            speed: '',
-            status: {
-              altitude: 3,
-              //isTakeoff 預設要改成false
-              isTakeoff: false
-            },
-            destination: {
-              lng: 0,
-              lat: 0
-            }
+        [droneList[i].id]: {
+          timeStamp: '',
+          roll: '',
+          yaw: '',
+          pitch: '',
+          voltage: '',
+          percentage: '',
+          hpop: '',
+          gpsCount: '',
+          mode: '',
+          isArmed: '',
+          heading: '',
+          latitude: '',
+          longitude: '',
+          altitude: '',
+          speed: '',
+          status: {
+            altitude: 3,
+            //isTakeoff 預設要改成false
+            isTakeoff: false
+          },
+          destination: {
+            lng: 0,
+            lat: 0
           }
-        }      
-        store.dispatch('drone/setDroneInfo', droneInfo)
+        }
+      }
+      store.dispatch('drone/setDroneInfo', droneInfo)
     }
     const rabbitmqInit = () => {
       // console.log('user: ', user.value.droneId[0])
@@ -285,6 +285,7 @@ export default {
         width: 30%;
         height: 400px;
         background-color: #545353ec;
+        position: relative;
 
         background-image: url('../assets/live-stream.png');
         background-size: 100% 100%;
@@ -304,9 +305,10 @@ export default {
       .bottomright-box {
         width: 25%;
         height: 400px;
-        // position: absolute;
-        // bottom: 0px;
-        // right:10px;
+        // width: 50%;
+        // height: 60%;
+        position: relative;
+        overflow: scroll;
         background-color: #545353ec;
       }
     }

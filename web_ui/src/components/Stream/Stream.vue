@@ -1,9 +1,20 @@
 <template>
   <div class="rtc-video">
+    <!-- new add select -->
+    <a-select
+      v-model:value="value"
+      label-in-value
+      style="width: 120px"
+      :options="options"
+      @change="handleChange"
+      class="dropdown-style"
+    >
+    </a-select>
+
     <video ref="remoteVideoEl" autoplay></video>
     <canvas ref="canvasEl" class="boundingBox"></canvas>
   </div>
-  
+
   <div class="control__wrapper">
     <a-tooltip placement="right" color="blue" title="Establish WEBRTC">
       <a-button
@@ -72,12 +83,31 @@ export default {
 
     const setLogs = (log) => store.dispatch('setLogs', log)
 
+    //多做一個droneID來選擇，然後在 socket.emit('send-webrtc', {})新增droneID來加入
+    const options = ref([
+      {
+        value: 'jack',
+        label: 'Jack (100)'
+      },
+      {
+        value: 'lucy',
+        label: 'Lucy (101)'
+      }
+    ])
+
+    const handleChange = (value) => {
+      console.log(value) // { key: "lucy", label: "Lucy (101)" }
+    }
+
     //handle ice candidate events
     //要看一下
     const onIceCandidate = (event) => {
+      //console.log()
+      console.log('onIceCandidate Event: ', event)
       if (event.candidate) {
         setTimeout(() => {
           socket.emit('send-webrtc', {
+            // droneID:
             type: 'candidate',
             payload: event.candidate
           })
@@ -88,6 +118,8 @@ export default {
 
     // handle receive media track event
     const onTrack = (event) => {
+      //consoloe.log()
+      console.log('ontrack event: ', event)
       setLogs('Received track')
       recordButton.isReady = true
       remoteStream = event.streams[0]
@@ -126,6 +158,7 @@ export default {
         pc.close()
       }
       pc = createPeerConnection()
+      console.log('Create peer connection: ', pc)
       setLogs('Create peer connection')
       pc.onicecandidate = onIceCandidate
       pc.ontrack = onTrack
@@ -143,7 +176,9 @@ export default {
     const startPeerNegotiation = async () => {
       initPeerConnection()
       const offer = await createOfferAndSetLocalSDP(pc)
+      console.log('offer: ', offer)
       setLogs('Create offer & set offer becomes local SDP')
+      //Fixedme here，這裡要改成傳droneID
       socket.emit('send-webrtc', { type: 'offer', payload: offer })
       setLogs('Send offer')
     }
@@ -265,45 +300,56 @@ export default {
       canvasEl,
       startPeerNegotiation,
       handleRecording,
-      recordButton
+      recordButton,
+      value: ref({
+        value: 'lucy'
+      }),
+      options,
+      handleChange
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.rtc-video {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .control__wrapper {
   position: absolute;
-  
   z-index: 10;
-  top: 200px;
+  top: 50%;
   left: 5px;
   display: flex;
   flex-direction: column;
+  transform: translateY(-50%);
 
   .button {
     margin-right: 0;
     margin-bottom: 2px;
   }
-    .rtc-video{
-      position: relative;
-      width: 80%;
-      height: 80%;
-      align-items: center;
+  .rtc-video {
+    position: relative;
+    width: 80%;
+    height: 80%;
 
-      video {
-        position: relative;
-        
-      }
-      .boundingBox {
-        position: absolute;
-        
-        top: 0;
-        left: 0;
-        z-index: 5;
+    video {
+      position: relative;
+    }
+    ::v-deep(.dropdown-style) {
+      background: aqua !important;
+      ::v-deep(.ant-select .ant-select-single) {
       }
     }
+    .boundingBox {
+      position: absolute;
+
+      top: 0;
+      left: 0;
+      z-index: 5;
+    }
+  }
 }
-
-
 </style>

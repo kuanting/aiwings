@@ -333,11 +333,11 @@ export default {
 
   .container__vertical {
     width: 100%;
+    height: 100%;
   }
-  .test{
-    background-color: #111;
-  }
-  
+  // .test{
+  //   background-color: #111;
+  // }
 }
 .ant-col {
   text-align: center;
