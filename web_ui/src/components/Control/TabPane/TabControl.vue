@@ -107,7 +107,13 @@ export default {
       () => `Are you sure to ${isTakeoff.value ? 'LAND' : 'TAKEOFF'}?`
     )
     // new add
-    let defaultSelected = userInfo.value.droneId[0].id
+    let defaultSelected
+    if (userInfo.value.droneId[0]){
+      defaultSelected = userInfo.value.droneId[0].id
+    }else{
+      defaultSelected = ''
+    }
+
 
     let droneList = []
     for (let i in droneArr) {
@@ -118,6 +124,7 @@ export default {
     const handleChange = (value) => {
       //defaultSelected 要用來表示目前所選擇要操作的droneID
       //且socket.emit("send-drone") 的時候 要回傳dorneID
+      
       let defaultSelected = value
       const drone_selected = computed(() =>
         store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
