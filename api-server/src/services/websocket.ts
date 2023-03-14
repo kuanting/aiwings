@@ -41,7 +41,6 @@ export default () => {
         // 4. Started to recieved message
         await consumeTopicQueue();
 
-        //這邊要再看一下
         queues.forEach((queue) => {
           // Telling frontend that queues have been created
           socket.emit("queue-created", queue.queue);
@@ -86,7 +85,6 @@ export default () => {
               queues[i].queue,
               (msg) => {
                 if (msg) {
-                  //現在的問題是如果有多台傳到後端，要怎麼區分是哪台drone的資訊
                   console.log('drone-topic messages: ', JSON.parse(msg.content.toString()))
                   socket.emit(
                     //drone-topic
