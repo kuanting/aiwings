@@ -106,12 +106,14 @@ export default {
     const confirmText = computed(
       () => `Are you sure to ${isTakeoff.value ? 'LAND' : 'TAKEOFF'}?`
     )
-    // new add
     let defaultSelected
+
+
+    // new add
     if (userInfo.value.droneId[0]){
       defaultSelected = userInfo.value.droneId[0].id
     }else{
-      defaultSelected = ''
+      defaultSelected = 'No droone'
     }
 
 

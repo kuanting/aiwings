@@ -61,7 +61,19 @@ export default {
     const store = useStore()
     const userInfo = computed(() => store.getters.getUserInfo)
     const droneArr = userInfo.value.droneId
-    let defaultSelected = userInfo.value.droneId[0].id
+    // let defaultSelected = userInfo.value.droneId[0].id
+    let defaultSelected
+
+    
+    // new add
+    if (userInfo.value.droneId[0]){
+      defaultSelected = userInfo.value.droneId[0].id
+    }else{
+      defaultSelected = 'No droone'
+    }
+
+
+
     let droneList = []
     for (let i in droneArr) {
       let droneID = droneArr[i].id
