@@ -13,9 +13,9 @@
         </div>
       </div>
       <div class="bottom-box">
-        <!-- <div class="bottomleft-box">
-          <Stream />
-        </div> -->
+        <div class="bottomleft-box">
+          <!-- <Stream /> -->
+        </div>
         <div class="bottomcenter-box">
           <DroneInfoDashBoardVue />
         </div>
@@ -88,19 +88,12 @@ export default {
     }
     const rabbitmqInit = () => {
       // console.log('user: ', user.value.droneId[0])
+      console.log(socket.id)
       saveLogs(`Websocket connected: ${socket.id}`)
-
       for (let i in user.value.droneId) {
         saveLogs(`Drone ID: ${user.value.droneId[i]}`)
       }
-
-      //FIXME
-      //這邊要再看一下
-      // for (let i in user.value.droneId){
-      //   // console.log(typeof(user.value.droneId[i]))
-      //   socket.emit('establish-rabbitmq-connection', user.value.droneId[i])
-      // }
-      socket.emit('establish-rabbitmq-connection', user.value.droneId)
+      socket.emit('establish-rabbitmq-connection-drone', user.value.droneId)
     }
     // Trigger RabbitMQ when the first come or refresh pages
     if (!rabbitmqIsInit.value) {
@@ -214,6 +207,8 @@ export default {
 
     // Remove listener to prevent multiple listening
     onBeforeUnmount(() => {
+      // store.dispatch('setRabbitmqIsInit', false)
+
       socket.off('connect')
       socket.off('disconnect')
       socket.off('queue-created')
@@ -284,31 +279,31 @@ export default {
       .bottomleft-box {
         width: 30%;
         height: 400px;
-        background-color: #545353ec;
-        position: relative;
+        // background-color: #545353ec;
+        // position: relative;
 
-        background-image: url('../assets/live-stream.png');
-        background-size: 100% 100%;
-        @media (min-width: 300px) {
-          visibility: visible;
-        }
+        // background-image: url('../assets/live-stream.png');
+        // background-size: 100% 100%;
+        // @media (min-width: 300px) {
+        //   visibility: visible;
+        // }
       }
 
       .bottomcenter-box {
-        width: 50%;
-        height: 60%;
-        // align-items: center;
+        width: 40%;
+        height: 25%;
+        display: flex;
+        // flex-direction: row;
         background-color: #545353ec;
-        overflow: scroll;
       }
 
       .bottomright-box {
-        width: 25%;
-        height: 400px;
+        width: 30%;
+        height: 350px;
         // width: 50%;
         // height: 60%;
-        position: relative;
-        overflow: scroll;
+        // position: relative;
+        
         background-color: #545353ec;
       }
     }

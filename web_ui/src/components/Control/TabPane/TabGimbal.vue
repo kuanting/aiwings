@@ -116,9 +116,10 @@ export default {
   width: 100%;
   height: 100%;
   padding: 0 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
+  position: relative;
+  // display: flex;
+  // flex-direction: column;
+  // justify-content: space-evenly;
 
   .slider__wrapper {
     width: 100%;
@@ -131,7 +132,7 @@ export default {
       font-weight: 600;
     }
     .slider__item {
-      width: 100%;
+      width: 90%;
     }
   }
 }

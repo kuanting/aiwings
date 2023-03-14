@@ -121,7 +121,7 @@ export default {
       //consoloe.log()
       console.log('ontrack event: ', event)
       setLogs('Received track')
-      recordButton.isReady = true
+      // recordButton.isReady = true
       remoteStream = event.streams[0]
       remoteVideoEl.value.srcObject = remoteStream
       detection.setupCanvasContainer(remoteVideoEl.value, canvasEl.value)

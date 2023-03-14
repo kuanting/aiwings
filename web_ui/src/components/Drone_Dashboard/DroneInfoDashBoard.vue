@@ -8,34 +8,34 @@
         overlayClassName="popover"
       >
         <template #content>
-          
-            <h3>
-              <span>{{ index }}</span>
-            </h3>
-            <li><span>TIME:</span> {{ droneArr[index].timeStamp }}</li>
-            <li>
-              <span>GPS:</span> {{ droneArr[index].longitude }}
-              {{ droneArr[index].latitude }}
-            </li>
-            <li><span>HEADING:</span> {{ droneArr[index].heading }}</li>
-            <li><span>ALTITUDE(m):</span> {{ droneArr[index].altitude }}</li>
-            <li><span>SPEED(m/s): </span> {{ droneArr[index].speed }}</li>
-            <li><span>STATUS:</span> {{ droneArr[index].isArmed }}</li>
-            <li><span>MODE:</span> {{ droneArr[index].mode }}</li>
-            <li><span>VOLTAGE:</span> {{ droneArr[index].voltage }}</li>
-            <li><span>BATTERY:</span> {{ droneArr[index].percentage }}</li>
-            <li><span>ROLL:</span> {{ droneArr[index].roll }}</li>
-            <li><span>PITCH:</span> {{ droneArr[index].pitch }}</li>
-            <li><span>GPS COUNTS:</span> {{ droneArr[index].gpsCount }}</li>
-            <li><span>GPS HPOP:</span> {{ droneArr[index].hpop }}</li>
+          <h3>
+            <span>{{ index }}</span>
+          </h3>
+          <li><span>TIME:</span> {{ droneArr[index].timeStamp }}</li>
+          <li>
+            <span>GPS:</span> {{ droneArr[index].longitude }}
+            {{ droneArr[index].latitude }}
+          </li>
+          <li><span>HEADING:</span> {{ droneArr[index].heading }}</li>
+          <li><span>ALTITUDE(m):</span> {{ droneArr[index].altitude }}</li>
+          <li><span>SPEED(m/s): </span> {{ droneArr[index].speed }}</li>
+          <li><span>STATUS:</span> {{ droneArr[index].isArmed }}</li>
+          <li><span>MODE:</span> {{ droneArr[index].mode }}</li>
+          <li><span>VOLTAGE:</span> {{ droneArr[index].voltage }}</li>
+          <li><span>BATTERY:</span> {{ droneArr[index].percentage }}</li>
+          <li><span>ROLL:</span> {{ droneArr[index].roll }}</li>
+          <li><span>PITCH:</span> {{ droneArr[index].pitch }}</li>
+          <li><span>GPS COUNTS:</span> {{ droneArr[index].gpsCount }}</li>
+          <li><span>GPS HPOP:</span> {{ droneArr[index].hpop }}</li>
         </template>
-        <img
-          class="cover-fit"
-          src="../../assets/drone1.gif"
-          @click="showSelected(index)"
-          @mouseover="mouseOverEvent(index)"
-          @mouseout="mouseOutEvent(index)"
-        />
+          <img
+            src="../../assets/drone1.gif"
+            alt="drone_gif"
+            @click="showSelected(index)"
+            @mouseover="mouseOverEvent(index)"
+            @mouseout="mouseOutEvent(index)"
+            class="cover-fit"
+          />
         {{ droneID.id }}
       </a-popover>
     </div>
@@ -55,7 +55,7 @@ export default {
     const store = useStore()
     const drone = computed(() => store.getters['drone/getDroneInfo'])
     let popOverState = reactive({})
-    //Drone array store the each drone information 
+    //Drone array store the each drone information
     let droneArr = reactive(drone.value)
     // console.log('droneARR: ', droneArr)
     // console.log('drone.value: ', drone.value)
@@ -115,34 +115,39 @@ export default {
 <style lang="scss" scoped>
 .container {
   display: flex;
-  flex-wrap: wrap-reverse;
-  overflow-y: auto;
-}
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  // white-space: nowrap;
 
-.box {
-  width: 130px;
-  height: 110px;
-  overflow: hidden;
-}
+  .box {
+    // position: relative;
+    width: 20%;
+    height: 90%;
+    padding: 1%;
+    flex-shrink: 0;
+  }
 
-.box:hover img {
-  transform: scale(1.1);
-}
-.cover-fit {
-  width: 70%;
-  height: 70%;
-  object-fit: cover;
-  margin-left: 7%;
-}
-
-img {
-  width: 50px;
-  height: 50px;
-  margin-top: 7%;
-  border-radius: 50%;
-  border-style: solid;
-  border-color: red;
-  transition: 0.5s;
+  .box:hover img {
+    transform: scale(1.1);
+  }
+  .cover-fit {
+    width: 100%;
+    height: 100%;
+    // object-fit: cover;
+    // margin-left: 30px;
+  }
+  img {
+    // display: flex;
+    width: 8em;
+    align-items: center;
+    border-radius: 50%;
+    border-style: solid;
+    border-color: red;
+    transition: 0.5s;
+  }
 }
 </style>
 
@@ -160,16 +165,18 @@ img {
 .popover .ant-popover-content .ant-popover-inner {
   // border-radius: 20px;
   background-color: transparent;
-  
 }
 // .popover .ant-popover-content {
 //   border-radius: 10px;
 // }
+.container {
+  overflow-x: scroll;
+}
 .popover {
   width: 220px;
   height: 110px;
-  background-color:#545353ca;
-  overflow-y: auto;
+  background-color: #545353ca;
+  // overflow-y: auto;
   top: 0.5rem;
   left: 0.5rem;
   position: relative;

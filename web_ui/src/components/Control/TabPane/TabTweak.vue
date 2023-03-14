@@ -124,8 +124,8 @@ export default {
 .container {
   width: 100%;
   height: 100%;
-  position: relative;
-
+  position: absolute;
+  // display: flex;
   .top-center {
     position: absolute;
     left: 50%;

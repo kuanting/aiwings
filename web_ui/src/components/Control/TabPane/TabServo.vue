@@ -7,6 +7,7 @@
       style="width: 120px"
       :options="options"
       @change="handleChange"
+      class="select"
     ></a-select>
     <!--  -->
     <Button
@@ -15,6 +16,7 @@
       :block="true"
       size="large"
       :click-handler="servoUpHandler"
+      class="servo_button_top"
     >
       <UpCircleOutlined />
     </Button>
@@ -25,6 +27,7 @@
       size="large"
       danger
       :click-handler="servoStopHandler"
+      class="servo_button"
     >
       <PauseCircleOutlined />
     </Button>
@@ -34,6 +37,7 @@
       :block="true"
       size="large"
       :click-handler="servoDownHandler"
+      class="servo_button"
     >
       <DownCircleOutlined />
     </Button>
@@ -115,9 +119,19 @@ export default {
   width: 100%;
   height: 100%;
   padding: 0 1rem;
-  display: flex;
+  // display: flex;
   flex-flow: column wrap;
   justify-content: space-evenly;
   align-items: center;
+  .select {
+    align-items: center;
+  }
+  .servo_button_top {
+    margin-bottom: 3%;
+    margin-top: 5%;
+  }
+  .servo_button {
+    margin-bottom: 3%;
+  }
 }
 </style>
