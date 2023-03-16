@@ -100,11 +100,7 @@ export default {
         // 如果已經註冊droneID, 那就直接進入操作介面， 如果沒有那就跳出提示，然後進入註冊畫面
         // if (data.isEnrolled === true) {
         router.push({ path: '/drone' })
-        // } else {
-        //   console.log('DRONEID 尚未被註冊，這裡要轉跳到註冊畫面')
-        //   router.push({ path: '/enroll' })
-        // }
-        // ------------------------------------
+        
       } catch ({ response }) {
         notification.error({
           message: response.data.msg

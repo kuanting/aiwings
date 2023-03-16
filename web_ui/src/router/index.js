@@ -54,7 +54,7 @@ const routes = [
   {
     path: '/drone',
     name: 'Drone',
-    component: () => import('../views/Drone01.vue')
+    component: () => import('../views/Drone.vue')
   },
   {
     path: '/records',

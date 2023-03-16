@@ -10,9 +10,9 @@ const {
   NODE_ENV,
 } = process.env;
 
-// CREATE TABLE drones(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, user_id INT NOT NULL, drone_id VARCHAR(100) ,isAdmin boolean DEFAULT false, FOREIGN KEY(user_id) REFERENCES user(id));
 // CREATE TABLE user(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL, drone_id INT);
-// CREATE TABLE user(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL);
+// CREATE TABLE drones(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, user_id INT NOT NULL, drone_id VARCHAR(100) ,isAdmin boolean DEFAULT false, FOREIGN KEY(user_id) REFERENCES user(id));
+// CREATE TABLE  IF NOT EXISTS user(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL);
 
 export async function connectToDatabase() {
   try {
@@ -22,8 +22,28 @@ export async function connectToDatabase() {
       user: MYSQL_SERVICE_USER,
       password: MYSQL_SERVICE_PASSWORD,
       database: "drone_cloud_test",
-      multipleStatements: true 
+      multipleStatements: true
     });
+    // 創建 user 表格
+    const createUserTableSql = 'CREATE TABLE IF NOT EXISTS user (id BINARY(16)  NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL)';
+    db.query(createUserTableSql, function(err: Error, result:any) {
+      if (err) {
+        logger.error(err);
+      } else {
+        logger.info("User table created!");
+      }
+    });
+    
+    // 創建 drones 表格
+    const createDronesTableSql = 'CREATE TABLE IF NOT EXISTS drones (id BINARY(16)  NOT NULL PRIMARY KEY, user_id BINARY(16) NOT NULL, drone_id VARCHAR(100), isAdmin boolean DEFAULT false, FOREIGN KEY(user_id) REFERENCES user(id))';
+    db.query(createDronesTableSql, function(err: Error, result:any) {
+      if (err) {
+        logger.error(err);
+      } else {
+        logger.info("Drones table created!");
+      }
+    });
+    
     logger.info("Connect to database successfully!");
     return db;
   } catch (err) {
@@ -31,3 +51,10 @@ export async function connectToDatabase() {
     setTimeout(connectToDatabase, 5000);
   }
 }
+
+
+
+
+
+
+
