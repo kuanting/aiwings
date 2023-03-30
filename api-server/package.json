@@ -10,7 +10,7 @@
     "build": "tsc -b"
   },
   "keywords": [],
-  "author": "Tony Chung",
+  "author": "Tony Chung, Brian Lin",
   "license": "ISC",
   "dependencies": {
     "amqplib": "^0.8.0",

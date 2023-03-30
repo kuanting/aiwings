@@ -22,6 +22,8 @@ export async function connectToDatabase() {
       user: MYSQL_SERVICE_USER,
       password: MYSQL_SERVICE_PASSWORD,
       database: "drone_cloud_test",
+      // logging: process.env.NODE_ENV === 'production' ? false : 'all',
+      // synchronize: NODE_ENV !== 'production',
       multipleStatements: true
     });
     // 創建 user 表格
