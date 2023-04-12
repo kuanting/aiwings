@@ -15,21 +15,22 @@ import { connectToRabbitmq as useRabbitmq } from './services/rabbitmq';
 
 // Create express application
 const app = express();
+const fs = require('fs');
 
 app.set('trust proxy', process.env.NODE_ENV === 'production');
 
+const options = {
+  key: fs.readFileSync('../src/certs/private.key'),
+  cert: fs.readFileSync('../src/certs/certificate.crt')
+};
 // Create server
 const server =
   process.env.NODE_ENV === 'production'
     ? https.createServer(
-        { key: process.env.TLS_KEY, cert: process.env.TLS_CERT },
-        app
-      ) 
+      options,
+      app
+    )
     : http.createServer(app);
-
-
-    
-
 
 // Logger
 const { combine, timestamp, printf } = format;
