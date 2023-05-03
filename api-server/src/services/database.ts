@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { logger } from "../server";
-const mysql = require("mysql");
+import mysql = require("mysql");
+// import mysql from 'mysql'
 
 const {
   MYSQL_SERVICE_SERVICE_HOST,
@@ -26,7 +27,7 @@ export async function connectToDatabase() {
       // synchronize: NODE_ENV !== 'production',
       multipleStatements: true
     });
-    // 創建 user 表格
+
     const createUserTableSql = 'CREATE TABLE IF NOT EXISTS user (id BINARY(16)  NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL)';
     db.query(createUserTableSql, function(err: Error, result:any) {
       if (err) {
@@ -36,7 +37,6 @@ export async function connectToDatabase() {
       }
     });
     
-    // 創建 drones 表格
     const createDronesTableSql = 'CREATE TABLE IF NOT EXISTS drones (id BINARY(16)  NOT NULL PRIMARY KEY, user_id BINARY(16) NOT NULL, drone_id VARCHAR(100), isAdmin boolean DEFAULT false, FOREIGN KEY(user_id) REFERENCES user(id))';
     db.query(createDronesTableSql, function(err: Error, result:any) {
       if (err) {

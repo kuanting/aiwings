@@ -49,11 +49,8 @@ export default () => {
         logger.error(error);
       }
 
-      //assert queue 是創建queue 等待exchange後的結果
-      //創建queue，如果沒有的話會自動生成
       async function assertTopicQueue() {
         for (let key in droneId) {
-            // console.log("droneId in assertQueue: ", key);
             const queue = await channel.assertQueue(
               `${socket.id}-${droneId[key].id}-drone`,
               {
@@ -69,7 +66,6 @@ export default () => {
       // according to the type of the exchange and the pattern given.
       async function bindTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
-          // console.log(queues[i].queue);
             await channel.bindQueue(
               queues[i].queue,
               RABBITMQ.EXCHANGE_NAME,
@@ -118,7 +114,6 @@ export default () => {
         // 4. Started to recieved message
         await consumeTopicQueue();
 
-        //這邊要再看一下
         queues.forEach((queue) => {
           // Telling frontend that queues have been created
           socket.emit("queue-created", queue.queue);
@@ -131,7 +126,6 @@ export default () => {
       //創建queue，如果沒有的話會自動生成
       async function assertTopicQueue() {
         for (let key in droneId) {
-            // console.log("droneId in assertQueue: ", key);
             const queue = await channel.assertQueue(
               `${socket.id}-${droneId[key].id}-webrtc`,
               {
@@ -210,8 +204,6 @@ export default () => {
     });
 
     // Drone-related
-    //如果要操作多台，前端需要回傳droneID， 因為要知道是誰傳過來的，這樣就可以知道要傳給誰
-    //droneID 可以用array來傳，這樣在操作多台可以一次傳入多台相同的cmd
 
     socket.on("send-drone", (command: Command) => {
       console.log("socket-> send-drone: ", command);

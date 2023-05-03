@@ -117,35 +117,7 @@ export default {
         return;
       }
 
-      //SEELCT DRONEID is enrolled or not
-      // const select_drone = async function (user: any) {
-      //   return new Promise(function (resolve, reject) {
-      //     let sql =
-      //       "SELECT BIN_TO_UUID(drones.id) AS droneId from drones WHERE drones.user_id = UUID_TO_BIN(?);";
-      //     conn.query(sql, [user.id], function (err: any, result: any) {
-      //       if (err) {
-      //         reject(err);
-      //         return;
-      //       }
-
-      //       let dataSTring = JSON.stringify(result);
-      //       let data = JSON.parse(dataSTring);
-      //       resolve(data[0]);
-      //       return;
-      //     });
-      //   });
-      // };
-      // let drone: any = await select_drone(user);
-      // console.log("drone: ", drone);
-
-      // if (drone === undefined) {
-      //   drone = false;
-      //   console.log(drone);
-      // } else {
-      //   drone = true;
-      //   console.log(drone);
-      // }
-
+      
       const accessToken = await signJwtToken("5m", { uuid: user.id });
       const refreshToken = await signJwtToken("30d", { uuid: user.id });
 
@@ -162,7 +134,6 @@ export default {
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           secure: process.env.NODE_ENV === "production",
         })
-        // .json({ msg: "User login", isEnrolled: drone });
         .json({ msg: "User login" });
     } catch (error) {
       logger.error(error);

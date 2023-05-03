@@ -45,9 +45,7 @@ export default {
       };
 
       const user: any = await select_user();
-      // console.log("user.ts: ", user);
 
-      // console.log("user.ts: ", user);
       if (user) {
         res
           .cookie("access_token", res.locals.accessToken, {
@@ -83,7 +81,6 @@ export default {
           //fixed me
           let sql =
             "SELECT email,drone_id, isAdmin FROM drones LEFT JOIN user ON user.id=drones.user_id WHERE user.id=UUID_TO_BIN(?);SELECT email FROM user  WHERE user.id=UUID_TO_BIN(?);";
-          // let sql = " SELECT email FROM user  WHERE user.id=UUID_TO_BIN(?);";
 
           conn.query(
             sql,
@@ -93,11 +90,8 @@ export default {
                 reject(err);
                 return;
               }
-              // console.log("result[0]: ", result[0]);
-              // console.log("resulr[1]: ", result[1]);
+            
               if (result[0].length == 0) {
-                //if user haven't enrolled droneID
-                // let drone: droneId = new Object();
                 let drone:  { id: string }[] = []
                 let userInfo = {
                   email: result[1][0].email,
@@ -113,10 +107,8 @@ export default {
                 // user has enrolled droneID
                 let drone:  { id: string }[] = []
 
-                //把它key改成都是id
-                //應該要改成array然後append，變成[{ID:XXXX}, {ID:XXXXX}, {ID:XXXXX}]
+              
                 for (const index in result[0]) {
-                  // drone[index] = result[0][index]['drone_id'];
                   drone.push({id: result[0][index]['drone_id']})
                 }
                 let userInfo = {
@@ -124,7 +116,6 @@ export default {
                   droneId: drone,
                   isAdmin: result[0][0].isAdmin
                 };
-                // console.log("else: ", userInfo);
                 let dataSTring = JSON.stringify(userInfo);
                 let data = JSON.parse(dataSTring);
                 resolve(data);
@@ -161,7 +152,6 @@ export default {
    * Edit user's `drone ID`
    */
 
-  //FIXED ME
   async editUserDroneId(req: Request, res: Response) {
     const { droneId }: EditIDPayload = req.body;
     try {
@@ -169,10 +159,7 @@ export default {
       const update_droneID = async function () {
         let conn = await db();
         return new Promise(function (resolve, reject) {
-          //FIXME
-          //要找到原來的id 插入第三個變數
-          console.log(req.body.droneId);
-          console.log(req.body.originDroneId);
+          
           let sql =
             " UPDATE drones SET drones.drone_id = ? WHERE (drones.user_id = (SELECT id FROM user WHERE id = ?)) AND (drones.drone_id= ?);";
           conn.query(

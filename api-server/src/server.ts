@@ -12,6 +12,8 @@ import routes from './routes';
 import useSocketIO from './services/websocket';
 import { connectToDatabase as useDatabase } from './services/database';
 import { connectToRabbitmq as useRabbitmq } from './services/rabbitmq';
+
+
 // Create express application
 const app = express();
 
@@ -69,4 +71,9 @@ server.listen(Number(process.env.BACKEND_SERVICE_SERVICE_PORT), () => {
   );
 });
 
+// server.listen(3030, () => {
+//   logger.info(
+//     `Server is listening on port 3030`
+//   );
+// });
 export { logger, io };
