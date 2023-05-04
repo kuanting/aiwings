@@ -1,6 +1,16 @@
 <template>
   <div class="container">
     <div class="container__vertical">
+      <!-- new add select drone -->
+      <a-select
+        v-model:value="value"
+        label-in-value
+        style="width: 120px"
+        :options="options"
+        @change="handleChange"
+        dropdownClassName=""
+      ></a-select>
+      <!-- end -->
       <a-row justify="space-around">
         <a-col flex="auto">
           <a-popconfirm
@@ -90,10 +100,74 @@ export default {
     const store = useStore()
     const drone = computed(() => store.getters['drone/getDroneInfo'])
     const destination = computed(() => store.getters['drone/getDestination'])
-
+    //這邊要新增從user/state取得droneID，放在畫面上做選擇，然後再把選擇的droneID傳到vuex的getDroneInfo取得資訊
+    const userInfo = computed(() => store.getters.getUserInfo)
+    const droneArr = userInfo.value.droneId
     const confirmText = computed(
       () => `Are you sure to ${isTakeoff.value ? 'LAND' : 'TAKEOFF'}?`
     )
+    let defaultSelected
+
+
+    // new add
+    if (userInfo.value.droneId[0]){
+      defaultSelected = userInfo.value.droneId[0].id
+    }else{
+      defaultSelected = 'No droone'
+    }
+
+
+    let droneList = []
+    for (let i in droneArr) {
+      let droneID = droneArr[i].id
+      droneList.push({ value: droneID, label: droneID })
+    }
+    const options = ref(droneList)
+    const handleChange = (value) => {
+      //defaultSelected 要用來表示目前所選擇要操作的droneID
+      //且socket.emit("send-drone") 的時候 要回傳dorneID
+      
+      let defaultSelected = value
+      const drone_selected = computed(() =>
+        store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
+      )
+      //dronechange表示選擇的droneID的data，drone變數表示的是全部的drone data
+      console.log('changeDroneInfo', drone_selected.value)
+      if (drone_selected.value === undefined) {
+        message.info("The drone you selected haven't connected!")
+      } else {
+        message.success(`The drone you select is ${defaultSelected.value}`)
+      }
+    }
+    // ----end----
+
+    //這邊要監視的是drone下的所有droneID的object
+    // console.log("TabControl watch drone: ", drone_selected)
+
+    //UPDATE
+    // watch(drone, (drone) => {
+    //   /*
+    //     When fulfill below situations, mode will change into GUIDED:
+
+    //     1. In LAND mode and the drone is DISARM
+    //    */
+    //   console.log('TabControl watch drone: ', drone)
+    //   if (typeof drone.mode === 'undefined') return
+    //   if (drone.isArmed === 'DISARM' && drone.mode === 'LAND') {
+    //     flightModeChangeHandler('GUIDED')
+    //   }
+
+    //   flightMode.value = drone.mode
+    //   isArm.value = drone.isArmed === 'ARM' ? true : false
+
+    //   isTakeoff.value =
+    //     drone.isArmed === 'ARM' && drone.altitude >= 0.5 ? true : false
+
+    //   isLanding.value =
+    //     drone.mode === 'LAND' && drone.isArmed === 'ARM' ? true : false
+    // })
+
+    //ORIGIN
 
     watch(drone, (drone) => {
       /*
@@ -101,34 +175,56 @@ export default {
 
         1. In LAND mode and the drone is DISARM
        */
-      if (typeof drone.mode === 'undefined') return
-      if (drone.isArmed === 'DISARM' && drone.mode === 'LAND') {
+      console.log('TabControl watch drone: ', drone[defaultSelected])
+      if (typeof drone[defaultSelected].mode === 'undefined') return
+      if (
+        drone[defaultSelected].isArmed === 'DISARM' &&
+        drone[defaultSelected].mode === 'LAND'
+      ) {
         flightModeChangeHandler('GUIDED')
       }
 
-      flightMode.value = drone.mode
-      isArm.value = drone.isArmed === 'ARM' ? true : false
+      flightMode.value = drone[defaultSelected].mode
+      isArm.value = drone[defaultSelected].isArmed === 'ARM' ? true : false
+
       isTakeoff.value =
-        drone.isArmed === 'ARM' && drone.altitude >= 0.5 ? true : false
+        drone[defaultSelected].isArmed === 'ARM' &&
+        drone[defaultSelected].altitude >= 0.5
+          ? true
+          : false
+
       isLanding.value =
-        drone.mode === 'LAND' && drone.isArmed === 'ARM' ? true : false
+        drone[defaultSelected].mode === 'LAND' &&
+        drone[defaultSelected].isArmed === 'ARM'
+          ? true
+          : false
     })
 
     watch([isTakeoff, altitude], ([isTakeoff, altitude]) => {
-      store.dispatch('drone/updateFlightStatus', { isTakeoff, altitude })
+      console.log(isTakeoff, altitude)
+      store.dispatch('drone/updateFlightStatus', {
+        droneID: defaultSelected,
+        status: { altitude, isTakeoff }
+      })
     })
+
+    console.log(isTakeoff.value, isLanding.value)
 
     const sendDroneCommand = (command) => socket.emit('send-drone', command)
 
     const flightHandler = () => {
       if (isTakeoff.value) {
-        sendDroneCommand({ cmd: 'LAND' })
+        sendDroneCommand({ droneID: defaultSelected, cmd: 'LAND' })
         message.success('LANDING')
         return
       }
-      sendDroneCommand({ cmd: 'ARM' })
+      sendDroneCommand({ droneID: defaultSelected, cmd: 'ARM' })
       setTimeout(() => {
-        sendDroneCommand({ cmd: 'TAKEOFF', altitude: altitude.value })
+        sendDroneCommand({
+          droneID: defaultSelected,
+          cmd: 'TAKEOFF',
+          altitude: altitude.value
+        })
         message.success('TAKEOFF')
       }, 2000)
     }
@@ -143,6 +239,7 @@ export default {
       if (isTakeoff.value) {
         if (destination.value.lng === 0) {
           sendDroneCommand({
+            droneID: defaultSelected,
             cmd: 'GOTO',
             altitude: altitude.value,
             lng: drone.value.longitude,
@@ -150,6 +247,7 @@ export default {
           })
         } else {
           sendDroneCommand({
+            droneID: defaultSelected,
             cmd: 'GOTO',
             altitude: altitude.value,
             lng: destination.value.lng,
@@ -171,7 +269,11 @@ export default {
 
     const speedEnterHandler = () => {
       if (isTakeoff.value) {
-        sendDroneCommand({ cmd: 'CHANGE_SPEED', speed: speed.value })
+        sendDroneCommand({
+          droneID: 'e27d4dacf11f9cd5',
+          cmd: 'CHANGE_SPEED',
+          speed: speed.value
+        })
         message.success(`Change SPEED to ${speed.value}m/s`)
         return
       }
@@ -183,12 +285,12 @@ export default {
       if (typeof mode === 'object') {
         mode = mode.target.value
       }
-      sendDroneCommand({ cmd: mode })
+      sendDroneCommand({ droneID: defaultSelected, cmd: mode })
       message.success(`Change MODE to ${mode}`)
     }
-
     const emergencyStopHandler = () => {
       sendDroneCommand({
+        droneID: defaultSelected,
         cmd: 'GOTO',
         altitude: altitude.value,
         lng: drone.value.longitude,
@@ -215,7 +317,13 @@ export default {
       speedChangeHandler,
       speedEnterHandler,
       emergencyStopHandler,
-      flightModeChangeHandler
+      flightModeChangeHandler,
+      //new add above for select
+      value: ref({
+        value: defaultSelected
+      }),
+      options,
+      handleChange
     }
   }
 }
@@ -234,11 +342,15 @@ export default {
 
   .container__vertical {
     width: 100%;
+    height: 100%;
   }
+  // .test{
+  //   background-color: #111;
+  // }
 }
 .ant-col {
   text-align: center;
   padding-top: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 30px;
 }
 </style>

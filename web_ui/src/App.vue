@@ -1,7 +1,7 @@
 <!-- Root App -->
 <template>
-  <Header />
-  <main>
+  <Header v-if="headerVisible" />
+  <main :style="{ top: headerVisible ? '60px' : '' }">
     <router-view />
   </main>
 </template>
@@ -12,6 +12,16 @@ export default {
   name: 'App',
   components: {
     Header
+  },
+  data() {
+    return {
+      headerVisible: false
+    }
+  },
+  watch: {
+    $route(v) {
+      this.headerVisible = !["/drone", "/drone01"].includes(v.path);
+    }
   }
 }
 </script>
@@ -37,7 +47,6 @@ body {
 
   main {
     position: relative;
-    top: 60px;
     width: 100%;
     overflow: hidden;
   }

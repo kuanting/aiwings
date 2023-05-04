@@ -1,8 +1,8 @@
 import mapboxgl from 'mapbox-gl'
 
 const MAPBOX = {
-  STYLE: 'mapbox://styles/waiting33118/ckdfkx3t10k9w1irkp8anuy39',
-  TOKEN: process.env.VUE_APP_MAPBOX_TOKEN
+  STYLE: 'mapbox://styles/mapbox/outdoors-v11',
+  TOKEN: import.meta.env.VITE_APP_MAPBOX_TOKEN
 }
 export default class CustomMap {
   constructor({ longitude, latitude }) {
@@ -15,7 +15,7 @@ export default class CustomMap {
     this.map = new mapboxgl.Map({
       style: mapStyle || MAPBOX.STYLE,
       center: [this.longitude, this.latitude],
-      zoom: 17,
+      zoom: 16,
       pitch: 0,
       bearing: 0,
       antialias: false,
@@ -31,6 +31,7 @@ export default class CustomMap {
 
   _loadBuildingLayer() {
     // Get label layer ID
+    
     const layers = this.map.getStyle().layers
     let labelLayerId
     for (let i = 0; i < layers.length; i++) {
@@ -80,7 +81,7 @@ export default class CustomMap {
       new mapboxgl.NavigationControl({
         visualizePitch: true,
         showZoom: true,
-        showCompass: true
+        showCompass: true,
       }),
       'top-right'
     )
@@ -157,20 +158,25 @@ export default class CustomMap {
     this.map.getSource(sourceId)?.setData(geoJsonData)
   }
 
+  
   createMarker({
     color = 'blue',
     scale = '1',
     longitude,
     latitude,
     draggable = false,
-    map
+    map,
+    popup,
+    element
   }) {
     return new mapboxgl.Marker({
+      element,
       color,
       scale,
       draggable
     })
       .setLngLat([longitude, latitude])
+      .setPopup(popup)
       .addTo(map)
   }
 

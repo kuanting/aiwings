@@ -2,7 +2,6 @@ export interface SignupField {
   email: string;
   password: string;
   checkPassword: string;
-  droneId: string;
 }
 
 export interface LoginField {
@@ -21,4 +20,13 @@ export interface CookiePayload {
 
 export interface EditIDPayload {
   droneId: string;
+}
+
+export interface AddIDPayload {
+  droneId: array;
+}
+
+export interface droneId {
+  [key: string]: any;
+  name: string;
 }

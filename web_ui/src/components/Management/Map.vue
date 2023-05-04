@@ -43,6 +43,7 @@ export default {
             lat
           ]
         } else {
+          //turf: It performs geospatial processing tasks with GeoJSON data and can be run on a server or in a browser.
           const feature = turf.point([lng, lat], { droneId: id })
           const index = featureCollection.features.push(feature)
           live.drone = {

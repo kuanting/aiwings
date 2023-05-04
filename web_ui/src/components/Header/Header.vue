@@ -3,7 +3,7 @@
     <nav>
       <router-link to="/" class="logo">
         <img src="../../assets/logo.svg" alt="logo-icon" class="logo__icon" />
-        <span class="logo__title">Drone Cloud Platform</span>
+        <span class="logo__title">AIwings</span>
       </router-link>
 
       <a-menu class="link" :selected-keys="current" mode="horizontal">
@@ -16,7 +16,6 @@
         <a-menu-item v-if="isAuth" key="drone">
           <router-link to="/drone">
             <ControlOutlined />
-            Control Panel
           </router-link>
         </a-menu-item>
         <a-menu-item v-if="isAuth && isAdmin" key="management">
@@ -35,6 +34,9 @@
           <a-menu-item-group>
             <a-menu-item key="account">
               <router-link to="account">Account</router-link>
+            </a-menu-item>
+            <a-menu-item key="drone">
+              <router-link to="enroll">Add drones</router-link>
             </a-menu-item>
             <a-menu-item key="records">
               <router-link to="records">Records</router-link>
@@ -82,7 +84,7 @@ export default {
         current.value = [currentRoute]
       }
     )
-
+    console.log(isAuth, isAdmin, username)
     return {
       current,
       isAuth,

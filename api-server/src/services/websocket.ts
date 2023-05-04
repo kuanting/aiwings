@@ -1,26 +1,104 @@
-import { io, logger } from '../server';
-import { Replies } from 'amqplib';
-import { Socket } from 'socket.io';
-import { channel } from '../services/rabbitmq';
-import { Command } from '../types/drone';
+import { io, logger } from "../server";
+import { Replies } from "amqplib";
+import { Socket } from "socket.io";
+import { channel } from "../services/rabbitmq";
+import { Command } from "../types/drone";
 
 const RABBITMQ = {
-  EXCHANGE_NAME: 'drone',
-  EXCHANGE_TYPE: 'topic',
-  QUEUE_TOPICS: ['drone', 'webrtc']
+  EXCHANGE_NAME: "drone",
+  EXCHANGE_TYPE: "topic",
+  QUEUE_TOPICS: ["drone", "webrtc"],
 };
 
+// binding key design: {user_uuid}.{drone_uuid}.{mavlink}, {user_uuid}.{drone_uuid}.{webrtc}
 export default () => {
   // When establish connection
-  io.on('connection', (socket: Socket) => {
+  io.on("connection", (socket: Socket) => {
     logger.info(`Websocket connected: ${socket.id}`);
-    let droneId: string;
+    let droneId: { id: string }[];
     let queues: Replies.AssertQueue[] = [];
     let consumers: Replies.Consume[] = [];
     let adminQueue: Replies.AssertQueue;
 
     // Inital RabbitMQ
-    socket.on('establish-rabbitmq-connection', async (receiveId: string) => {
+    socket.on("establish-rabbitmq-connection-drone", async (receiveId: { id: string }[]) => {
+      console.log("DroneID List(webSocket): ", receiveId);
+      // console.log(Object.keys(receiveId).length);
+      // console.log(Object.keys(receiveId));
+      droneId = receiveId;
+      // console.log(droneId);
+      try {
+        // 1. Create exchange
+        await channel.assertExchange(
+          RABBITMQ.EXCHANGE_NAME,
+          RABBITMQ.EXCHANGE_TYPE,
+          { durable: false }
+        );
+        // 2. Create topic queue
+        await assertTopicQueue();
+        // 3. Bind topic queue (phone)
+        await bindTopicQueue();
+        // 4. Started to recieved message
+        await consumeTopicQueue();
+
+        queues.forEach((queue) => {
+          // Telling frontend that queues have been created
+          socket.emit("queue-created", queue.queue);
+        });
+      } catch (error) {
+        logger.error(error);
+      }
+
+      async function assertTopicQueue() {
+        for (let key in droneId) {
+            const queue = await channel.assertQueue(
+              `${socket.id}-${droneId[key].id}-drone`,
+              {
+                autoDelete: true,
+                durable: false,
+              }
+            );
+            queues.push(queue);
+        }
+      }
+
+      //Assert a routing path from an exchange to a queue: the exchange named by source will relay messages to the queue named,
+      // according to the type of the exchange and the pattern given.
+      async function bindTopicQueue() {
+        for (let i = 0; i < queues.length; i++) {
+            await channel.bindQueue(
+              queues[i].queue,
+              RABBITMQ.EXCHANGE_NAME,
+              `${droneId[i].id}.phone.drone`
+            );
+        }
+      }
+
+      async function consumeTopicQueue() {
+        for (let i = 0; i < queues.length; i++) {
+          //if divisible means the topic is "drone" else means "webrtc"
+            const consume = await channel.consume(
+              queues[i].queue,
+              (msg) => {
+                if (msg) {
+                  console.log('drone-topic messages: ', JSON.parse(msg.content.toString()))
+                  socket.emit(
+                    //drone-topic
+                    `${RABBITMQ.QUEUE_TOPICS[0]}-topic`,
+                    JSON.parse(msg.content.toString())
+                  );
+                }
+              },
+              { noAck: true }
+            );
+            consumers.push(consume);
+          
+        }
+      }
+    });
+
+    socket.on("establish-rabbitmq-connection-webrtc", async (receiveId: { id: string }[]) => {
+      console.log("DroneID List(webSocket-webrtc): ", receiveId);
       droneId = receiveId;
       try {
         // 1. Create exchange
@@ -38,60 +116,69 @@ export default () => {
 
         queues.forEach((queue) => {
           // Telling frontend that queues have been created
-          socket.emit('queue-created', queue.queue);
+          socket.emit("queue-created", queue.queue);
         });
       } catch (error) {
         logger.error(error);
       }
 
+      //assert queue 是創建queue 等待exchange後的結果
+      //創建queue，如果沒有的話會自動生成
       async function assertTopicQueue() {
-        for (let topic of RABBITMQ.QUEUE_TOPICS) {
-          const queue = await channel.assertQueue(
-            `${socket.id}-${receiveId}-${topic}`,
-            {
-              autoDelete: true,
-              durable: false
-            }
-          );
-          queues.push(queue);
+        for (let key in droneId) {
+            const queue = await channel.assertQueue(
+              `${socket.id}-${droneId[key].id}-webrtc`,
+              {
+                autoDelete: true,
+                durable: false,
+              }
+            );
+            queues.push(queue);
         }
       }
 
+      //Assert a routing path from an exchange to a queue: the exchange named by source will relay messages to the queue named,
+      // according to the type of the exchange and the pattern given.
       async function bindTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
-          await channel.bindQueue(
-            queues[i].queue,
-            RABBITMQ.EXCHANGE_NAME,
-            `${receiveId}.phone.${RABBITMQ.QUEUE_TOPICS[i]}`
-          );
+          // console.log(droneId[i].id);
+            await channel.bindQueue(
+              queues[i].queue,
+              RABBITMQ.EXCHANGE_NAME,
+              `${droneId[i].id}.phone.webrtc`
+            );
+          
         }
       }
 
       async function consumeTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
-          const consume = await channel.consume(
-            queues[i].queue,
-            (msg) => {
-              if (msg) {
-                socket.emit(
-                  `${RABBITMQ.QUEUE_TOPICS[i]}-topic`,
-                  JSON.parse(msg.content.toString())
-                );
-              }
-            },
-            { noAck: true }
-          );
-          consumers.push(consume);
+            const consume = await channel.consume(
+              queues[i].queue,
+              (msg) => {
+                if (msg) {
+                  console.log('webrtc messages: ', JSON.parse(msg.content.toString()))
+                  socket.emit(
+                    //webrtc-topic
+                    `${RABBITMQ.QUEUE_TOPICS[1]}-topic`,
+                    JSON.parse(msg.content.toString())
+                  );
+                }
+              },
+              { noAck: true }
+            );
+            consumers.push(consume);
+          }
         }
-      }
     });
 
-    // For management used
-    socket.on('drone-admin', async () => {
+
+    // For management used(in views/Management.vue)
+    socket.on("drone-admin", async () => {
       try {
-        adminQueue = await channel.assertQueue('admin-drone', {
+        adminQueue = await channel.assertQueue("admin-drone", {
           autoDelete: true,
-          durable: false
+          durable: false,
         });
         await channel.bindQueue(
           adminQueue.queue,
@@ -117,25 +204,31 @@ export default () => {
     });
 
     // Drone-related
-    socket.on('send-drone', (command: Command) => {
+
+    socket.on("send-drone", (command: Command) => {
+      console.log("socket-> send-drone: ", command);
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
-        `${droneId}.web.drone`,
+        `${command.droneID}.web.drone`,
         Buffer.from(JSON.stringify(command))
       );
     });
 
+    
     // WebRTC-related
-    socket.on('send-webrtc', (data) => {
+    socket.on("send-webrtc", (data) => {
+      // console.log("socket-> send-webrtc: ", data);
+      console.log("socket-> send-webrtc---ID: ", data.droneID);
+
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
-        `${droneId}.web.webrtc`,
+        `${data.droneID}.web.webrtc`,
         Buffer.from(JSON.stringify(data))
       );
     });
 
     // Terminate receiving message
-    socket.on('cancel-consume', async () => {
+    socket.on("cancel-consume", async () => {
       try {
         if (consumers.length) {
           await cancelConsuming();
@@ -149,7 +242,7 @@ export default () => {
     });
 
     // Handle WebSocket disconnect
-    socket.on('disconnect', async (reason) => {
+    socket.on("disconnect", async (reason) => {
       logger.info(`Websocket disconnected:${socket.id} Reason:${reason}`);
       try {
         if (consumers.length) {

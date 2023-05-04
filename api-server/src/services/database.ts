@@ -1,33 +1,62 @@
-import 'reflect-metadata';
-import { createConnection } from 'typeorm';
-import { Flight } from '../entity/Flight';
-import { User } from '../entity/User';
-import { logger } from '../server';
+import "reflect-metadata";
+import { logger } from "../server";
+import mysql = require("mysql");
+// import mysql from 'mysql'
 
 const {
   MYSQL_SERVICE_SERVICE_HOST,
-  MYSQL_SERVICE_SERVICE_PORT = '3306',
+  MYSQL_SERVICE_SERVICE_PORT = "3306",
   MYSQL_SERVICE_USER,
   MYSQL_SERVICE_PASSWORD,
-  NODE_ENV
+  NODE_ENV,
 } = process.env;
+
+// CREATE TABLE user(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL, drone_id INT);
+// CREATE TABLE drones(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, user_id INT NOT NULL, drone_id VARCHAR(100) ,isAdmin boolean DEFAULT false, FOREIGN KEY(user_id) REFERENCES user(id));
+// CREATE TABLE  IF NOT EXISTS user(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL);
 
 export async function connectToDatabase() {
   try {
-    await createConnection({
-      type: 'mysql',
+    let db = await mysql.createConnection({
       host: MYSQL_SERVICE_SERVICE_HOST,
       port: +MYSQL_SERVICE_SERVICE_PORT,
-      username: MYSQL_SERVICE_USER,
+      user: MYSQL_SERVICE_USER,
       password: MYSQL_SERVICE_PASSWORD,
-      database: 'drone_cloud',
-      entities: [User, Flight],
-      synchronize: NODE_ENV !== 'production',
-      logging: process.env.NODE_ENV === 'production' ? false : 'all'
+      database: "drone_cloud_test",
+      // logging: process.env.NODE_ENV === 'production' ? false : 'all',
+      // synchronize: NODE_ENV !== 'production',
+      multipleStatements: true
     });
-    logger.info('Connect to database successfully');
-  } catch (error) {
-    logger.error(error);
+
+    const createUserTableSql = 'CREATE TABLE IF NOT EXISTS user (id BINARY(16)  NOT NULL PRIMARY KEY,email VARCHAR(100) NOT NULL ,password VARCHAR(100) NOT NULL)';
+    db.query(createUserTableSql, function(err: Error, result:any) {
+      if (err) {
+        logger.error(err);
+      } else {
+        logger.info("User table created!");
+      }
+    });
+    
+    const createDronesTableSql = 'CREATE TABLE IF NOT EXISTS drones (id BINARY(16)  NOT NULL PRIMARY KEY, user_id BINARY(16) NOT NULL, drone_id VARCHAR(100), isAdmin boolean DEFAULT false, FOREIGN KEY(user_id) REFERENCES user(id))';
+    db.query(createDronesTableSql, function(err: Error, result:any) {
+      if (err) {
+        logger.error(err);
+      } else {
+        logger.info("Drones table created!");
+      }
+    });
+    
+    logger.info("Connect to database successfully!");
+    return db;
+  } catch (err) {
+    logger.error(err);
     setTimeout(connectToDatabase, 5000);
   }
 }
+
+
+
+
+
+
+

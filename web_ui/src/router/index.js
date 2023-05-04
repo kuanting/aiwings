@@ -13,6 +13,8 @@ const refreshToken = () => {
 }
 
 // Clean state funtion for logout
+
+//FIXEDME： 改成多台後，這邊的狀態清除也要更改
 const cleanState = async () => {
   await auth.logout()
   clearInterval(intervalTimer)
@@ -20,24 +22,24 @@ const cleanState = async () => {
   store.dispatch('setRabbitmqIsInit', false)
   store.dispatch('setIsAuth', false)
   store.dispatch('setUserInfo', { email: '', droneId: '', isAdmin: false })
-  store.dispatch('drone/updateFlightStatus', { altitude: 3, isTakeoff: false })
-  store.dispatch('drone/updateDestination', { lng: 0, lat: 0 })
+  // store.dispatch('drone/updateFlightStatus', { altitude: 3, isTakeoff: false })
+  // store.dispatch('drone/updateDestination', { lng: 0, lat: 0 })
   store.dispatch('drone/setDroneInfo', {
-    timeStamp: '',
-    roll: '',
-    yaw: '',
-    pitch: '',
-    voltage: '',
-    percentage: '',
-    hpop: '',
-    gpsCount: '',
-    mode: '',
-    isArmed: '',
-    heading: '',
-    latitude: '',
-    longitude: '',
-    altitude: '',
-    speed: ''
+    // timeStamp: '',
+    // roll: '',
+    // yaw: '',
+    // pitch: '',
+    // voltage: '',
+    // percentage: '',
+    // hpop: '',
+    // gpsCount: '',
+    // mode: '',
+    // isArmed: '',
+    // heading: '',
+    // latitude: '',
+    // longitude: '',
+    // altitude: '',
+    // speed: ''
   })
   store.dispatch('clearLogs')
 }
@@ -78,6 +80,11 @@ const routes = [
     }
   },
   {
+    path: '/enroll',
+    name: 'Enroll',
+    component: () => import('../views/Enroll.vue')
+  },
+  {
     path: '/account',
     name: 'Account',
     component: () => import('../views/Account.vue')
@@ -88,6 +95,11 @@ const routes = [
     component: () => import('../views/Management.vue')
   },
   {
+    path: '/monitor',
+    name: 'Monitor',
+    component: () => import('../views/Monitor.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue')
@@ -95,7 +107,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 
@@ -126,10 +138,13 @@ router.beforeEach(async (to) => {
     }
   }
 
+
+
   if (!isAuth.value) {
     if (to.path === '/') return true
     try {
       const { data } = await user.getUserInfo()
+      // console.log('router/index.js',data)
       store.dispatch('setIsAuth', true)
       store.dispatch('setUserInfo', data)
       intervalTimer = refreshToken()
