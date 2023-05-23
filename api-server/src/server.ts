@@ -13,7 +13,6 @@ import useSocketIO from './services/websocket';
 import { connectToDatabase as useDatabase } from './services/database';
 import { connectToRabbitmq as useRabbitmq } from './services/rabbitmq';
 
-
 // Create express application
 const app = express();
 
@@ -23,9 +22,9 @@ app.set('trust proxy', process.env.NODE_ENV === 'production');
 const server =
   process.env.NODE_ENV === 'production'
     ? https.createServer(
-      { key: process.env.TLS_KEY, cert: process.env.TLS_CERT },
-      app
-    )
+        { key: process.env.TLS_KEY, cert: process.env.TLS_CERT },
+        app
+      )
     : http.createServer(app);
 
 // Logger
@@ -69,11 +68,7 @@ server.listen(Number(process.env.BACKEND_SERVICE_SERVICE_PORT), () => {
   logger.info(
     `Server is listening on port ${process.env.BACKEND_SERVICE_SERVICE_PORT}`
   );
+  // console.log("server is on http://localhost:3080/api/v1")
 });
 
-// server.listen(3030, () => {
-//   logger.info(
-//     `Server is listening on port 3030`
-//   );
-// });
 export { logger, io };

@@ -1,9 +1,11 @@
 import axios from 'axios'
 import { notification } from 'ant-design-vue'
 
+console.log("------./lib/axios.js--------")
+
 axios.defaults.baseURL =
   import.meta.env.NODE_ENV === 'production'
-    ? 'https://35.201.205.104:3030/api/v1'
+    ? 'https://ai-wings.ga:30110/api/v1'
     : `${import.meta.env.VITE_APP_BACKEND_SERVICE_PROTOCOL}://${import.meta.env.VITE_APP_BACKEND_SERVICE_SERVICE_HOST}:${import.meta.env.VITE_APP_BACKEND_SERVICE_SERVICE_PORT}/api/v1`
 axios.defaults.withCredentials = true
 

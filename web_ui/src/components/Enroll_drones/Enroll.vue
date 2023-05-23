@@ -91,6 +91,8 @@ export default defineComponent({
       drones: []
     })
 
+    console.log("在Enroll, 新增前store.state.user = ",store.state.user)
+
     const submitForm = async function () {
       formRef.value
         .validate()
@@ -104,10 +106,10 @@ export default defineComponent({
           //here
           console.log("here: ", droneId)
           //這邊有問題
-          //update
+          //update 【更新store】
           for (let drone of droneId){
             console.log(drone)
-          store.commit('setUserDroneID', droneId)
+            store.commit('addNewDroneID', drone)
           }
           //origin
           // store.commit(droneId)

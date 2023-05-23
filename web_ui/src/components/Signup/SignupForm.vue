@@ -141,17 +141,19 @@ export default {
 
     const submitFromHandler = async function (formData) {
       isSubmmited.value = true
-      // console.log(formData)
+      console.log("用戶輸入的signup資料: ",formData)
       try {
         const { data } = await auth.signup(formData)
         //FIX
-        console.log('singupform: ', data)
+        console.log('成功singup後取得的資料: ', data)
         notification.success({
           message: data.msg
         })
         isSubmmited.value = false
+        console.log("註冊成功，前往登入頁面")
         router.push({ path: '/login' })
       } catch ({ response }) {
+        console.log("註冊失敗\n失敗原因: ",response.data.msg)
         notification.error({
           message: response.data.msg
         })
