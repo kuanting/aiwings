@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import Header from '../components/Header/Header.vue'
+// import Header from '../components/Header/Header.vue'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { GithubFilled } from '@ant-design/icons-vue'
@@ -100,7 +100,7 @@ export default {
   name: 'Introduction',
   components: {
     GithubFilled,
-    Header
+    // Header
   },
   setup() {
     onMounted(() => {

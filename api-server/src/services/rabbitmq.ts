@@ -22,6 +22,7 @@ export async function connectToRabbitmq() {
     logger.info('Connect to Rabbitmq successfully');
   } catch (error) {
     logger.error(error);
+    // 5秒後重新嘗試連線
     setTimeout(connectToRabbitmq, 5000);
   }
 }

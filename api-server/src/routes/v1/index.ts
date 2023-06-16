@@ -16,8 +16,8 @@ router.post("/auth/logout", auth.logout);
 
 router.get("/user/me", verifyTokens, user.getUserInfo);
 router.get("/user/login", verifyTokens, user.loginUser);
-router.post("/user/droneId", verifyTokens, user.editUserDroneId);
-router.post("/user/drones", verifyTokens, user.addNewDrone);
+router.post("/user/edit_droneId", verifyTokens, user.editUserDroneId);
+router.post("/user/add_drones", verifyTokens, user.addNewDrone);
 router.post("/user/delete_drones", verifyTokens, user.deleteDrone);
 
 // router.get('/drone/records', verifyTokens, drone.getFlightRecords);

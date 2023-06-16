@@ -14,12 +14,12 @@
    },
    //Fixed API endpoint
    async editUserDroneId(droneId) {
-     return await axios.post('/user/droneId', droneId)
+     return await axios.post('/user/edit_droneId', droneId)
    },
    
    //New add
    async enrollDroneId(droneId) {
-     return await axios.post('/user/drones', droneId)
+     return await axios.post('/user/add_drones', droneId)
    },
  
    //delete ID

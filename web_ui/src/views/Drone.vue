@@ -93,7 +93,7 @@ export default {
       for (let i in user.value.droneId) {
         saveLogs(`Drone ID: ${user.value.droneId[i]}`)
       }
-      socket.emit('establish-rabbitmq-connection-drone', user.value.droneId)
+      socket.emit('establish-rabbitmq-connection-drone', user.value.droneId) //webSocket監聽到此事件後，會建立rabbitNq的Queue
     }
     // Trigger RabbitMQ when the first come or refresh pages
     if (!rabbitmqIsInit.value) {
