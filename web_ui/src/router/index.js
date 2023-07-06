@@ -117,39 +117,54 @@ const router = createRouter({
 const whiteListRoute = ['/signup']
 const isAuth = computed(() => store.getters.getIsAuth)
 
+/* 切換路由時執行 */
 router.beforeEach(async (to) => {
+  console.log("----Router/index.js----\n即將前往 to.path = ",to.path,"\n身分驗證IsAuth.value = ",isAuth.value)
+
+  // 如果即將進入['/signup']，則回傳true結束，正常進入導向的頁面
   if (whiteListRoute.includes(to.path)) {
     return true
   }
 
+  // 如果進入的是名為'NotFound'的路由(第104行所定義)，進入後，停頓5秒後倒向首頁
   if (to.name === 'NotFound') {
     setTimeout(() => router.push({ path: '/' }), 5000)
   }
 
+  // 如果即將進入'/login'，
+  // if isAuth.value 不為空(true)，直接導向'/drone'
+  // if isAuth.value 為空(false)，等待獲取 user.getUserInfo()後，再導向'/drone'，如果不能獲取UserInfo，表示用戶未登入，回傳true結束【正常進入'/login'畫面】
   if (to.path === '/login') {
     if (isAuth.value) return '/drone'
     if (!isAuth.value) {
+      console.log("嘗試抓取身分資料 (getUserInfo)")
       try {
         await user.getUserInfo()
+        console.log("抓取成功")
         return '/drone'
       } catch (error) {
+        console.log("抓取失敗，前往登入頁面")
         return true
       }
     }
   }
 
-
-
-  if (!isAuth.value) {
+  // 其他路由中，如果isAuth.value為false 【身分驗證未通過】
+  // 如果即將進入首頁，不需任何動作直接跳轉
+  // 如果不是首頁，嘗試抓取userInfo，有抓到資料則可以前往，沒抓到的畫改前往'/login'
+  if (!isAuth.value) {  
     if (to.path === '/') return true
+    console.log("嘗試抓取身分資料 (getUserInfo)")
     try {
       const { data } = await user.getUserInfo()
-      // console.log('router/index.js',data)
       store.dispatch('setIsAuth', true)
       store.dispatch('setUserInfo', data)
       intervalTimer = refreshToken()
+      console.log("抓取成功")
       return true
     } catch (error) {
+      //情況：ex：為登入狀態下想直接跳轉到應用子頁面，會跳出警示並導到/login頁面
+      console.log("抓取失敗，前往登入頁面")
       notification.error({
         message: error.response.data.msg
       })

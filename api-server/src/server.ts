@@ -10,9 +10,9 @@ import { createLogger, format, transports } from 'winston';
 import { Server } from 'socket.io';
 import routes from './routes';
 import useSocketIO from './services/websocket';
-import { connectToDatabase as useDatabase } from './services/database';
+// import { connectToDatabase as useDatabase } from './services/database';
+import {creatTable} from './services/database'
 import { connectToRabbitmq as useRabbitmq } from './services/rabbitmq';
-
 
 // Create express application
 const app = express();
@@ -23,9 +23,9 @@ app.set('trust proxy', process.env.NODE_ENV === 'production');
 const server =
   process.env.NODE_ENV === 'production'
     ? https.createServer(
-      { key: process.env.TLS_KEY, cert: process.env.TLS_CERT },
-      app
-    )
+        { key: process.env.TLS_KEY, cert: process.env.TLS_CERT },
+        app
+      )
     : http.createServer(app);
 
 // Logger
@@ -62,18 +62,15 @@ const io = new Server(server, {
 });
 
 useSocketIO();
-useDatabase();
+// let db =useDatabase();
+creatTable();
 useRabbitmq();
 
 server.listen(Number(process.env.BACKEND_SERVICE_SERVICE_PORT), () => {
   logger.info(
     `Server is listening on port ${process.env.BACKEND_SERVICE_SERVICE_PORT}`
   );
+  // console.log("server is on http://localhost:3080/api/v1")
 });
 
-// server.listen(3030, () => {
-//   logger.info(
-//     `Server is listening on port 3030`
-//   );
-// });
 export { logger, io };

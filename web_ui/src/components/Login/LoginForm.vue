@@ -89,9 +89,10 @@ export default {
 
     const submitFromHandler = async (formData) => {
       isSubmmited.value = true
+      console.log('用戶輸入的login資料: ', formData)
       try {
         const { data } = await auth.login(formData)
-        console.log('login: ', data)
+        console.log('成功login後取得的資料: ', data)
         notification.success({
           message: data.msg
         })
@@ -99,9 +100,11 @@ export default {
         //FIXME:
         // 如果已經註冊droneID, 那就直接進入操作介面， 如果沒有那就跳出提示，然後進入註冊畫面
         // if (data.isEnrolled === true) {
+        console.log("登入成功，前往操控介面")
         router.push({ path: '/drone' })
         
       } catch ({ response }) {
+        console.log("登入error")
         notification.error({
           message: response.data.msg
         })
