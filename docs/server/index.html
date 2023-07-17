@@ -22,8 +22,9 @@
       <script src="../js/html5shiv.min.js"></script>
     <![endif]-->
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/java.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
       <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
@@ -87,7 +88,7 @@
 <p><img alt="Github Action" src="https://github.com/waiting33118/drone-api-server/actions/workflows/dockerCICD.yml/badge.svg" />
 <img alt="Docker pull" src="https://img.shields.io/docker/pulls/waiting33118/drone-cloud-backend" />
 <img alt="Docker" src="https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&amp;logoColor=white" /></p>
-<p><img alt="eco-system" src="docs/images/eco-system%20relationship.png" /></p>
+<p><img alt="eco-system" src="../img/eco-system%20relationship.png" /></p>
 <blockquote>
 <p>This is the backend API server of <a href="https://github.com/waiting33118/drone-cloud-platform3.0">Drone Cloud Platform</a>, used for handle drone communication between drone's android app and the drone cloud platform.</p>
 </blockquote>
@@ -108,7 +109,7 @@
 <li><strong>.env</strong> - Environment variables</li>
 </ul>
 <h2 id="production-cloud-infrastructure">Production Cloud Infrastructure</h2>
-<p><img alt="infra" src="docs/images/backend%20architecture.png" /></p>
+<p><img alt="infra" src="../img/backend%20architecture.png" /></p>
 <ul>
 <li>Infra as a Service(IaaS)</li>
 <li>Google Coompute Engine (Ubuntu 20.04)</li>
@@ -116,14 +117,14 @@
 <li>Cloud SQL (MySQL)</li>
 <li>Container Orchestration Platform</li>
 <li>K3S (light weight kubernetes)
-    <img alt="kubectl" src="docs/images/kubectl.png" /></li>
+    <img alt="kubectl" src="../img/kubectl.png" /></li>
 <li>Message Broker</li>
 <li>RabbitMQ AMQP server</li>
 </ul>
 <h2 id="gihub-action-cicd-pipeline">Gihub Action CI/CD pipeline</h2>
-<p><img alt="cicd" src="docs/images/cicd%20pipeline.png" /></p>
+<p><img alt="cicd" src="../img/cicd%20pipeline.png" /></p>
 <h2 id="multi-drone-simulation">Multi-drone Simulation</h2>
-<p><img alt="multi-drone" src="docs/images/multi-drone%20simulation.png" />
+<p><img alt="multi-drone" src="../img/multi-drone%20simulation.png" />
 Please start the simulator one by one! </p>
 <pre><code class="language-bash">docker run -p 5671:5672 -it --name sitl_1 waiting33118/ardupilot-sitl  # 1st
 docker run -p 5672:5672 -it --name sitl_2 waiting33118/ardupilot-sitl  # 2nd
@@ -135,9 +136,9 @@ docker run -p 5673:5672 -it --name sitl_3 waiting33118/ardupilot-sitl  # 3rd
 <h2 id="experiment-results">Experiment Results</h2>
 <blockquote>
 <p>Control drone by platform service
-<img alt="flight" src="docs/images/flight_1.png" />
+<img alt="flight" src="../img/flight_1.png" />
 Pilot remotely control
-<img alt="control" src="docs/images/pilot%20remote%20control.jpg" /></p>
+<img alt="control" src="../img/pilot%20remote%20control.jpg" /></p>
 </blockquote>
 <h1 id="project-setup">Project Setup</h1>
 <h2 id="prerequisites">Prerequisites</h2>
