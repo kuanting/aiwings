@@ -1,0 +1,57 @@
+name: Continuous deploy
+
+on:
+  push:
+    branches: [ main ]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with: 
+          node-version: 'lts/*'
+      
+      - name: Install node dependencies
+        run: npm i
+        
+      - name: Bundle app in production ready
+        run: npm run build
+        env:
+          VUE_APP_MAPBOX_TOKEN: ${{ secrets.VUE_APP_MAPBOX_TOKEN }}
+        
+      - name: Achieve production artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
+  
+  deploy:
+    name: Deploy
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+    
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
+          
+      - name: GitHub Action for Firebase
+        uses: w9jds/firebase-action@v2.0.0
+        with:
+          args: deploy --only hosting
+        env: 
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+

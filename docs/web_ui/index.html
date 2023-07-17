@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://aiwings.org/web_ui/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Web UI - AI Wings</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Web UI";
+        var mkdocs_page_input_path = "web_ui.md";
+        var mkdocs_page_url = "/web_ui/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> AI Wings
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../server/">Server</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Web UI</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#service-introduction">Service Introduction</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#experiment-captures">Experiment Captures</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#project-setup">Project Setup</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-prerequisite">1. Prerequisite</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-install-dependencies">2. Install Dependencies</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-config-environment-variables">3. Config Environment Variables</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-run-project-development-mode">4. Run project (Development mode)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-build-project-production-mode">5. Build project (Production mode)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-deployment">6. Deployment</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-to-start-to-use-the-drone-service">How to start to use the drone service?</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-download-the-app">1. Download the App</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-open-the-app-to-get-the-drone-id">2. Open the App to get the Drone ID</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-sign-up-the-service-account">3. Sign up the service account</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../onboard_app/">Onboard App</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">AI Wings</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li>Web UI</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="drone-cloud-platform-drone-as-a-service-daas">Drone Cloud Platform | Drone As A Service | DaaS</h1>
+<p><img alt="Github Action" src="https://github.com/waiting33118/drone-cloud-platform3.0/actions/workflows/deployment.yml/badge.svg" />
+<img alt="Vue" src="https://img.shields.io/badge/Vue.js-35495E?logo=vue.js&amp;logoColor=4FC08D" /></p>
+<p><img alt="banner" src="./public/img/github_readme_banner.png" /></p>
+<blockquote>
+<p><a href="https://aiotlab-drone-cloud.web.app/">Drone Cloud Platfrom</a> is a drone ground control system (GCS) build by Vue.js and it provide user to control there ardupilot-based drone through 4G network.</p>
+</blockquote>
+<h2 id="service-introduction">Service Introduction</h2>
+<p><img alt="Concept" src="./public/img/eco-system%20relationship.png" /></p>
+<blockquote>
+<p>We propose an eco-system of the UAV, the system including frontend service, backend API server, multi drone simulation environment, topic-subscribe broker. The pilot commanding the drone by controlling the fronend interface, the command will first forward to the backend by using Websocket, then the AMQP client in the backend server will send the command to the AMQP broker, after recieved the payload, it would follow the routing rules and forward the command to the target drone.</p>
+<p><strong>Views/Components Design</strong>
+<img alt="Component Design" src="./public/img/component%20tree.png" /></p>
+<p><strong>Global State Management (Vuex)</strong>
+<img alt="Vuex" src="./public/img/global%20state%20usage.png" /></p>
+</blockquote>
+<h3 id="experiment-captures">Experiment Captures</h3>
+<blockquote>
+<p><strong>Main control interface</strong>
+<img alt="Main_Page" src="./public/img/service%20introduction.png" /></p>
+<p><strong>Drone that flight by platform service</strong>
+<img alt="real_world_test" src="./public/img/flight_1.png" /></p>
+<p><strong>SITL infrastructure to simulate multi-drones</strong>
+<img alt="sitl" src="./public/img/multi-drone%20simulation.png" /></p>
+<p><strong>Multi drones observation</strong>
+<img alt="multi-drone_observation" src="./public/img/multi-drone%20verification%20by%20sitl.png" /></p>
+<p><strong>Drone's orbit history records</strong>
+<img alt="records" src="./public/img/flight%20records.png" /></p>
+<p><strong>Object detection (Tensorflow.js)</strong>
+<img alt="object detection" src="./public/img/object%20detection.png" /></p>
+</blockquote>
+<h2 id="project-setup">Project Setup</h2>
+<h3 id="1-prerequisite">1. Prerequisite</h3>
+<ol>
+<li>Node.js LTS runtime  (Install by NVM or official Website)</li>
+<li>Backend API server (Please setup <a href="https://github.com/waiting33118/drone-api-server">drone-api-server</a> first!!)</li>
+</ol>
+<h3 id="2-install-dependencies">2. Install Dependencies</h3>
+<pre><code class="language-bash">npm install
+</code></pre>
+<h3 id="3-config-environment-variables">3. Config Environment Variables</h3>
+<p>Copy env example file and rename to <code>.env.local</code></p>
+<pre><code class="language-bash">cp .env.local.example .env.local
+</code></pre>
+<p>Fill in credentials</p>
+<pre><code class="language-bash">VUE_APP_MAPBOX_TOKEN=your mapbox token
+VUE_APP_BACKEND_SERVICE_PROTOCOL=http
+VUE_APP_BACKEND_SERVICE_SERVICE_HOST=localhost
+VUE_APP_BACKEND_SERVICE_SERVICE_PORT=3030
+</code></pre>
+<p><em>Generate mapbox token(free, no need credit card) in <a href="https://account.mapbox.com/access-tokens/create">mapbox offical website</a></em></p>
+<h3 id="4-run-project-development-mode">4. Run project (Development mode)</h3>
+<pre><code class="language-bash">npm run serve
+</code></pre>
+<p><em>Frontend service will now run on http://localhost:8080</em></p>
+<h3 id="5-build-project-production-mode">5. Build project (Production mode)</h3>
+<pre><code class="language-bash">npm run build
+</code></pre>
+<h3 id="6-deployment">6. Deployment</h3>
+<p>Initial firebase configs</p>
+<pre><code class="language-bash">firebase init
+</code></pre>
+<p>Deploy to firebase hosting</p>
+<pre><code class="language-bash">firebase deploy --only hosting
+</code></pre>
+<h2 id="how-to-start-to-use-the-drone-service">How to start to use the drone service?</h2>
+<h3 id="1-download-the-app">1. Download the App</h3>
+<p><a href="https://github.com/waiting33118/AED-Rescue-Drone-Project-for-Android/releases">Download the latest apk</a></p>
+<h3 id="2-open-the-app-to-get-the-drone-id">2. Open the App to get the <strong>Drone ID</strong></h3>
+<p><img src="./public/img/drone_id_step.jpg" height="500"></p>
+<h3 id="3-sign-up-the-service-account">3. Sign up the service account</h3>
+<ul>
+<li><a href="https://aiotlab-drone-cloud.web.app/signup">Drone Cloud Platform Sign up</a></li>
+<li>Enter your Drone ID that shows on your App when register account</li>
+</ul>
+<p><img alt="sign_up" src="./public/img/signup_step.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../server/" class="btn btn-neutral float-left" title="Server"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../onboard_app/" class="btn btn-neutral float-right" title="Onboard App">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../server/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../onboard_app/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

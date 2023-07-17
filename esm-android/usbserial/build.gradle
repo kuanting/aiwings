@@ -1,0 +1,55 @@
+apply plugin: 'com.android.library'
+
+def artifact = "usbserial.jar"
+
+android {
+
+    group = 'com.felhr.usbserial'
+//    version = project.VERSION_NAME
+//    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    compileSdkVersion 29
+
+    compileOptions {
+        encoding "UTF-8"
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+//        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
+//        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+//        archivesBaseName = "${project.name}-${project.VERSION_NAME}"
+//        consumerProguardFiles 'proguard-rules.pro'
+
+        minSdkVersion 19
+        targetSdkVersion 29
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    //noinspection GroovyAssignabilityCheck
+    task deleteJar(type: Delete) {
+        delete "eclipse_lib/${artifact}"
+    }
+
+    //noinspection GroovyAssignabilityCheck
+    task createJar(type: org.gradle.api.tasks.Copy) {
+        from('build/intermediates/bundles/release/')
+        into('eclipse_lib/')
+        include('classes.jar')
+        rename('classes.jar', artifact)
+    }
+
+    dependencies {
+        implementation 'com.annimon:stream:1.2.1'
+        implementation 'com.squareup.okio:okio:2.1.0'
+
+        androidTestImplementation 'com.android.support.test:runner:1.0.2'
+        androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+        androidTestImplementation 'junit:junit:4.12'
+
+        testImplementation 'junit:junit:4.12'
+
+    }
+
+    createJar.dependsOn(deleteJar, build)
+}

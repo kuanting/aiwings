@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" /><link rel="canonical" href="https://aiwings.org/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>AI Wings</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> AI Wings
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#real-world-testing">Real World Testing</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-build-your-own-drones">1. Build Your own Drones</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-install-onboard-app">2. Install Onboard App</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-setup-a-cloud-server">3. Setup a Cloud Server</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vr-simulation">VR Simulation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#software-development">Software Development</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="server/">Server</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="web_ui/">Web UI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="onboard_app/">Onboard App</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">AI Wings</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ai-wings">AI Wings</h1>
+<p>AI Wings is an AIoT Drone System for commanding AIoT drone fleets via the 4G/5G network. We integrate ArduPilot with Android phones and endow DIY drones with AI computing power and 4G/5G connectiviy. AI Wings consists of a cloud server (node.js), Web UI (vue.js), onboard App (Android), and VR simulation (Unreal). Users can install our cloud server and create their own Internet of Drones. Our paper "<a href="https://ieeexplore.ieee.org/document/9836339">AI Wings: An AIoT Drone System for Commanding ArduPilot UAVs</a>" has been published by IEEE Systems Journal.</p>
+<p><img width=640 src="doc/img/ai_wings_arch.jpg" /></p>
+<h2 id="real-world-testing">Real World Testing</h2>
+<p>All test videos in the real world can be found here: <br/>
+<a href="https://www.youtube.com/playlist?list=PL3S3ZnDPwJ-MV5H1yTzR0jPp5sz-ptSo3">www.youtube.com/playlist?list=PL3S3ZnDPwJ-MV5H1yTzR0jPp5sz-ptSo3</a>.</p>
+<table>
+<thead>
+<tr>
+<th align="center">AI Wings System Test</th>
+<th align="center">AED Delivery Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><a href="https://www.youtube.com/watch?v=ou2W5PuoimQ"><img src="http://img.youtube.com/vi/ou2W5PuoimQ/0.jpg" width="300"/></a></td>
+<td align="center"><a href="https://www.youtube.com/watch?v=jq7bbERNfHk"><img src="http://img.youtube.com/vi/jq7bbERNfHk/0.jpg" width="300"/></a></td>
+</tr>
+<tr>
+<td align="center">4G/5G Two-drones Control</td>
+<td align="center">VR Drone control</td>
+</tr>
+<tr>
+<td align="center"><a href="https://www.youtube.com/watch?v=ok3dn92Ep88"><img src="http://img.youtube.com/vi/ok3dn92Ep88/0.jpg" width="300"/></a></td>
+<td align="center"><a href="https://www.youtube.com/watch?v=v67eJAYtv8c"><img src="http://img.youtube.com/vi/v67eJAYtv8c/0.jpg" width="300"/></a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="getting-started">Getting Started</h2>
+<p>The major steps to create your own AIoT drone fleet are:</p>
+<h3 id="1-build-your-own-drones">1. Build Your own Drones</h3>
+<ol>
+<li>Assemble an ArduPilot-based drone. We recommend <a href="https://docs.px4.io/v1.9.0/en/getting_started/">Pixhawk AutoPilot</a></li>
+</ol>
+<h3 id="2-install-onboard-app">2. Install Onboard App</h3>
+<p><a name="software"/></p>
+<ol>
+<li>Get an Android phone and install our Android control APP. Refer to our <a href="onboard_app/">esm-android page</a></li>
+<li>Connect APP to your server. (Bind your phone to the server if you are using multi-user server)</li>
+<li>Attach the phone to the drone and connect it to Pixhawk MCU</li>
+</ol>
+<h3 id="3-setup-a-cloud-server">3. Setup a Cloud Server</h3>
+<p><a name="cloud"/></p>
+<ol>
+<li>Install our <a href="server/">cloud server</a>.</li>
+<li>Read the user's manual of <a href="web_ui/">Web UI</a></li>
+<li>Check the web UI to see if the drone appears on the map</li>
+<li>Ready to fly! </li>
+</ol>
+<h3 id="vr-simulation">VR Simulation</h3>
+<p>AI Wings supports Microsoft AirSim, which allows users to simulate drone functtions in VR worlds. The simulation video is shown below. The upper-left window is the VR world and lower-left window is the virtual camera view. The right window is the web UI of AI Wings.</p>
+<p><a href="https://www.youtube.com/watch?v=v67eJAYtv8c"><img alt="AI Wings VR Test" src="doc/img/ai_wings_airsim.png" /></a></p>
+<h2 id="software-development">Software Development</h2>
+<p>The system architecture is shown as below.</p>
+<p><img width=480 src="doc/img/ai_wings_sw_arch.png"></p>
+<p>This project is under active development and will be updated frequently.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="server/" class="btn btn-neutral float-right" title="Server">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="server/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.4.3
+Build Date UTC : 2023-07-09 15:57:41.232073+00:00
+-->

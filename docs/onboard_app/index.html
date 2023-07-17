@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://aiwings.org/onboard_app/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Onboard App - AI Wings</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Onboard App";
+        var mkdocs_page_input_path = "onboard_app.md";
+        var mkdocs_page_url = "/onboard_app/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> AI Wings
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../server/">Server</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../web_ui/">Web UI</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Onboard App</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#test-app-with-ardupilot-software-simulator">Test APP with ArduPilot software simulator</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#build-ardupilot-sitl">Build ArduPilot SITL</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-to-use">How to use</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#takeoff">★ TakeOff</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#bulid-a-command_long-76-message-and-use-mav_cmd_nav_takeoff-22-command">Bulid a COMMAND_LONG (#76) Message and use MAV_CMD_NAV_TAKEOFF (22) command.</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#change-flight-speed">★ Change Flight Speed</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#bulid-a-command_long-76-message-and-use-mav_cmd_do_change_speed-178-command">Bulid a COMMAND_LONG (#76) Message and use MAV_CMD_DO_CHANGE_SPEED (178) command.</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#control-servo">★ Control Servo</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#bulid-a-command_long-76-message-and-use-mav_cmd_do_set_servo-183-command">Bulid a COMMAND_LONG (#76) Message and use MAV_CMD_DO_SET_SERVO (183) command.</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#memo-receive-flight-message">:memo: Receive  Flight Message</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#memo-custom-drone-message">:memo: Custom Drone Message</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#pushpin-location-message-from-global_position_int-33-message">:pushpin: location Message from GLOBAL_POSITION_INT (#33) Message</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pushpin-battery-message-from-sys_status-1-message">:pushpin: battery Message from SYS_STATUS (#1) Message</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pushpin-speed-message-from-vfr_hud-74-message">:pushpin: speed Message from VFR_HUD (#74) Message</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pushpin-attitude-message-from-attitude-30-message">:pushpin: attitude Message from ATTITUDE (#30) Message</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pushpin-gps_status-message-from-gps_raw_int-24-message">:pushpin: gps_status Message from GPS_RAW_INT (#24) Message</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pushpin-heartbeat-message-from-heartbeat-0-message">:pushpin: heartbeat Message from HEARTBEAT (#0) Message</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#demo-video">DEMO video</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reference_1">Reference</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">AI Wings</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li>Onboard App</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ai-wings-android-app-for-ardupilot">AI Wings Android APP for ArduPilot</h1>
+<p>This is the embedded drone control software of AI Wings, which is based on Android. The APP connects to the drone cloud via internet and communicates with ArduPilot (Pixhawk) using MAVLINK protocol. It also includes WebRTC for video streamining.  </p>
+<h2 id="test-app-with-ardupilot-software-simulator">Test APP with ArduPilot software simulator</h2>
+<ul>
+<li><a href="#A">Build ArduPilot SITL</a></li>
+<li><a href="#B">How to use</a></li>
+<li><a href="#C">MAVLink Command Usage</a></li>
+<li><a href="#D">DEMO Video</a></li>
+<li><a href="#E">Reference</a></li>
+</ul>
+<h2 id="build-ardupilot-sitl"><em><a id="A">Build ArduPilot SITL</a></em></h2>
+<ol>
+<li><strong><em>If you use Linux pls skip this step</em></strong>, Install WSL (Win10 Subsystem).</li>
+<li>Follow https://ardupilot.org/dev/docs/building-setup-linux.html#building-setup-linux to set up the SITL environment.</li>
+<li>Follow https://github.com/ArduPilot/ardupilot/blob/master/BUILD.md to build the SITL source code. <strong><em>I use ./waf configure --board sitl</em></strong></li>
+<li><strong><em>If you use Linux pls skip this step</em></strong>, Download https://sourceforge.net/projects/vcxsrv/ to visualize the Linux windows.</li>
+<li>Input the command <strong><em><sim_vehicle.py -v ArduCopter --console></em></strong> on WSL terminal to run SITL. <strong><em>Input command <sim_vehicle.py -h> to see how to use the exist parameters.</em></strong></li>
+<li>Open <strong><em>Mission Planner</em></strong> or <strong><em>QGroundControl</em></strong> to control and monitor the virtual drone.</li>
+</ol>
+<h2 id="how-to-use"><em><a id="B">How to use</a></em></h2>
+<ol>
+<li>Select <strong><em>"USB"</em></strong> option and <strong><em>connect to Pixhawk</em></strong> via USB or select <strong><em>"TCP"</em></strong> and <strong><em>connect to SITL</em></strong> via networks. <strong><em>If successful, "Pixhawk Status"</em></strong> will be displayed <strong><em>"Connected..."</em></strong>.</li>
+<li>The <strong><em>"RABBITMQ" button</em></strong> is used to connecnt to the pre-built RabbitMQ broker. If successful, <strong><em>"RabbitMQ Status"</em></strong> will be displayed <strong><em>"Connected..."</em></strong>.</li>
+<li>The <strong><em>"WEBRTC" button</em></strong> is used to establish PeerConnection of WebRTC with the back-end control webpage</li>
+</ol>
+<h3 id="reference">Reference</h3>
+<p>★ If you want to use USBCamera rather than Android Phone's built-in Camera. You can change the boolean value from <code>MainActivity.java</code>.
+```java=0
+boolean isUsingUSBCamera = true;</p>
+<pre><code>
+★ If you want to modify the IP &amp; port of ArduPilot SITL. You can change the code from ```MAVLinkConnection.java```.
+```java=0
+socket = new Socket(&quot;192.168.2.230&quot;, 5762);
+</code></pre>
+<p>★ You can change the RabbitMQ IP &amp; port and user name &amp; pwd from <code>RabbitMQ.java</code>.
+```java=0
+ConnectionFactory factory = new ConnectionFactory();
+factory.setHost("aiotlab-drone-cloud.ga");
+factory.setPort(5672);
+factory.setUsername("aiotlab");
+factory.setPassword("aiotlab208");</p>
+<pre><code>
+## *&lt;a id=&quot;C&quot;&gt;MAVLink Command Usage&lt;/a&gt;*
+### :memo: Control Drone
+
+### ★ Arm &amp; Disarm
+#### Bulid a **COMMAND_LONG (#76)** Message and use **MAV_CMD_COMPONENT_ARM_DISARM (400)** command.
+```java=0
+CommandLong cmd = new CommandLong.Builder().command(MavCmd.MAV_CMD_COMPONENT_ARM_DISARM).param1(is_armed).param2(0).build();
+connection.send1(255,0, cmd);
+
+| is_armed | Status |
+| ---------| -------|
+| 0        | DISARM |
+| 1        | ARM    |
+</code></pre>
+<h3 id="takeoff">★ TakeOff</h3>
+<h4 id="bulid-a-command_long-76-message-and-use-mav_cmd_nav_takeoff-22-command">Bulid a <strong>COMMAND_LONG (#76)</strong> Message and use <strong>MAV_CMD_NAV_TAKEOFF (22)</strong> command.</h4>
+<p>```java=0
+CommandLong cmd = new CommandLong.Builder().command(MavCmd.MAV_CMD_NAV_TAKEOFF).param1(15).param2(0).param3(0).param4(0).param5(0).param6(0).param7(takeoff_alt).build();
+connection.send1(255,0, cmd);</p>
+<pre><code>### ★ Set Flight Mode
+#### Bulid a **COMMAND_LONG (#76)** Message and use **MavCmd.MAV_CMD_DO_SET_MODE (176)** command.
+```java=0
+CommandLong cmd = new CommandLong.Builder().command(MavCmd.MAV_CMD_DO_SET_MODE).param1(1).param2(CustomMode).build();
+connection.send1(255, 0, cmd);
+
+| CustomMode | FlightMode |
+| ---------- | -----------|
+| 0          | STABILIZE  |
+| 1          | ACRO       |
+| 2          | ALT_HOLD   |
+| 3          | AUTO       |
+| 4          | GUIDED     |
+| 5          | LOITER     |
+| 6          | RTL        |
+| 7          | CIRCLE     |
+| 9          | LAND       |
+</code></pre>
+<h3 id="change-flight-speed">★ Change Flight Speed</h3>
+<h4 id="bulid-a-command_long-76-message-and-use-mav_cmd_do_change_speed-178-command">Bulid a <strong>COMMAND_LONG (#76)</strong> Message and use <strong>MAV_CMD_DO_CHANGE_SPEED (178)</strong> command.</h4>
+<p>```java=0
+CommandLong cmd = new CommandLong.Builder().command(MavCmd.MAV_CMD_DO_CHANGE_SPEED).param1(0).param2(speed).param3(-1).param4(0).build();
+connection.send1(255,0, cmd);</p>
+<pre><code>
+### ★ Change Flight Yaw
+#### Bulid a **COMMAND_LONG (#76)** Message and use **MAV_CMD_CONDITION_YAW (115)** command.
+```java=0
+CommandLong cmd = new CommandLong.Builder().command(MavCmd.MAV_CMD_CONDITION_YAW).param1(angle).param2(1).param3(-1).build();
+connection.send1(255, 0, cmd);
+</code></pre>
+<h3 id="control-servo">★ Control Servo</h3>
+<h4 id="bulid-a-command_long-76-message-and-use-mav_cmd_do_set_servo-183-command">Bulid a <strong>COMMAND_LONG (#76)</strong> Message and use <strong>MAV_CMD_DO_SET_SERVO (183)</strong> command.</h4>
+<p>```java=0
+CommandLong cmd = new CommandLong.Builder().command(MavCmd.MAV_CMD_DO_SET_SERVO).param1(pin).param2(PWM).build();
+connection.send1(255,0, cmd);</p>
+<pre><code>
+### ★ Go to
+#### Bulid a **MISSION_ITEM (#39)** Message and use **MAV_CMD_NAV_WAYPOINT (16)** command.
+```java=0
+MissionItem mission = new MissionItem.Builder().command(MavCmd.MAV_CMD_NAV_WAYPOINT).targetSystem(0).targetComponent(0).seq(0).current(2).autocontinue(0).frame(MavFrame.MAV_FRAME_GLOBAL_RELATIVE_ALT).x(lat).y(lng).z(alt).build();
+connection.send1(255,0, mission);
+</code></pre>
+<h3 id="memo-receive-flight-message">:memo: Receive  Flight Message</h3>
+<p>★ Bulid a <strong>COMMAND_LONG (#76)</strong> Message and use <strong>MAV_CMD_SET_MESSAGE_INTERVAL (511)</strong> command to listen the message you want and set the transmission interval.
+```java=0
+//MAVLINK_MSG_ID_GLOBAL_POSITION_INT 33
+CommandLong STATUS_Position = new CommandLong.Builder().command(MavCmd.MAV_CMD_SET_MESSAGE_INTERVAL).param1(33).param2(1000000).param7(0).build();
+connection.send1(255, 0, STATUS_Position);</p>
+<p>//MAVLINK_MSG_ID_BATTERY_STATUS 147
+CommandLong STATUS_Battery = new CommandLong.Builder().command(MavCmd.MAV_CMD_SET_MESSAGE_INTERVAL).param1(147).param2(1000000).param7(0).build();
+connection.send1(255, 0, STATUS_Battery);</p>
+<p>//MAVLINK_MSG_ID_VFR_HUD 74
+CommandLong STATUS_Speed = new CommandLong.Builder().command(MavCmd.MAV_CMD_SET_MESSAGE_INTERVAL).param1(74).param2(1000000).param7(0).build();
+connection.send1(255, 0, STATUS_Speed);</p>
+<p>//MAVLINK_MSG_ID_SYS_STATUS 1
+CommandLong STATUS_System = new CommandLong.Builder().command(MavCmd.MAV_CMD_SET_MESSAGE_INTERVAL).param1(1).param2(1000000).param7(0).build();
+connection.send1(255, 0, STATUS_System);</p>
+<p>//MAVLINK_MSG_ID_ATTITUDE 30
+CommandLong STATUS_Attitude = new CommandLong.Builder().command(MavCmd.MAV_CMD_SET_MESSAGE_INTERVAL).param1(30).param2(1000000).param7(0).build();
+connection.send1(255, 0, STATUS_Attitude);</p>
+<p>//MAVLINK_MSG_ID_GPS_RAW_INT 24
+CommandLong STATUS_gps = new CommandLong.Builder().command(MavCmd.MAV_CMD_SET_MESSAGE_INTERVAL).param1(24).param2(1000000).param7(0).build();
+connection.send1(255, 0, STATUS_gps);</p>
+<pre><code>| msg                 | msg_id | Link                 |
+| ------------------- | ------ | -------------------- |
+| HEARTBEAT           | 0      | [:link:][HEARTBEAT]  |
+| GLOBAL_POSITION_INT | 33     | [:link:][POSITION]   |
+| VFR_HUD             | 74     | [:link:][VFR_HUD]    |
+| SYS_STATUS          | 1      | [:link:][SYS_STATUS] | 
+| ATTITUDE            | 30     | [:link:][ATTITUDE]   |
+| GPS_RAW_INT         | 24     | [:link:][GPS_RAW_INT]|
+
+[HEARTBEAT]: https://mavlink.io/en/messages/common.html#HEARTBEAT
+[POSITION]: https://mavlink.io/en/messages/common.html#GLOBAL_POSITION_INT
+[VFR_HUD]: https://mavlink.io/en/messages/common.html#VFR_HUD
+[SYS_STATUS]: https://mavlink.io/en/messages/common.html#SYS_STATUS
+[ATTITUDE]: https://mavlink.io/en/messages/common.html#ATTITUDE
+[GPS_RAW_INT]: https://mavlink.io/en/messages/common.html#GPS_RAW_INT
+
+★ You can receive and handle drone's message from ```Drone_Message.java```. Take ***GLOBAL_POSITION_INT ( #33 )*** as an example.
+
+```java=0
+// GLOBAL_POSITION_INT ( #33 )
+else if(message.getPayload() instanceof GlobalPositionInt){
+    MavlinkMessage&lt;GlobalPositionInt&gt; positionMessage = (MavlinkMessage&lt;GlobalPositionInt&gt;)message;
+    String payload = &quot;&quot; + positionMessage.getPayload();
+    String[] payload_GlobalPositionInt = payload.replaceAll(&quot;[^\\d-.,E]&quot;, &quot;&quot;).split(&quot;,&quot;);
+    String lat_ = payload_GlobalPositionInt[1];
+    String lng_ = payload_GlobalPositionInt[2];
+    String alt_ = payload_GlobalPositionInt[3];
+    String relative_alt_ = payload_GlobalPositionInt[4];
+    String heading_ = payload_GlobalPositionInt[8];
+    try{
+        lat = String.valueOf(Double.parseDouble(lat_) / 10000000);
+        lng = String.valueOf(Double.parseDouble(lng_) / 10000000);
+        alt = String.valueOf(Double.parseDouble(alt_) / 1000);
+        relative_alt = String.valueOf(Double.parseDouble(relative_alt_) / 1000);
+        heading = String.valueOf(Double.parseDouble(heading_) / 100);
+    }catch(NumberFormatException e){
+        e.printStackTrace();
+    }
+    Log.i(&quot;Drone_Message&quot;, &quot;GLOBAL_POSITION_INT: &quot; + lat + &quot; &quot; + lng + &quot; &quot; + alt + &quot; &quot; + relative_alt + &quot; &quot; + heading);
+}
+</code></pre>
+<h3 id="memo-custom-drone-message">:memo: Custom Drone Message</h3>
+<p><code>json=0
+{
+  "type": "message",
+  "drone_info": {
+    "timestamp": "2020-12-23 22:43:01",
+    "drone_id" : "c756023fc7039ee5"
+    "location": {
+      "lat": "25.0430116",
+      "lng": "121.536214",
+      "alt": "13.04",
+      "relative_alt": "3.003",
+      "heading": "95.42"
+    },
+    "battery": {
+      "voltage": "12.587",
+      "current": "28.16",
+      "percentage": "0"
+    },
+    "speed": {
+      "air_speed": "0.01",
+      "gnd_speed": "0.10"
+    },
+    "attitude": {
+      "roll": "-0.38",
+      "pitch": "-0.40",
+      "yaw": "95.42"
+    },
+    "gps_status": {
+      "fix_type": "GPS_FIX_TYPE_RTK_FIXED",
+      "hpop": "1.21",
+      "vdop": "2.00",
+      "cog": "22054",
+      "gps_count": "10"
+    },
+    "heartbeat": {
+      "mav_type": "MAV_TYPE_QUADROTOR",
+      "mav_autopilot": "MAV_AUTOPILOT_ARDUPILOTMEGA",
+      "flight_mode": "GUIDED",
+      "system_status": "MAV_STATE_ACTIVE",
+      "is_armed": "1"
+    }
+  }
+}</code></p>
+<h4 id="pushpin-location-message-from-global_position_int-33-message">:pushpin: <strong>location</strong> Message from <strong>GLOBAL_POSITION_INT (#33)</strong> Message</h4>
+<table>
+<thead>
+<tr>
+<th>location</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lat</td>
+<td>Latitude</td>
+</tr>
+<tr>
+<td>lng</td>
+<td>Longitude</td>
+</tr>
+<tr>
+<td>alt</td>
+<td>Altitude (MSL)</td>
+</tr>
+<tr>
+<td>relative_alt</td>
+<td>Altitude above ground</td>
+</tr>
+<tr>
+<td>heading</td>
+<td>Vehicle heading (0~360 degrees)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="pushpin-battery-message-from-sys_status-1-message">:pushpin: <strong>battery</strong> Message from <strong>SYS_STATUS (#1)</strong> Message</h4>
+<table>
+<thead>
+<tr>
+<th>battery</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>voltage</td>
+<td>Battery voltage</td>
+</tr>
+<tr>
+<td>current</td>
+<td>Battery current</td>
+</tr>
+<tr>
+<td>percentage</td>
+<td>Battery energy remaining</td>
+</tr>
+</tbody>
+</table>
+<h4 id="pushpin-speed-message-from-vfr_hud-74-message">:pushpin: <strong>speed</strong> Message from <strong>VFR_HUD (#74)</strong> Message</h4>
+<table>
+<thead>
+<tr>
+<th>speed</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>airspeed</td>
+<td>Current air speed</td>
+</tr>
+<tr>
+<td>groundspeed</td>
+<td>Current ground speed</td>
+</tr>
+</tbody>
+</table>
+<h4 id="pushpin-attitude-message-from-attitude-30-message">:pushpin: <strong>attitude</strong> Message from <strong>ATTITUDE (#30)</strong> Message</h4>
+<table>
+<thead>
+<tr>
+<th>attitude</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>row</td>
+<td>Roll angle (-pi..+pi)</td>
+</tr>
+<tr>
+<td>pitch</td>
+<td>Pitch angle (-pi..+pi)</td>
+</tr>
+<tr>
+<td>yaw</td>
+<td>Yaw angle (-pi..+pi)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="pushpin-gps_status-message-from-gps_raw_int-24-message">:pushpin: <strong>gps_status</strong> Message from <strong>GPS_RAW_INT (#24)</strong> Message</h4>
+<table>
+<thead>
+<tr>
+<th>gps_status</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fix_type</td>
+<td>GPS fix type</td>
+</tr>
+<tr>
+<td>hpop</td>
+<td>GPS HDOP horizontal dilution of position</td>
+</tr>
+<tr>
+<td>vdop</td>
+<td>GPS VDOP vertical dilution of position</td>
+</tr>
+<tr>
+<td>cog</td>
+<td>Course over ground (0.0..359.99 degrees)</td>
+</tr>
+<tr>
+<td>gps_count</td>
+<td>Number of satellites visible</td>
+</tr>
+</tbody>
+</table>
+<h4 id="pushpin-heartbeat-message-from-heartbeat-0-message">:pushpin: <strong>heartbeat</strong> Message from <strong>HEARTBEAT (#0)</strong> Message</h4>
+<table>
+<thead>
+<tr>
+<th>heartbeat</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mav_type</td>
+<td>Vehicle or component type</td>
+</tr>
+<tr>
+<td>mav_autopilot</td>
+<td>Autopilot type / class</td>
+</tr>
+<tr>
+<td>flight_mode</td>
+<td>Current Flight mode</td>
+</tr>
+<tr>
+<td>system_status</td>
+<td>System status flag</td>
+</tr>
+<tr>
+<td>is_armed</td>
+<td>Whether the drone is armed (0 : Disarmed 1 : Armed)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="demo-video"><em><a id="D">DEMO video</a></em></h2>
+<p>https://youtu.be/Q5ktT4_TEg4</p>
+<h2 id="reference_1"><em><a id="E">Reference</a></em></h2>
+<ol>
+<li>https://github.com/dronefleet/mavlink</li>
+<li>https://github.com/felHR85/UsbSerial</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../web_ui/" class="btn btn-neutral float-left" title="Web UI"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../web_ui/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
