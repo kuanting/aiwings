@@ -2,7 +2,7 @@
 
 AI Wings is an AIoT Drone System for commanding AIoT drone fleets via the 4G/5G network. We integrate ArduPilot with Android phones and endow DIY drones with AI computing power and 4G/5G connectiviy. AI Wings consists of a cloud server (node.js), Web UI (vue.js), onboard App (Android), and VR simulation (Unreal). Users can install our cloud server and create their own Internet of Drones. Our paper "[AI Wings: An AIoT Drone System for Commanding ArduPilot UAVs](https://ieeexplore.ieee.org/document/9836339)" has been published by IEEE Systems Journal.
 
-<img width=640 src="doc/img/ai_wings_arch.jpg" />
+<img width=640 src="img/ai_wings_arch.jpg" />
 
 ## Real World Testing
 
@@ -45,12 +45,12 @@ The major steps to create your own AIoT drone fleet are:
 
 AI Wings supports Microsoft AirSim, which allows users to simulate drone functtions in VR worlds. The simulation video is shown below. The upper-left window is the VR world and lower-left window is the virtual camera view. The right window is the web UI of AI Wings.
 
-[![AI Wings VR Test](doc/img/ai_wings_airsim.png)](https://www.youtube.com/watch?v=v67eJAYtv8c)
+[![AI Wings VR Test](img/ai_wings_airsim.png)](https://www.youtube.com/watch?v=v67eJAYtv8c)
 
 ## Software Development
 
 The system architecture is shown as below.
 
-<img width=480 src="doc/img/ai_wings_sw_arch.png">
+<img width=480 src="img/ai_wings_sw_arch.png">
 
 This project is under active development and will be updated frequently.
