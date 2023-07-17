@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://aiwings.org/server/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Server - AI Wings</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Server";
+        var mkdocs_page_input_path = "server.md";
+        var mkdocs_page_url = "/server/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> AI Wings
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Server</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../web_ui/">Web UI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../onboard_app/">Onboard App</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">AI Wings</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li>Server</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="backend-server-of-drone-cloud-platform">Backend Server of Drone Cloud Platform</h1>
+<p><img alt="Github Action" src="https://github.com/waiting33118/drone-api-server/actions/workflows/dockerCICD.yml/badge.svg" />
+<img alt="Docker pull" src="https://img.shields.io/docker/pulls/waiting33118/drone-cloud-backend" />
+<img alt="Docker" src="https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&amp;logoColor=white" /></p>
+<p><img alt="eco-system" src="docs/images/eco-system%20relationship.png" /></p>
+<blockquote>
+<p>This is the backend API server of <a href="https://github.com/waiting33118/drone-cloud-platform3.0">Drone Cloud Platform</a>, used for handle drone communication between drone's android app and the drone cloud platform.</p>
+</blockquote>
+<h1 id="project-introduction">Project introduction</h1>
+<h2 id="file-structure">File structure</h2>
+<ul>
+<li><strong>Src</strong> - The main source code</li>
+<li><strong>Entity</strong> - Datebase schemas</li>
+<li><strong>Helpers</strong> - Some helper funtions</li>
+<li><strong>MiddleWares</strong> - Intermediate checkpoint services</li>
+<li><strong>Routes</strong> - Restful API routes</li>
+<li><strong>Services</strong> - The main business logic</li>
+<li><strong>Types</strong> - TypeScript type definitions</li>
+<li><strong>Server.ts</strong> - Main entry point</li>
+<li><strong>Package.json</strong> - The dependency list</li>
+<li><strong>Dockerfile</strong> - For creating docker container</li>
+<li><strong>Docker-compose</strong> - For creating multi-containers/services environment</li>
+<li><strong>.env</strong> - Environment variables</li>
+</ul>
+<h2 id="production-cloud-infrastructure">Production Cloud Infrastructure</h2>
+<p><img alt="infra" src="docs/images/backend%20architecture.png" /></p>
+<ul>
+<li>Infra as a Service(IaaS)</li>
+<li>Google Coompute Engine (Ubuntu 20.04)</li>
+<li>Platform as a Service (PaaS)</li>
+<li>Cloud SQL (MySQL)</li>
+<li>Container Orchestration Platform</li>
+<li>K3S (light weight kubernetes)
+    <img alt="kubectl" src="docs/images/kubectl.png" /></li>
+<li>Message Broker</li>
+<li>RabbitMQ AMQP server</li>
+</ul>
+<h2 id="gihub-action-cicd-pipeline">Gihub Action CI/CD pipeline</h2>
+<p><img alt="cicd" src="docs/images/cicd%20pipeline.png" /></p>
+<h2 id="multi-drone-simulation">Multi-drone Simulation</h2>
+<p><img alt="multi-drone" src="docs/images/multi-drone%20simulation.png" />
+Please start the simulator one by one! </p>
+<pre><code class="language-bash">docker run -p 5671:5672 -it --name sitl_1 waiting33118/ardupilot-sitl  # 1st
+docker run -p 5672:5672 -it --name sitl_2 waiting33118/ardupilot-sitl  # 2nd
+docker run -p 5673:5672 -it --name sitl_3 waiting33118/ardupilot-sitl  # 3rd
+</code></pre>
+<p>After enter the terminal, execute the script</p>
+<pre><code class="language-bash">./start
+</code></pre>
+<h2 id="experiment-results">Experiment Results</h2>
+<blockquote>
+<p>Control drone by platform service
+<img alt="flight" src="docs/images/flight_1.png" />
+Pilot remotely control
+<img alt="control" src="docs/images/pilot%20remote%20control.jpg" /></p>
+</blockquote>
+<h1 id="project-setup">Project Setup</h1>
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>MySQL server (<a href="https://dev.mysql.com/downloads/">Install locally</a>/ <a href="https://hub.docker.com/_/mysql">Docker Image</a>)</li>
+<li>RabbitMQ server (<a href="https://www.rabbitmq.com/download.html">Install locally</a>/<a href="https://hub.docker.com/_/rabbitmq">Docker Image</a>)</li>
+</ol>
+<blockquote>
+<p>Recommend to install locally for more stable</p>
+</blockquote>
+<h2 id="install-dependencies">Install dependencies</h2>
+<pre><code class="language-bash">npm install
+</code></pre>
+<h2 id="config-environment-variables">Config Environment Variables</h2>
+<p>Copy env example file and rename to <code>.env</code></p>
+<pre><code class="language-bash">cp .env.example .env
+</code></pre>
+<p>Fill in credentials</p>
+<pre><code>FRONTEND_URL=http://localhost:8080
+BACKEND_SERVICE_SERVICE_PORT=3080
+RABBITMQ_SERVICE_SERVICE_HOST=127.0.0.1
+RABBITMQ_SERVICE_SERVICE_PORT=5672
+RABBITMQ_SERVICE_USER=user (replace by your username)
+RABBITMQ_SERVICE_PASSWORD=rabbitmq (replace by your password)
+MYSQL_SERVICE_SERVICE_HOST=127.0.0.1
+MYSQL_SERVICE_SERVICE_PORT=3306
+MYSQL_SERVICE_USER=root (replace by your username)
+MYSQL_SERVICE_PASSWORD=password (replace by your password)
+JWT_TOKEN_SECRET=littleSecret
+</code></pre>
+<h2 id="start-the-server">Start The Server</h2>
+<pre><code class="language-bash">npm run dev
+</code></pre>
+<p><em>The server will now run on http://localhost:3080</em></p>
+<h2 id="build-project">Build project</h2>
+<pre><code class="language-bash">npm run build
+</code></pre>
+<h1 id="drone-cloud-system-environment-optional">Drone Cloud System Environment (Optional)</h1>
+<h2 id="prerequisite">Prerequisite</h2>
+<ul>
+<li>Node.js &gt;=v14.18.1</li>
+<li>Docker</li>
+<li>Docker-compose</li>
+</ul>
+<h2 id="frontend">FrontEnd</h2>
+<pre><code class="language-bash">git clone https://github.com/waiting33118/drone-cloud-platform3.0
+</code></pre>
+<ul>
+<li>Please read the <a href="https://github.com/waiting33118/drone-cloud-platform3.0#readme">README.md</a> section to start the frontend localhost server</li>
+</ul>
+<h2 id="backend-api-server-rabbitmq-broker-and-drone-simulator">Backend API server, RabbitMQ broker and Drone Simulator</h2>
+<ul>
+<li>Edit ENV variables in <code>.docker.env</code> file</li>
+</ul>
+<h3 id="startup-system">Startup System</h3>
+<pre><code class="language-bash"># attach mode
+docker-compose up
+
+# detached mode
+docker-compose up -d
+
+# follow logs
+docker-compose logs -f
+
+# stop all containers(remove volumes)
+docker-compose down -v
+</code></pre>
+<h3 id="initial-drone-simulator">Initial Drone Simulator</h3>
+<p>Attach the "sitl" container</p>
+<pre><code class="language-bash">docker attach drone-api-server_sitl
+</code></pre>
+<p>Run script to build sitl</p>
+<pre><code class="language-bash">./start.sh
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../web_ui/" class="btn btn-neutral float-right" title="Web UI">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../web_ui/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

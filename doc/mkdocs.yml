@@ -1,0 +1,14 @@
+site_name: AI Wings
+site_url: https://aiwings.org/
+nav:
+  - Home: index.md
+  - Server: server.md
+  - Web UI: web_ui.md
+  - Onboard App: onboard_app.md
+  
+theme:
+    name: readthedocs
+    highlightjs: true
+    hljs_languages:
+        - yaml
+        - rust
