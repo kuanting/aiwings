@@ -4,7 +4,7 @@
 ![Docker pull](https://img.shields.io/docker/pulls/waiting33118/drone-cloud-backend)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)
 
-![eco-system](docs/images/eco-system%20relationship.png)
+![eco-system](img/eco-system%20relationship.png)
 >This is the backend API server of [Drone Cloud Platform](https://github.com/waiting33118/drone-cloud-platform3.0), used for handle drone communication between drone's android app and the drone cloud platform.
 
 # Project introduction
@@ -24,7 +24,7 @@
 - **.env** - Environment variables
 
 ## Production Cloud Infrastructure
-![infra](docs/images/backend%20architecture.png)
+![infra](img//backend%20architecture.png)
 
 - Infra as a Service(IaaS)
   - Google Coompute Engine (Ubuntu 20.04)
@@ -32,14 +32,14 @@
   - Cloud SQL (MySQL)
 - Container Orchestration Platform
   - K3S (light weight kubernetes)
-    ![kubectl](docs/images/kubectl.png)
+    ![kubectl](img//kubectl.png)
 - Message Broker
   - RabbitMQ AMQP server
 ## Gihub Action CI/CD pipeline
-![cicd](docs/images/cicd%20pipeline.png)
+![cicd](img//cicd%20pipeline.png)
 
 ## Multi-drone Simulation
-![multi-drone](docs/images/multi-drone%20simulation.png)
+![multi-drone](img//multi-drone%20simulation.png)
 Please start the simulator one by one! 
 ```bash
 docker run -p 5671:5672 -it --name sitl_1 waiting33118/ardupilot-sitl  # 1st
@@ -54,9 +54,9 @@ After enter the terminal, execute the script
 ## Experiment Results
 
 > Control drone by platform service
-![flight](docs/images/flight_1.png)
+![flight](img//flight_1.png)
 > Pilot remotely control
-![control](docs/images/pilot%20remote%20control.jpg)
+![control](img//pilot%20remote%20control.jpg)
 
 # Project Setup
 
