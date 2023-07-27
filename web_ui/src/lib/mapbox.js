@@ -24,19 +24,19 @@ export default class CustomMap {
     })
 
     this.map.on('load', () => {
-      this._loadBuildingLayer()
-      this._addMapControls()
+      this._loadBuildingLayer() // 載入建築物圖層
+      this._addMapControls()  // 添加地圖控制元件
     })
   }
 
   _loadBuildingLayer() {
     // Get label layer ID
     
-    const layers = this.map.getStyle().layers
+    const layers = this.map.getStyle().layers // 獲取當前地圖樣式的所有圖層
     let labelLayerId
     for (let i = 0; i < layers.length; i++) {
       if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-        labelLayerId = layers[i].id
+        labelLayerId = layers[i].id // labelLayerId：儲存所有圖層id
         break
       }
     }
@@ -77,6 +77,7 @@ export default class CustomMap {
   }
 
   _addMapControls() {
+    // 添加導航控件到地圖右上角
     this.map.addControl(
       new mapboxgl.NavigationControl({
         visualizePitch: true,
@@ -85,11 +86,15 @@ export default class CustomMap {
       }),
       'top-right'
     )
+
+    // 添加比例尺控件到地圖的左下角
     this.map.addControl(
       new mapboxgl.ScaleControl({ maxWidth: 100, unit: 'metric' }),
       'bottom-left'
     )
   }
+
+  /** 先透過addSource將數據資料將數據資料加到地圖 */
 
   /**
    * Create a Geojson source and apply into custom map
@@ -109,6 +114,7 @@ export default class CustomMap {
    * @param {string} source source data ID
    */
   createLineLayer(id, source) {
+    //將地圖中的數據資料轉為圖層
     this.map.addLayer({
       id,
       type: 'line',
@@ -169,7 +175,7 @@ export default class CustomMap {
     popup,
     element
   }) {
-    return new mapboxgl.Marker({
+    return new mapboxgl.Marker({  // 創建標記點
       element,
       color,
       scale,

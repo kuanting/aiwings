@@ -121,7 +121,7 @@ export default {
       };
 
       const user: any = await select_user();
-      console.log("login user的資料: ", user); 
+      console.log("透過用戶輸入在db搜尋到的相對應login user的資料:", user); 
       if(!user){
         console.log("此email用戶不存在")
         res.status(401).json({ msg: "此email用戶不存在" }); //用401提醒用戶輸入錯誤
@@ -160,6 +160,8 @@ export default {
       //   console.log(drone);
       // }
 
+      console.log("用戶存在，建立 accessToken 和 refreshToken 並存於cookie中回傳用戶端")
+      
       const accessToken = await signJwtToken("5m", { uuid: user.id });
       const refreshToken = await signJwtToken("30d", { uuid: user.id });
 
