@@ -29,9 +29,11 @@
             "
           >
             <video
-              ref="remoteSubVideoEl"
+              :ref="el => {
+                remoteSubVideoEl = el;
+              }"
               poster="../../assets/live-stream.png"
-              autoplay
+              autoplay="true"
             ></video>
           </div>
         </div>
@@ -84,12 +86,13 @@ export default {
 
     const rabbitmqInit = () => {
       // setLogs(`Websocket connected: ${socket.id}`)
-      console.log(socket.id)
+      console.log("----rabbitmqInit---\nsocket.id = ",socket.id)
       for (let i in user.value.droneId) {
         setLogs(`Drone ID: ${user.value.droneId[i]}`)
         console.log(user.value.droneId[i])
       }
       socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)
+      console.log("socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)\n---------------")
     }
     // Trigger RabbitMQ when the first come or refresh pages
     if (!rabbitmqIsInit.value) {
@@ -121,12 +124,16 @@ export default {
 
     // handle receive media track event
     const onTrack = (event) => {
+      console.log("----接收影像----")
       //consoloe.log()
-      // console.log('ontrack event: ', event)
+      console.log('ontrack event.streams[0]: ', event.streams[0])
       setLogs('Received track')
-      recordButton.isReady = true
+      // recordButton.isReady = true //recordButton現在沒用到
       remoteStream = event.streams[0]
       remoteSubVideoEl.value.srcObject = remoteStream
+      // TESTvideo.value.srcObject  = localStream
+      // console.log('localStream = ', localStream)
+
       detection.setupCanvasContainer(remoteSubVideoEl.value, canvasEl.value)
       detection.start(remoteSubVideoEl.value, canvasEl.value)
     }
@@ -163,7 +170,6 @@ export default {
       }
       pc = createPeerConnection()
       console.log('Create peer connection: ', pc)
-
       setLogs('Create peer connection')
       // pc.onicecandidate = onIceCandidate(pc, droneId)
       pc.onicecandidate = onIceCandidate
@@ -180,6 +186,9 @@ export default {
     }
 
     const startPeerNegotiation = async (droneID) => {
+      console.log("*************startPeerNegotiation***********")
+      // remoteSubVideoEl.value.srcObject = localStream
+      console.log("remoteSubVideoEl.value = ",remoteSubVideoEl.value)
       select_droneID = droneID
       initPeerConnection()
       const offer = await createOfferAndSetLocalSDP(pc)
@@ -192,6 +201,7 @@ export default {
     // webRTC establish workflow
     getLocalStream()
       .then((mediaStream) => {
+        console.log("getLocalStream() 成功")
         localStream = mediaStream
       })
       .catch((error) => {
@@ -253,6 +263,7 @@ export default {
     })
 
     return {
+      remoteSubVideoEl,
       droneArr,
       select_drone_video,
       startPeerNegotiation
