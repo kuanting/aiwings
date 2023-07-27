@@ -23,7 +23,7 @@ export default {
               reject(err);
               return;
             }
-            console.log("------- [user.ts] -------\n------ loginUser() ------\nselect_user()【getUserInfo】: ", result);
+            console.log("------- [user.ts] -------\n------ loginUser() ------\nselect_user(): ", result);
             // handle object for userInfo
             type droneId = {
               [key: string]: any;

@@ -10,8 +10,8 @@ axios.defaults.baseURL =
 axios.defaults.withCredentials = true
 
 axios.interceptors.response.use(
-  (res) => res,
-  (error) => {
+  (res) => res, // 第一個函式:  // Do something 
+  (error) => {  // 第二個函式: // Do something with request error
     if (error.response.status === 500) {
       notification.error({
         message: 'Error',

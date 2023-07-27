@@ -42,7 +42,7 @@
         <a-col flex="auto">
           <InputNumber
             item-name="Altitude(Max:100)"
-            :value="altitude"
+            :value="alt_byUser"
             :max="Number(100)"
             :min="Number(1)"
             :change-handler="altitudeChangeHandler"
@@ -94,7 +94,7 @@ export default {
     const isArm = ref(false)
     const isTakeoff = ref(false)
     const isLanding = ref(false)
-    const altitude = ref(3)
+    const alt_byUser = ref(3)
     const speed = ref(3)
     const flightMode = ref('')
     const store = useStore()
@@ -175,7 +175,6 @@ export default {
 
         1. In LAND mode and the drone is DISARM
        */
-      console.log('TabControl watch drone: ', drone[defaultSelected])
       if (typeof drone[defaultSelected].mode === 'undefined') return
       if (
         drone[defaultSelected].isArmed === 'DISARM' &&
@@ -186,7 +185,6 @@ export default {
 
       flightMode.value = drone[defaultSelected].mode
       isArm.value = drone[defaultSelected].isArmed === 'ARM' ? true : false
-
       isTakeoff.value =
         drone[defaultSelected].isArmed === 'ARM' &&
         drone[defaultSelected].altitude >= 0.5
@@ -200,39 +198,40 @@ export default {
           : false
     })
 
-    watch([isTakeoff, altitude], ([isTakeoff, altitude]) => {
-      console.log(isTakeoff, altitude)
+    watch([isTakeoff, alt_byUser], ([isTakeoff, alt_byUser]) => {
+      console.log(isTakeoff, alt_byUser)
       store.dispatch('drone/updateFlightStatus', {
         droneID: defaultSelected,
-        status: { altitude, isTakeoff }
+        status: { alt_byUser, isTakeoff }
       })
     })
-
-    console.log(isTakeoff.value, isLanding.value)
-
     const sendDroneCommand = (command) => socket.emit('send-drone', command)
 
     const flightHandler = () => {
       if (isTakeoff.value) {
-        sendDroneCommand({ droneID: defaultSelected, cmd: 'LAND' })
+        sendDroneCommand({ droneID: defaultSelected, cmd: 'LAND' }) // LAND 降落
         message.success('LANDING')
+        console.log("LAND")
+        // isTakeoff.value = false
         return
       }
-      sendDroneCommand({ droneID: defaultSelected, cmd: 'ARM' })
-      setTimeout(() => {
+      sendDroneCommand({ droneID: defaultSelected, cmd: 'ARM' }) // ARM 解鎖
+      setTimeout(() => {//TAKEOFF 起飛
         sendDroneCommand({
           droneID: defaultSelected,
           cmd: 'TAKEOFF',
-          altitude: altitude.value
+          altitude: alt_byUser.value
         })
         message.success('TAKEOFF')
+        console.log("TAKEOFF")
+        // isTakeoff.value = true
       }, 2000)
     }
 
     const altitudeChangeHandler = (value) => {
       if (value === '' || value < 1) value = 1
       if (value > 100) value = 100
-      altitude.value = value
+      alt_byUser.value = value
     }
 
     const altitudeEnterHandler = () => {
@@ -241,21 +240,21 @@ export default {
           sendDroneCommand({
             droneID: defaultSelected,
             cmd: 'GOTO',
-            altitude: altitude.value,
-            lng: drone.value.longitude,
-            lat: drone.value.latitude
+            altitude: alt_byUser.value,
+            lng: drone.value[defaultSelected].longitude,
+            lat: drone.value[defaultSelected].latitude
           })
         } else {
           sendDroneCommand({
             droneID: defaultSelected,
             cmd: 'GOTO',
-            altitude: altitude.value,
-            lng: destination.value.lng,
-            lat: destination.value.lat
+            altitude: alt_byUser.value,
+            lng: destination.value[defaultSelected].lng,
+            lat: destination.value[defaultSelected].lat
           })
         }
 
-        message.success(`Change ALTITUDE to ${altitude.value}m`)
+        message.success(`Change ALTITUDE to ${alt_byUser.value}m`)
         return
       }
       message.error('Please TAKEOFF the drone first')
@@ -288,17 +287,24 @@ export default {
       sendDroneCommand({ droneID: defaultSelected, cmd: mode })
       message.success(`Change MODE to ${mode}`)
     }
+
+
     const emergencyStopHandler = () => {
-      sendDroneCommand({
-        droneID: defaultSelected,
-        cmd: 'GOTO',
-        altitude: altitude.value,
-        lng: drone.value.longitude,
-        lat: drone.value.latitude
-      })
+      // sendDroneCommand({
+      //   droneID: defaultSelected,
+      //   cmd: 'GOTO',
+      //   altitude: 0,
+      //   lng: drone.value[defaultSelected].longitude,
+      //   lat: drone.value[defaultSelected].latitude
+      // })
+      sendDroneCommand({ droneID: defaultSelected, cmd: 'LAND' })
+
+
+
       store.dispatch('drone/updateDestination', {
-        lng: drone.value.longitude,
-        lat: drone.value.latitude
+        droneID: defaultSelected,
+        lng: drone.value[defaultSelected].longitude,
+        lat: drone.value[defaultSelected].latitude
       })
       message.warn(`Emergency Stop`)
     }
@@ -307,7 +313,7 @@ export default {
       isArm,
       isTakeoff,
       isLanding,
-      altitude,
+      alt_byUser,
       speed,
       confirmText,
       flightMode,
