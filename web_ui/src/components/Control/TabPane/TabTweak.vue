@@ -52,7 +52,9 @@ export default {
   setup() {
     const store = useStore()
     const coords = computed(() => store.getters['drone/getDroneCoords'])
-    const altitude = computed(() => store.getters['drone/getAltitude'])
+    // const altitude = computed(() => store.getters['drone/getAltitude'])
+    const drone = computed(() => store.getters['drone/getDroneInfo']) //++
+
     const isTakeoff = computed(() => store.getters['drone/getTakeoffStatus'])
     const userInfo = computed(() => store.getters.getUserInfo)
     const droneArr = userInfo.value.droneId
@@ -100,21 +102,27 @@ export default {
         message.error('Please TAKEOFF the drone first')
         return
       }
-      let longitude = +coords.value[0]
-      let latitude = +coords.value[1]
+      // let longitude = +coords.value[0]
+      // let latitude = +coords.value[1]
+      let longitude = drone.value[defaultSelected].longitude
+      let latitude = drone.value[defaultSelected].latitude
       if (axis === 'X') {
-        longitude = newLongitude(direction)
+        // longitude = newLongitude(direction)
+        longitude += direction * 0.00001
       }
       if (axis === 'Y') {
-        latitude = newLatitide(direction)
+        // latitude = newLatitide(direction)
+        latitude += direction * 0.00001
       }
       socket.emit('send-drone', {
         droneID: defaultSelected,
         cmd: 'GOTO',
-        altitude: altitude.value,
+        altitude: drone.value[defaultSelected].altitude,
         lng: longitude,
         lat: latitude
       })
+
+      message.success(`Change lng, lat to (${longitude, latitude}m`)
     }
 
     return {

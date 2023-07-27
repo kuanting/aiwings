@@ -130,7 +130,7 @@ export default {
 
     //FIXEDME: 這邊要改
     getUserCurrentLocation()
-      .then(([lng, lat]) => {
+      .then(([lng, lat]) => {//取得設備的經緯度
         longitude = lng
         latitude = lat
       })
@@ -146,7 +146,7 @@ export default {
         // map_instnace = mapbox
         // console.log("here: ", map_instnace)
         mapbox.initMapbox()
-        mapbox.map.dragRotate.disable()
+        mapbox.map.dragRotate.disable()//禁用了地圖的拖動旋轉功能
         mapbox.map.on('load', () => {
           mapbox.createGeoJsonSource('real-time-record', geoJsonFormatData)
           mapbox.createLineLayer('real-time-path', 'real-time-record')
@@ -180,7 +180,11 @@ export default {
               `<p style="color:blue; font-weight: bold;">${droneID}</p>`
             )
           })
+
+          // drones_marker[droneID].setLngLat([longitude+0.0001, latitude+0.0001])
+
           drones_marker[droneID].on('dragend', () => {
+            console.log("drones_marker[droneID].on('dragend',")
             // const isTakeoff = computed(() => store.getters['drone/getTakeoffStatus']('1ee52ca0171e4978'))
             // console.log('drone.value: ', drone.value[user.value.droneId[i]])
             droneElement.width = 100
@@ -199,8 +203,11 @@ export default {
             if (isTakeoff) {
               const lngLat = drones_marker[droneID].getLngLat()
 
+              console.log(lngLat)
+
               cacheTarget = lngLat
-              mapbox.flyTo([lngLat.lng, lngLat.lat])
+              mapbox.flyTo([lngLat.lng, lngLat.
+              lat])
               popEl.value.click()
               return
             }

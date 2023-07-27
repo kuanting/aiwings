@@ -20,13 +20,15 @@ const app = express();
 app.set('trust proxy', process.env.NODE_ENV === 'production');
 
 // Create server
+const fs = require('fs');
 const server =
   process.env.NODE_ENV === 'production'
     ? https.createServer(
-        { key: process.env.TLS_KEY, cert: process.env.TLS_CERT },
+        { key: fs.readFileSync(process.env.TLS_KEY), cert: fs.readFileSync(process.env.TLS_CERT) },
         app
       )
     : http.createServer(app);
+// const server = http.createServer(app);
 
 // Logger
 const { combine, timestamp, printf } = format;
