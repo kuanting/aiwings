@@ -25,12 +25,12 @@
           <div
             class="video"
             @click="
-              startPeerNegotiation(index.id), select_drone_video(index.id)
+              select_drone_video(index.id), startPeerNegotiation(index.id)
             "
           >
             <video
               :ref="el => {
-                remoteSubVideoEl = el;
+                remoteSubVideoEl[index.id] = el;
               }"
               poster="../../assets/live-stream.png"
               autoplay="true"
@@ -60,12 +60,12 @@ export default {
 
   setup() {
     const remoteMainVideoEl = ref(null)
-    const remoteSubVideoEl = ref(null)
-    const canvasEl = ref(null)
+    const remoteSubVideoEl = []
 
-    // let test1 = ref(null)
+    // const TESTvideo = ref(null)
+    // const canvasEl = ref(null) // for 顯示偵測結果
 
-    let pc
+    let pc = []
     let recorder
     let localStream
     let remoteStream
@@ -109,11 +109,11 @@ export default {
       setLogs(`Queue created: ${queueName}`)
     })
 
-    const onIceCandidate = (event) => {
+    const onIceCandidate = (droneID)=>(event) => {
       if (event.candidate) {
         setTimeout(() => {
           socket.emit('send-webrtc', {
-            droneID: select_droneID,
+            droneID: droneID,
             type: 'candidate',
             payload: event.candidate
           })
@@ -123,25 +123,25 @@ export default {
     }
 
     // handle receive media track event
-    const onTrack = (event) => {
-      console.log("----接收影像----")
+    const onTrack = (droneID) => (event) => {
+      console.log("----onTrack()---接收影像----droneID=",droneID)
       //consoloe.log()
       console.log('ontrack event.streams[0]: ', event.streams[0])
       setLogs('Received track')
-      // recordButton.isReady = true //recordButton現在沒用到
+      // recordButton.isReady = true
       remoteStream = event.streams[0]
-      remoteSubVideoEl.value.srcObject = remoteStream
+      remoteSubVideoEl[droneID].srcObject = remoteStream
       // TESTvideo.value.srcObject  = localStream
       // console.log('localStream = ', localStream)
 
-      detection.setupCanvasContainer(remoteSubVideoEl.value, canvasEl.value)
-      detection.start(remoteSubVideoEl.value, canvasEl.value)
+      // detection.setupCanvasContainer(remoteSubVideoEl.value, canvasEl.value)
+      // detection.start(remoteSubVideoEl.value, canvasEl.value)
     }
 
     // handle connection change
-    const onIceConnectionStateChange = () => {
-      setLogs(`ICE connection Change: ${pc.iceConnectionState}`)
-      if (pc.iceConnectionState === 'disconnected') {
+    const onIceConnectionStateChange = (droneID) => {
+      setLogs(`ICE connection Change: ${pc[droneID].iceConnectionState}`)
+      if (pc[droneID].iceConnectionState === 'disconnected') {
         if (recordButton.isRecording) {
           recordButton.isRecording = false
           recorder.stop()
@@ -149,38 +149,39 @@ export default {
         }
         recordButton.isReady = false
         remoteStream.getTracks().forEach((track) => track.stop())
-        remoteSubVideoEl.value.srcObject = new MediaStream()
+        remoteSubVideoEl[droneID].srcObject = new MediaStream()
 
-        // clean stream canvas
-        detection.cleanBoundingBox(canvasEl.value)
-        detection.stopDetection()
+        // // clean stream canvas
+        // detection.cleanBoundingBox(canvasEl.value)
+        // detection.stopDetection()
       }
     }
 
-    const onIceConnectionGatheringChange = () => {
-      setLogs(`ICE gathering Change: ${pc.iceGatheringState}`)
+    const onIceConnectionGatheringChange = (droneID) => {
+      setLogs(`ICE gathering Change: ${pc[droneID].iceGatheringState}`)
     }
 
     // peer connection initialization
-    const initPeerConnection = () => {
-      // console.log("droneID, initPeerConnection: ", droneId)
-      if (pc?.connectionState) {
+    const initPeerConnection = (droneID) => {
+      console.log("initPeerConnection: droneId=", droneID)
+
+      if (pc[droneID]?.connectionState) {
         setLogs('Close previous peer connection')
-        pc.close()
+        pc[droneID].close()
       }
-      pc = createPeerConnection()
-      console.log('Create peer connection: ', pc)
+      pc[droneID] = createPeerConnection()
+      console.log('Create peer connection: ', pc[droneID])
       setLogs('Create peer connection')
       // pc.onicecandidate = onIceCandidate(pc, droneId)
-      pc.onicecandidate = onIceCandidate
-      pc.ontrack = onTrack
-      pc.oniceconnectionstatechange = onIceConnectionStateChange
-      pc.onicegatheringstatechange = onIceConnectionGatheringChange
+      pc[droneID].onicecandidate = onIceCandidate(droneID)
+      pc[droneID].ontrack = onTrack(droneID)
+      pc[droneID].oniceconnectionstatechange = onIceConnectionStateChange(droneID)
+      pc[droneID].onicegatheringstatechange = onIceConnectionGatheringChange(droneID)
       if (localStream) {
-        localStream.getTracks().forEach((track) => pc.addTrack(track))
+        localStream.getTracks().forEach((track) => pc[droneID].addTrack(track))
         setLogs('Add local tracks to peer connection')
       } else {
-        dummyStream.getTracks().forEach((track) => pc.addTrack(track))
+        dummyStream.getTracks().forEach((track) => pc[droneID].addTrack(track))
         setLogs('No local stream,add dummy track to peer connection')
       }
     }
@@ -188,14 +189,23 @@ export default {
     const startPeerNegotiation = async (droneID) => {
       console.log("*************startPeerNegotiation***********")
       // remoteSubVideoEl.value.srcObject = localStream
-      console.log("remoteSubVideoEl.value = ",remoteSubVideoEl.value)
+      console.log(`droneID=${droneID}, \nremoteSubVideoEl[droneID] = `,remoteSubVideoEl[droneID])
       select_droneID = droneID
-      initPeerConnection()
-      const offer = await createOfferAndSetLocalSDP(pc)
-      console.log('offer: ', offer)
-      setLogs('Create offer & set offer becomes local SDP')
-      //Fixedme here，這裡要改成傳droneIDs })
-      setLogs('Send offer')
+
+      if(pc[droneID]==null){
+        initPeerConnection(droneID)
+        const offer = await createOfferAndSetLocalSDP(pc[droneID])
+        console.log('offer: ', offer)
+        setLogs('Create offer & set offer becomes local SDP')
+        //Fixedme here，這裡要改成傳droneIDs })
+        setLogs('Send offer')
+      }
+
+      console.log(">>>",remoteMainVideoEl.value)
+      if(remoteSubVideoEl[droneID].srcObject){
+        remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
+      }
+      
     }
 
     // webRTC establish workflow
@@ -203,6 +213,15 @@ export default {
       .then((mediaStream) => {
         console.log("getLocalStream() 成功")
         localStream = mediaStream
+
+        //TESTvideo.value.srcObject  = localStream
+
+        // remoteSubVideoEl.value.srcObject = localStream
+        // console.log("remoteSubVideoEl.value = ",remoteSubVideoEl.value,
+        //               "TESTvideo.value = ",TESTvideo.value)
+
+        // document.getElementById('Tvideo').srcObject = localStream
+        // console.log("document.getElementById('Tvideo') = ",document.getElementById('Tvideo').srcObject)
       })
       .catch((error) => {
         message.error(
@@ -224,13 +243,13 @@ export default {
           console.log(data)
           if (data.type === 'offer') {
             setLogs('Received offer')
-            initPeerConnection()
-            await pc.setRemoteDescription(data.payload)
+            initPeerConnection(select_droneID) // 需要手機端傳送id資訊 ＋＋
+            await pc[select_droneID].setRemoteDescription(data.payload)
             setLogs('Set offer becomes remote SDP')
-            const answer = await createAnswerAndSetLocalSDP(pc)
+            const answer = await createAnswerAndSetLocalSDP(pc[select_droneID])
             setLogs('Create answer & set answer becomes local SDP')
             socket.emit('send-webrtc', {
-              droneID: select_droneID,
+              droneID: select_droneID,  //id要改成能從手機端接收到
               type: 'answer',
               payload: answer
             })
@@ -239,12 +258,12 @@ export default {
 
           if (data.type === 'answer') {
             setLogs('Received answer')
-            await pc.setRemoteDescription(data.payload)
+            await pc[select_droneID].setRemoteDescription(data.payload)
             setLogs('Set answer becomes remote SDP')
           }
 
           if (data.type === 'candidate') {
-            await pc.addIceCandidate(data.payload)
+            await pc[select_droneID].addIceCandidate(data.payload)
             setLogs('Add received candidate')
           }
         })
@@ -263,10 +282,13 @@ export default {
     })
 
     return {
+      remoteMainVideoEl,
       remoteSubVideoEl,
+      // TESTvideo,
+
       droneArr,
       select_drone_video,
-      startPeerNegotiation
+      startPeerNegotiation,
     }
   }
 }
