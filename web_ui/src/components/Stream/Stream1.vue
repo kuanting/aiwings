@@ -33,7 +33,7 @@
                 remoteSubVideoEl[index.id] = el;
               }"
               poster="../../assets/live-stream.png"
-              autoplay="true"
+              autoplay
             ></video>
           </div>
         </div>
@@ -71,7 +71,6 @@ export default {
     let remoteStream
     let dummyStream
     let localDisplayStream
-    let select_droneID
     const store = useStore()
     const rabbitmqIsInit = computed(() => store.getters.getRabbitmqIsInit)
     const userInfo = computed(() => store.getters.getUserInfo)
@@ -82,6 +81,10 @@ export default {
     const select_drone_video = (droneID) => {
       console.log('click', droneID)
       // remoteMainVideoEl.value.srcObject = remoteSubVideoEl
+      if(remoteSubVideoEl[droneID].srcObject){
+        remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
+        remoteSubVideoEl[droneID].srcObject = remoteMainVideoEl.value.srcObject //有時子畫面不知為何不顯示，這樣強制出現...
+      }
     }
 
     const rabbitmqInit = () => {
@@ -163,7 +166,7 @@ export default {
 
     // peer connection initialization
     const initPeerConnection = (droneID) => {
-      console.log("initPeerConnection: droneId=", droneID)
+      // console.log("initPeerConnectsion: droneId=", droneID)
 
       if (pc[droneID]?.connectionState) {
         setLogs('Close previous peer connection')
@@ -187,25 +190,20 @@ export default {
     }
 
     const startPeerNegotiation = async (droneID) => {
-      console.log("*************startPeerNegotiation***********")
       // remoteSubVideoEl.value.srcObject = localStream
-      console.log(`droneID=${droneID}, \nremoteSubVideoEl[droneID] = `,remoteSubVideoEl[droneID])
-      select_droneID = droneID
+      // console.log(`droneID=${droneID}, \nremoteSubVideoEl[droneID] = `,remoteSubVideoEl[droneID])
+      // select_droneID = droneID
 
       if(pc[droneID]==null){
+        console.log(`*****startPeerNegotiation(${droneID})*****`)
         initPeerConnection(droneID)
         const offer = await createOfferAndSetLocalSDP(pc[droneID])
         console.log('offer: ', offer)
         setLogs('Create offer & set offer becomes local SDP')
         //Fixedme here，這裡要改成傳droneIDs })
         setLogs('Send offer')
+        console.log(`****startPeerNegotiation(${droneID})**END*****`)
       }
-
-      console.log(">>>",remoteMainVideoEl.value)
-      if(remoteSubVideoEl[droneID].srcObject){
-        remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
-      }
-      
     }
 
     // webRTC establish workflow
@@ -240,16 +238,18 @@ export default {
       })
       .finally(() => {
         socket.on('webrtc-topic', async (data) => {
-          console.log(data)
+          console.log("接收的資料 = ",data)
+
           if (data.type === 'offer') {
+            console.log('Received offer')
             setLogs('Received offer')
-            initPeerConnection(select_droneID) // 需要手機端傳送id資訊 ＋＋
-            await pc[select_droneID].setRemoteDescription(data.payload)
+            initPeerConnection(data.id) // 需要手機端傳送id資訊 ＋＋
+            await pc[data.id].setRemoteDescription(data.payload)
             setLogs('Set offer becomes remote SDP')
-            const answer = await createAnswerAndSetLocalSDP(pc[select_droneID])
+            const answer = await createAnswerAndSetLocalSDP(pc[data.id])
             setLogs('Create answer & set answer becomes local SDP')
             socket.emit('send-webrtc', {
-              droneID: select_droneID,  //id要改成能從手機端接收到
+              droneID: data.id,  //id要改成能從手機端接收到
               type: 'answer',
               payload: answer
             })
@@ -257,15 +257,20 @@ export default {
           }
 
           if (data.type === 'answer') {
+            console.log('Received answer')
             setLogs('Received answer')
-            await pc[select_droneID].setRemoteDescription(data.payload)
+            await pc[data.id].setRemoteDescription(data.payload)
             setLogs('Set answer becomes remote SDP')
           }
 
           if (data.type === 'candidate') {
-            await pc[select_droneID].addIceCandidate(data.payload)
+            
+            await pc[data.id].addIceCandidate(data.payload)
             setLogs('Add received candidate')
+            console.log('Add received candidate answer')
           }
+
+          console.log("________交換結束__________")
         })
       })
 

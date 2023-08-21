@@ -106,14 +106,15 @@ export default {
     const confirmText = computed(
       () => `Are you sure to ${isTakeoff.value ? 'LAND' : 'TAKEOFF'}?`
     )
-    let defaultSelected
+    const defaultSelected = ref(false)
 
 
     // new add
     if (userInfo.value.droneId[0]){
-      defaultSelected = userInfo.value.droneId[0].id
+      defaultSelected.value = userInfo.value.droneId[0].id
+      // console.log("defaultSelected.value = ",defaultSelected.value)
     }else{
-      defaultSelected = 'No droone'
+      defaultSelected.value = 'No drone'
     }
 
 
@@ -127,7 +128,7 @@ export default {
       //defaultSelected 要用來表示目前所選擇要操作的droneID
       //且socket.emit("send-drone") 的時候 要回傳dorneID
       
-      let defaultSelected = value
+      defaultSelected.value = value.value
       const drone_selected = computed(() =>
         store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
       )
@@ -175,33 +176,33 @@ export default {
 
         1. In LAND mode and the drone is DISARM
        */
-      if (typeof drone[defaultSelected].mode === 'undefined') return
+      if (typeof drone[defaultSelected.value].mode === 'undefined') return
       if (
-        drone[defaultSelected].isArmed === 'DISARM' &&
-        drone[defaultSelected].mode === 'LAND'
+        drone[defaultSelected.value].isArmed === 'DISARM' &&
+        drone[defaultSelected.value].mode === 'LAND'
       ) {
         flightModeChangeHandler('GUIDED')
       }
 
-      flightMode.value = drone[defaultSelected].mode
-      isArm.value = drone[defaultSelected].isArmed === 'ARM' ? true : false
-      isTakeoff.value =
-        drone[defaultSelected].isArmed === 'ARM' &&
-        drone[defaultSelected].altitude >= 0.5
-          ? true
-          : false
+      flightMode.value = drone[defaultSelected.value].mode
+      isArm.value = drone[defaultSelected.value].isArmed === 'ARM' ? true : false
+      // isTakeoff.value =
+      //   drone[defaultSelected].isArmed === 'ARM' &&
+      //   drone[defaultSelected].altitude >= 0.5
+      //     ? true
+      //     : false
 
-      isLanding.value =
-        drone[defaultSelected].mode === 'LAND' &&
-        drone[defaultSelected].isArmed === 'ARM'
-          ? true
-          : false
+      // isLanding.value =
+      //   drone[defaultSelected].mode === 'LAND' &&
+      //   drone[defaultSelected].isArmed === 'ARM'
+      //     ? true
+      //     : false
     })
 
     watch([isTakeoff, alt_byUser], ([isTakeoff, alt_byUser]) => {
       console.log(isTakeoff, alt_byUser)
       store.dispatch('drone/updateFlightStatus', {
-        droneID: defaultSelected,
+        droneID: defaultSelected.value,
         status: { alt_byUser, isTakeoff }
       })
     })
@@ -209,23 +210,24 @@ export default {
 
     const flightHandler = () => {
       if (isTakeoff.value) {
-        sendDroneCommand({ droneID: defaultSelected, cmd: 'LAND' }) // LAND 降落
+        sendDroneCommand({ droneID: defaultSelected.value, cmd: 'LAND' }) // LAND 降落
         message.success('LANDING')
         console.log("LAND")
-        // isTakeoff.value = false
+        isTakeoff.value = false
         return
       }
-      sendDroneCommand({ droneID: defaultSelected, cmd: 'ARM' }) // ARM 解鎖
-      setTimeout(() => {//TAKEOFF 起飛
+      sendDroneCommand({ droneID: defaultSelected.value, cmd: 'ARM' }) // ARM 解鎖
+      //TAKEOFF 起飛
+      setTimeout(() => {
         sendDroneCommand({
-          droneID: defaultSelected,
+          droneID: defaultSelected.value,
           cmd: 'TAKEOFF',
           altitude: alt_byUser.value
         })
         message.success('TAKEOFF')
         console.log("TAKEOFF")
-        // isTakeoff.value = true
-      }, 2000)
+        isTakeoff.value = true
+      }, 2000)     
     }
 
     const altitudeChangeHandler = (value) => {
@@ -238,19 +240,19 @@ export default {
       if (isTakeoff.value) {
         if (destination.value.lng === 0) {
           sendDroneCommand({
-            droneID: defaultSelected,
+            droneID: defaultSelected.value,
             cmd: 'GOTO',
             altitude: alt_byUser.value,
-            lng: drone.value[defaultSelected].longitude,
-            lat: drone.value[defaultSelected].latitude
+            lng: drone.value[defaultSelected.value].longitude,
+            lat: drone.value[defaultSelected.value].latitude
           })
         } else {
           sendDroneCommand({
-            droneID: defaultSelected,
+            droneID: defaultSelected.value,
             cmd: 'GOTO',
             altitude: alt_byUser.value,
-            lng: destination.value[defaultSelected].lng,
-            lat: destination.value[defaultSelected].lat
+            lng: destination.value[defaultSelected.value].lng,
+            lat: destination.value[defaultSelected.value].lat
           })
         }
 
@@ -283,8 +285,9 @@ export default {
     const flightModeChangeHandler = (mode) => {
       if (typeof mode === 'object') {
         mode = mode.target.value
+        console.log("___flightModeChangeHandler()__mode = ",mode)
       }
-      sendDroneCommand({ droneID: defaultSelected, cmd: mode })
+      sendDroneCommand({ droneID: defaultSelected.value, cmd: mode })
       message.success(`Change MODE to ${mode}`)
     }
 
@@ -297,14 +300,14 @@ export default {
       //   lng: drone.value[defaultSelected].longitude,
       //   lat: drone.value[defaultSelected].latitude
       // })
-      sendDroneCommand({ droneID: defaultSelected, cmd: 'LAND' })
+      sendDroneCommand({ droneID: defaultSelected.value, cmd: 'LAND' })
 
 
 
       store.dispatch('drone/updateDestination', {
-        droneID: defaultSelected,
-        lng: drone.value[defaultSelected].longitude,
-        lat: drone.value[defaultSelected].latitude
+        droneID: defaultSelected.value, //++
+        lng: drone.value[defaultSelected.value].longitude,
+        lat: drone.value[defaultSelected.value].latitude
       })
       message.warn(`Emergency Stop`)
     }
@@ -325,9 +328,15 @@ export default {
       emergencyStopHandler,
       flightModeChangeHandler,
       //new add above for select
+      // value: ref({
+      //   value: defaultSelected
+      // }),
+
       value: ref({
-        value: defaultSelected
+        value: defaultSelected.value
       }),
+      defaultSelected,
+
       options,
       handleChange
     }

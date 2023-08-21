@@ -46,7 +46,7 @@ export async function connectToDatabase() {
 }
 
 /** 執行server時，確認是否可連線，以及判斷表格是否存在，如果不存在則創建表格 */
-export async function creatTable() {
+export async function createTable() {
   let db = await connectToDatabase();
   // console.log("db = ",db)
 

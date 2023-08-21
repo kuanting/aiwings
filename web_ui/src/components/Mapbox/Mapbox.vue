@@ -42,6 +42,7 @@ import { useStore } from 'vuex'
 import { message, notification } from 'ant-design-vue'
 import { SaveOutlined } from '@ant-design/icons-vue'
 import mapboxgl from 'mapbox-gl'
+import droneImgSrc from '../../../img/drone2.gif'
 
 export default {
   name: 'Mapbox',
@@ -166,7 +167,7 @@ export default {
           let droneID = user.value.droneId[i].id
           const droneElement = document.createElement('img')
           droneElement.width = 100
-          droneElement.src = '../../../img/drone2.gif'
+          droneElement.src = droneImgSrc
           droneElement.id = droneID          
           drones_marker[droneID] = mapbox.createMarker({
             color: 'red',
