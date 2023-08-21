@@ -51,14 +51,14 @@ export default () => {
 
       async function assertTopicQueue() {
         for (let key in droneId) {
-            const queue = await channel.assertQueue(
-              `${socket.id}-${droneId[key].id}-drone`,
-              {
-                autoDelete: true,
-                durable: false,
-              }
-            );
-            queues.push(queue);
+          const queue = await channel.assertQueue(
+            `${socket.id}-${droneId[key].id}-drone`,
+            {
+              autoDelete: true,
+              durable: false,
+            }
+          );
+          queues.push(queue);
         }
       }
 
@@ -66,33 +66,33 @@ export default () => {
       // according to the type of the exchange and the pattern given.
       async function bindTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
-            await channel.bindQueue(
-              queues[i].queue,
-              RABBITMQ.EXCHANGE_NAME,
-              `${droneId[i].id}.phone.drone`
-            );
+          await channel.bindQueue(
+            queues[i].queue,
+            RABBITMQ.EXCHANGE_NAME,
+            `${droneId[i].id}.phone.drone`
+          );
         }
       }
 
       async function consumeTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
           //if divisible means the topic is "drone" else means "webrtc"
-            const consume = await channel.consume(
-              queues[i].queue,
-              (msg) => {
-                if (msg) {
-                  console.log('drone-topic messages: ', JSON.parse(msg.content.toString()))
-                  socket.emit(
-                    //drone-topic
-                    `${RABBITMQ.QUEUE_TOPICS[0]}-topic`,
-                    JSON.parse(msg.content.toString())
-                  );
-                }
-              },
-              { noAck: true }
-            );
-            consumers.push(consume);
-          
+          const consume = await channel.consume(
+            queues[i].queue,
+            (msg) => {
+              if (msg) {
+                console.log('drone-topic messages: ', JSON.parse(msg.content.toString()))
+                socket.emit(
+                  //drone-topic
+                  `${RABBITMQ.QUEUE_TOPICS[0]}-topic`,
+                  JSON.parse(msg.content.toString())
+                );
+              }
+            },
+            { noAck: true }
+          );
+          consumers.push(consume);
+
         }
       }
     });
@@ -126,14 +126,14 @@ export default () => {
       //創建queue，如果沒有的話會自動生成
       async function assertTopicQueue() {
         for (let key in droneId) {
-            const queue = await channel.assertQueue(
-              `${socket.id}-${droneId[key].id}-webrtc`,
-              {
-                autoDelete: true,
-                durable: false,
-              }
-            );
-            queues.push(queue);
+          const queue = await channel.assertQueue(
+            `${socket.id}-${droneId[key].id}-webrtc`,
+            {
+              autoDelete: true,
+              durable: false,
+            }
+          );
+          queues.push(queue);
         }
       }
 
@@ -142,34 +142,35 @@ export default () => {
       async function bindTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
           // console.log(droneId[i].id);
-            await channel.bindQueue(
-              queues[i].queue,
-              RABBITMQ.EXCHANGE_NAME,
-              `${droneId[i].id}.phone.webrtc`
-            );
-          
+          await channel.bindQueue(
+            queues[i].queue,
+            RABBITMQ.EXCHANGE_NAME,
+            `${droneId[i].id}.phone.webrtc`
+          );
+
         }
       }
 
       async function consumeTopicQueue() {
         for (let i = 0; i < queues.length; i++) {
-            const consume = await channel.consume(
-              queues[i].queue,
-              (msg) => {
-                if (msg) {
-                  console.log('webrtc messages: ', JSON.parse(msg.content.toString()))
-                  socket.emit(
-                    //webrtc-topic
-                    `${RABBITMQ.QUEUE_TOPICS[1]}-topic`,
-                    JSON.parse(msg.content.toString())
-                  );
-                }
-              },
-              { noAck: true }
-            );
-            consumers.push(consume);
-          }
+          const consume = await channel.consume(
+            queues[i].queue,
+            (msg) => {
+              if (msg) {
+                console.log('webrtc messages: ', Object.assign(JSON.parse(msg.content.toString()), droneId[i]))
+                socket.emit(
+                  //webrtc-topic
+                  `${RABBITMQ.QUEUE_TOPICS[1]}-topic`,
+                  // JSON.parse(msg.content.toString())
+                  Object.assign(JSON.parse(msg.content.toString()), droneId[i])
+                );
+              }
+            },
+            { noAck: true }
+          );
+          consumers.push(consume);
         }
+      }
     });
 
 
@@ -214,7 +215,7 @@ export default () => {
       );
     });
 
-    
+
     // WebRTC-related
     socket.on("send-webrtc", (data) => {
       // console.log("socket-> send-webrtc: ", data);

@@ -11,7 +11,7 @@ import { Server } from 'socket.io';
 import routes from './routes';
 import useSocketIO from './services/websocket';
 // import { connectToDatabase as useDatabase } from './services/database';
-import {creatTable} from './services/database'
+import {createTable} from './services/database'
 import { connectToRabbitmq as useRabbitmq } from './services/rabbitmq';
 
 // Create express application
@@ -65,7 +65,7 @@ const io = new Server(server, {
 
 useSocketIO();
 // let db =useDatabase();
-creatTable();
+createTable();
 useRabbitmq();
 
 server.listen(Number(process.env.BACKEND_SERVICE_SERVICE_PORT), () => {

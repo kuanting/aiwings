@@ -70,14 +70,14 @@ export default {
     const userInfo = computed(() => store.getters.getUserInfo)
     const droneArr = userInfo.value.droneId
     // let defaultSelected = userInfo.value.droneId[0].id
-    let defaultSelected
+    const defaultSelected = ref(false)
 
     
     // new add
     if (userInfo.value.droneId[0]){
-      defaultSelected = userInfo.value.droneId[0].id
+      defaultSelected.value = userInfo.value.droneId[0].id
     }else{
-      defaultSelected = 'No droone'
+      defaultSelected.value = 'No drone'
     }
 
 
@@ -90,7 +90,7 @@ export default {
     const options = ref(droneList)
 
     const handleChange = (value) => {
-      let defaultSelected = value
+      defaultSelected.value = value.value
       const drone_selected = computed(() =>
         store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
       )
@@ -100,15 +100,15 @@ export default {
 
     const sendDroneCommand = (command) => socket.emit('send-drone', command)
     const servoUpHandler = () => {
-      sendDroneCommand({ droneID: defaultSelected, cmd: 'SERVO_UP' })
+      sendDroneCommand({ droneID: defaultSelected.value, cmd: 'SERVO_UP' })
       message.success('SERVO UP')
     }
     const servoStopHandler = () => {
-      sendDroneCommand({ droneID: defaultSelected, cmd: 'SERVO_STOP' })
+      sendDroneCommand({ droneID: defaultSelected.value, cmd: 'SERVO_STOP' })
       message.success('SERVO STOP')
     }
     const servoDownHandler = () => {
-      sendDroneCommand({ droneID: defaultSelected, cmd: 'SERVO_DOWN' })
+      sendDroneCommand({ droneID: defaultSelected.value, cmd: 'SERVO_DOWN' })
       message.success('SERVO DOWN')
     }
 
@@ -117,8 +117,9 @@ export default {
       servoStopHandler,
       servoDownHandler,
       value: ref({
-        value: defaultSelected
+        value: defaultSelected.value
       }),
+      defaultSelected,
       options,
       handleChange
     }

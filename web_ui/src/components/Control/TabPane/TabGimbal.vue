@@ -62,14 +62,14 @@ export default {
     const userInfo = computed(() => store.getters.getUserInfo)
     const droneArr = userInfo.value.droneId
     // let defaultSelected = userInfo.value.droneId[0].id
-    let defaultSelected
+    const defaultSelected = ref(false)
 
     
     // new add
     if (userInfo.value.droneId[0]){
-      defaultSelected = userInfo.value.droneId[0].id
+      defaultSelected.value = userInfo.value.droneId[0].id
     }else{
-      defaultSelected = 'No droone'
+      defaultSelected.value = 'No droone'
     }
 
 
@@ -82,7 +82,7 @@ export default {
     const options = ref(droneList)
 
     const handleChange = (value) => {
-      let defaultSelected = value
+      defaultSelected.value = value.value
       const drone_selected = computed(() =>
         store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
       )
@@ -93,7 +93,7 @@ export default {
     const sendDroneCommand = (command) => socket.emit('send-drone', command)
     const xAxisChangeHandler = (value) => {
       sendDroneCommand({
-        droneID: defaultSelected,
+        droneID: defaultSelected.value,
         cmd: 'GIMBAL_LEFT_RIGHT',
         pwm: value
       })
@@ -101,7 +101,7 @@ export default {
     }
     const yAxisChangeHandler = (value) => {
       sendDroneCommand({
-        droneID: defaultSelected,
+        droneID: defaultSelected.value,
         cmd: 'GIMBAL_FRONT_BACK',
         pwm: value
       })
@@ -114,8 +114,9 @@ export default {
       xAxisChangeHandler,
       yAxisChangeHandler,
       value: ref({
-        value: defaultSelected
+        value: defaultSelected.value
       }),
+      defaultSelected,
       options,
       handleChange
     }

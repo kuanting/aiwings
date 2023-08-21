@@ -82,7 +82,9 @@ public class RabbitMQ {
 
     public void connect() {
         new Thread(() -> {
+            // 如果尚未連線
             if(!isConnected) {
+                // 建立與 RabbitMQ Server 的連線
                 ConnectionFactory factory = new ConnectionFactory();
 
                 factory.setHost(broker_address);
@@ -94,10 +96,10 @@ public class RabbitMQ {
                 factory.setNetworkRecoveryInterval(5);
 
                 try {
-                    Connection connection = factory.newConnection();
-                    channel = connection.createChannel();
+                    Connection connection = factory.newConnection(); // 建立連線
+                    channel = connection.createChannel();   // 在連線中建立通道
                     channel.confirmSelect();
-                    channel.exchangeDeclare(EXCHANGE_NAME, "topic");
+                    channel.exchangeDeclare(EXCHANGE_NAME, "topic"); // 在通道中設定exchange的名稱和類型
 
                     Consume();
                     RabbitMQ_PUBLISH_DRONE_MESSAGE();
@@ -121,9 +123,12 @@ public class RabbitMQ {
     public void Consume() {
         new Thread(() -> {
             try {
+                // 如果RabbitMQ的通道已建立並且已打開
                 if (channel != null && channel.isOpen()) {
+                    // 在通道中建立佇列 【channel.queueDeclare(......)】
                     String queueName = drone_ID + "'s  Android application";
                     AMQP.Queue.DeclareOk q = channel.queueDeclare(queueName, false, false, true, null);
+                    // 把通道中的 Exchange 和 Queue 用 bindingKey 連接綁定
                     for (String bindingKey : bindingKeys) {
                         channel.queueBind(q.getQueue(), EXCHANGE_NAME, bindingKey);
                     }
