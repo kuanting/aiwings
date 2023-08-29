@@ -364,7 +364,7 @@ export default {
   background: #ffffff;
 }
 video{
-  width: 50%;//測試
+  // width: 50%;//測試
   max-width:100%;
   max-height:100%;
   // object-fit: fill; /* 图片填充整个容器，忽略原始宽高比 */
