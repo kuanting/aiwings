@@ -92,7 +92,12 @@ export default {
   },
   setup() {
     const isArm = ref(false)
-    const isTakeoff = ref(false)
+    const isTakeoff = computed(
+      () => {
+        return drone.value[defaultSelected.value].altitude > 0.5
+      }
+    )
+    
     const isLanding = ref(false)
     const alt_byUser = ref(3)
     const speed = ref(3)
@@ -106,7 +111,7 @@ export default {
     const confirmText = computed(
       () => `Are you sure to ${isTakeoff.value ? 'LAND' : 'TAKEOFF'}?`
     )
-    const defaultSelected = ref(false)
+    const defaultSelected = ref(false) //用戶所選的ID
 
 
     // new add
@@ -209,7 +214,7 @@ export default {
     const sendDroneCommand = (command) => socket.emit('send-drone', command)
 
     const flightHandler = () => {
-      if (isTakeoff.value) {
+      if (isTakeoff.value || drone.value[defaultSelected.value].altitude > 0.5) {
         sendDroneCommand({ droneID: defaultSelected.value, cmd: 'LAND' }) // LAND 降落
         message.success('LANDING')
         console.log("LAND")
@@ -236,25 +241,17 @@ export default {
       alt_byUser.value = value
     }
 
+
+    /* 在高度框中按下enter時觸發，將更改無人機高度 */
     const altitudeEnterHandler = () => {
-      if (isTakeoff.value) {
-        if (destination.value.lng === 0) {
-          sendDroneCommand({
-            droneID: defaultSelected.value,
-            cmd: 'GOTO',
-            altitude: alt_byUser.value,
-            lng: drone.value[defaultSelected.value].longitude,
-            lat: drone.value[defaultSelected.value].latitude
-          })
-        } else {
-          sendDroneCommand({
-            droneID: defaultSelected.value,
-            cmd: 'GOTO',
-            altitude: alt_byUser.value,
-            lng: destination.value[defaultSelected.value].lng,
-            lat: destination.value[defaultSelected.value].lat
-          })
-        }
+      if (isTakeoff.value) {//如果已經起飛
+        sendDroneCommand({
+          droneID: defaultSelected.value,
+          cmd: 'GOTO',
+          altitude: alt_byUser.value,
+          lng: drone.value[defaultSelected.value].longitude,
+          lat: drone.value[defaultSelected.value].latitude
+        })
 
         message.success(`Change ALTITUDE to ${alt_byUser.value}m`)
         return
@@ -271,7 +268,7 @@ export default {
     const speedEnterHandler = () => {
       if (isTakeoff.value) {
         sendDroneCommand({
-          droneID: 'e27d4dacf11f9cd5',
+          droneID: defaultSelected.value,
           cmd: 'CHANGE_SPEED',
           speed: speed.value
         })
@@ -285,7 +282,8 @@ export default {
     const flightModeChangeHandler = (mode) => {
       if (typeof mode === 'object') {
         mode = mode.target.value
-        console.log("___flightModeChangeHandler()__mode = ",mode)
+        console.log("mode.target.value =",mode
+                    ,"\n___flightModeChangeHandler()__mode = ",mode)
       }
       sendDroneCommand({ droneID: defaultSelected.value, cmd: mode })
       message.success(`Change MODE to ${mode}`)
