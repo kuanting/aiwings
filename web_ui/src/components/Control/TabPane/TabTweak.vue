@@ -83,15 +83,6 @@ export default {
       //dronechange表示選擇的droneID的data，drone變數表示的是全部的drone data
       console.log('changeDroneInfo', drone_selected.value)
     }
-    const newLatitide = (direction) => {
-      const latitude = +coords.value[1]
-      return latitude + direction * 0.00001
-    }
-
-    const newLongitude = (direction) => {
-      const longitude = +coords.value[0]
-      return longitude + direction * 0.00001
-    }
 
     /**
      * @param {'X'|'Y'} axis X stand for longitude, Y stand for latitude
@@ -104,18 +95,17 @@ export default {
       }
       // let longitude = +coords.value[0]
       // let latitude = +coords.value[1]
-      let longitude = drone.value[defaultSelected.value].longitude
-      let latitude = drone.value[defaultSelected.value].latitude
+      let longitude = Number(drone.value[defaultSelected.value].longitude)
+      let latitude = Number(drone.value[defaultSelected.value].latitude)
+      console.log("latitude = ",latitude)
       if (axis === 'X') {
-        // longitude = newLongitude(direction)
-        longitude += direction * 0.00001
+        longitude += direction * 0.00003
       }
       if (axis === 'Y') {
-        // latitude = newLatitide(direction)
-        latitude += direction * 0.00001
+        latitude += direction * 0.00003
       }
 
-      console.log("TESTalt.value(defaultSelected.value)  = ",TESTalt.value(defaultSelected.value))
+      // console.log("取得高度  = ",TESTalt.value(defaultSelected.value))
 
       socket.emit('send-drone', {
         droneID: defaultSelected.value,
