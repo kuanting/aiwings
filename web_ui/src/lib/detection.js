@@ -1,9 +1,11 @@
 import '@tensorflow/tfjs-backend-cpu'
 import '@tensorflow/tfjs-backend-webgl'
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
-import { keep } from '@tensorflow/tfjs'
+import { keep, mod } from '@tensorflow/tfjs'
 
 let requestAnimationId
+let detectEnabled = false
+var model = null
 
 /**
  * Object detection canvas initialization
@@ -11,15 +13,29 @@ let requestAnimationId
  * @param {HTMLCanvasElement} canvas
  */
 const setupCanvasContainer = (video, canvas) => {
-  video.addEventListener('loadedmetadata', () => { // 監聽此HTML元素上的影像是否加載完成，如果是，執行後方程式
-    canvas.height = video.offsetHeight
-    canvas.width = video.offsetWidth
-    const ctx = canvas.getContext('2d')
-    ctx.lineWidth = 3
-    ctx.strokeStyle = '#ffffff'
-    ctx.font = '20px sans-serif'
-    ctx.fillStyle = '#ff00ff'
-  })
+  // video.addEventListener('loadedmetadata', () => { // 監聽此HTML元素上的影像是否加載完成，如果是，執行後方程式【注意：綁定監聽是件必須在事件發生前綁定，否則沒用(意思就是在影片開始撥放錢就要綁訂了)】
+  canvas.height = video.videoHeight
+  canvas.width = video.videoWidth //不該用offsetWidth，可能會與video影像大小不匹配，導致繪製影像時出現圖片被放大到超級大的狀況
+  const ctx = canvas.getContext('2d')
+  ctx.lineWidth = 3
+  ctx.strokeStyle = '#ffffff'
+  ctx.font = '20px sans-serif'
+  ctx.fillStyle = '#ff0000'
+  // })
+}
+
+const startDetection = async () => {
+  if (model == null) {
+    console.log(`偵測模型下載中`)
+    model = await cocoSsd.load({ base: 'mobilenet_v2' })
+    console.log(`模型下載完成 =>`, model)
+  }
+  detectEnabled = true //啟動偵測
+  return true
+}
+const stopDetection = () => {
+  detectEnabled = false //關閉偵測
+  // model = null
 }
 
 /**
@@ -28,30 +44,32 @@ const setupCanvasContainer = (video, canvas) => {
  * @param {HTMLCanvasElement} canvas
  */
 const start = async (video, canvas) => {
-  console.log(`偵測模型下載中`)
-  const model = await cocoSsd.load({ base: 'mobilenet_v2' })
-  console.log(`模型下載完成`)
+  // console.log(`偵測模型下載中`)
+  // model = await cocoSsd.load({ base: 'mobilenet_v2' })
+  // console.log(`模型下載完成`)
 
   console.log("297*401 \ncanvas寬高= ", canvas.width,
-    "\nVideo寬高 = ", video.width, video.offsetWidth, video.videoWidth, video.naturalWidth) //Video寬高 =  0 640
-    
+    "\nVideo寬高 = ", video.videoWidth) //Video寬高 和 canvas寬高 需要匹配
+
   requestAnimationId = window.requestAnimationFrame(
-    detectAndUpdate.bind(null, model, video, canvas)
+    detectAndUpdate.bind(null, video, canvas)
   )
 }
 
-async function detectAndUpdate(model, video, canvas) {
-  // console.log("detectAndUpdate>>>Video寬 = ", video.width, video.videoWidth)
-  const detections = await model.detect(video, 50, 0.3)
-
+async function detectAndUpdate(video, canvas) {
   const ctx = canvas.getContext('2d')
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  ctx.drawImage(video, 0, 0); // 以畫布的(0,0)為起點，繪製video上的影像
+  // ctx.drawImage(video, 0, 0); // 以畫布的(0,0)為起點，繪製video上的影像
+  ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight); // 以畫布的(0,0)為起點，繪製video上的影像
+  // 設定canvas畫布的大小為影像的原始大小，繪製也繪製影像的原始大小。當canvas標籤被縮放時，是整個畫布縮放，繪製的圖像會跟著canvas畫布起縮放
 
+  if (detectEnabled && model) {
+    const detections = await model.detect(video, 50, 0.3)
+    drawBoundingBox(detections, canvas)
+  }
 
-  drawBoundingBox(detections, canvas)
   requestAnimationId = window.requestAnimationFrame(
-    detectAndUpdate.bind(null, model, video, canvas)
+    detectAndUpdate.bind(null, video, canvas)
   )
 }
 
@@ -82,11 +100,13 @@ const cleanBoundingBox = (canvas) => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
 
-const stopDetection = () => window.cancelAnimationFrame(requestAnimationId)
+const stopCanvasVideo = () => window.cancelAnimationFrame(requestAnimationId)
 
 export default {
   setupCanvasContainer,
+  startDetection,
+  stopDetection,
   start,
   cleanBoundingBox,
-  stopDetection
+  stopCanvasVideo
 }

@@ -4,13 +4,12 @@
     <div class="main_frame frame_container" > 
       <!------------------------------------------->
       <div class="main_video" >
-        <!-- <div style="background-color: rgb(255, 234, 77); width: 2000px; height: 30px;"></div> -->
-        <video
+        <!-- <video
           ref="remoteMainVideoEl"
           poster="../../assets/live-stream.png"
           autoplay
-        ></video>
-        <!-- <canvas ref="canvasEl" class="boundingBox" style="background-color: rgb(255, 234, 77); margin:10px"></canvas> -->
+        ></video> -->
+        <canvas ref="canvasEl" class="boundingBox"></canvas>
       </div>
       <div class="info_dashboard">
         <p>
@@ -28,20 +27,15 @@
           <div class="details">
             <h3>{{ index.id }}</h3>
           </div>
-          <div
-            class="video"
+          <video
+            :ref="el => setSubVideoRef(el, index.id)"
+            poster="../../assets/live-stream.png"
+            muted 
+            autoplay
             @click="
-              select_drone_video(index.id), startPeerNegotiation(index.id)
+              select_drone_video(index.id)
             "
-          >
-            <video
-              :ref="el => {
-                remoteSubVideoEl[index.id] = el;
-              }"
-              poster="../../assets/live-stream.png"
-              autoplay
-            ></video>
-          </div>
+          ></video>
         </div>
       <!-- </div> -->
       <!------------------------------------------->
@@ -93,51 +87,48 @@ export default {
     const clickBtn = ()=>{
       Detection.value = !Detection.value
       if(Detection.value){
-        startDetection()
+        detection.startDetection()
+      }else{
+        detection.stopDetection()
       }
     }
     /*************** */
 
+    const setSubVideoRef = (el, id) => {
+      remoteSubVideoEl[id] = el;
+      startPeerNegotiation(id)
+      // console.log("---detection.setupCanvasContainer(影像, 畫布)---")
+      // // detection.setupCanvasContainer(remoteMainVideoEl.value, canvasEl.value)
+      // detection.setupCanvasContainer(remoteSubVideoEl[id], canvasEl.value)
+
+    }
+
+    /**********/
+
     const select_drone_video = (droneID) => {
       console.log('click', droneID,"，將此子畫面映射到主畫面上")
-      // remoteMainVideoEl.value.srcObject = remoteSubVideoEl
       if(remoteSubVideoEl[droneID].srcObject){
-        remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
-        remoteSubVideoEl[droneID].srcObject = remoteMainVideoEl.value.srcObject //有時子畫面不知為何不顯示，這樣強制出現...
+        // remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
+
+        console.log("---detection.setupCanvasContainer(影像, 畫布)---")
+        // detection.setupCanvasContainer(remoteMainVideoEl.value, canvasEl.value)
+        detection.setupCanvasContainer(remoteSubVideoEl[droneID], canvasEl.value)
+        
+        // detection.start(remoteMainVideoEl.value, canvasEl.value)
+        detection.start(remoteSubVideoEl[droneID], canvasEl.value)
       }
-
-      // console.log("---detection.setupCanvasContainer(影像, 畫布)---")
-      // detection.setupCanvasContainer(remoteMainVideoEl.value, canvasEl.value)
-      // // detection.setupCanvasContainer(remoteSubVideoEl[droneID], canvasEl.value)
-      // detection.start(remoteMainVideoEl.value, canvasEl.value)
-      // // detection.start(remoteSubVideoEl[droneID], canvasEl.value)
-
     }
     
 
-    const startDetection =()=>{
-    //   if(remoteMainVideoEl.value.srcObject){
-    //     console.log("---detection.setupCanvasContainer(影像, 畫布)---")
-        
-    //     detection.setupCanvasContainer(remoteMainVideoEl.value, canvasEl.value)
-    //     // detection.setupCanvasContainer(remoteSubVideoEl[droneID], canvasEl.value)
-    //     console.log("remoteMainVideoEl.value = ",remoteMainVideoEl.value,
-    //                 "canvasEl.value",canvasEl.value)
-
-    //     detection.start(remoteMainVideoEl.value, canvasEl.value)
-    //     // detection.start(remoteSubVideoEl[droneID], canvasEl.value)
-    //   }
-    }
-
     const rabbitmqInit = () => {
       // setLogs(`Websocket connected: ${socket.id}`)
-      console.log("----rabbitmqInit---\nsocket.id = ",socket.id)
+      // console.log("----rabbitmqInit---\nsocket.id = ",socket.id)
       for (let i in user.value.droneId) {
         setLogs(`Drone ID: ${user.value.droneId[i]}`)
         console.log(user.value.droneId[i])
       }
       socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)
-      console.log("socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)\n---------------")
+      // console.log("socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)\n---------------")
     }
     // Trigger RabbitMQ when the first come or refresh pages
     if (!rabbitmqIsInit.value) {
@@ -173,6 +164,7 @@ export default {
       //consoloe.log()
       console.log('ontrack event.streams[0]: ', event.streams[0])
       setLogs('Received track')
+      console.log("event.streams[0].getTracks(): ",event.streams[0].getTracks())
       // recordButton.isReady = true
       remoteStream = event.streams[0]
       remoteSubVideoEl[droneID].srcObject = remoteStream
@@ -184,18 +176,13 @@ export default {
       setLogs(`ICE connection Change: ${pc[droneID].iceConnectionState}`)
       if (pc[droneID].iceConnectionState === 'disconnected') {     
         console.log("ICE連線斷開")   
-        // if (recordButton.isRecording) {
-        //   recordButton.isRecording = false
-        //   recorder.stop()
-        //   localDisplayStream.getTracks().forEach((track) => track.stop())
-        // }
-        // recordButton.isReady = false
-        remoteStream.getTracks().forEach((track) => track.stop())
+        // remoteStream.getTracks().forEach((track) => track.stop())
+        remoteStream = null
         remoteSubVideoEl[droneID].srcObject = new MediaStream()
           
-        // // clean stream canvas
-        // detection.cleanBoundingBox(canvasEl.value)
-        // detection.stopDetection()
+        // clean stream canvas
+        detection.cleanBoundingBox(canvasEl.value)
+        detection.stopCanvasVideo()
       }
     }
 
@@ -213,7 +200,7 @@ export default {
         pc[droneID].close()
       }
       pc[droneID] = createPeerConnection()
-      console.log('Create peer connection: ', pc[droneID])
+      // console.log('Create peer connection: ', pc[droneID])
       setLogs('Create peer connection')
       // pc.onicecandidate = onIceCandidate(pc, droneId)
       pc[droneID].onicecandidate = (event) => onIceCandidate(droneID, event)
@@ -238,7 +225,7 @@ export default {
         console.log(`*****startPeerNegotiation(${droneID})*****`)
         initPeerConnection(droneID)
         const offer = await createOfferAndSetLocalSDP(pc[droneID])
-        console.log('offer: ', offer)
+        // console.log('offer: ', offer)
         setLogs('Create offer & set offer becomes local SDP')
         //Fixedme here，這裡要改成傳droneIDs })
         // socket.emit('send-webrtc', { droneID: droneID,  type: 'offer',  payload: offer})
@@ -289,7 +276,7 @@ export default {
           if (data.type === 'offer') {
             console.log('Received offer')
             setLogs('Received offer')
-            initPeerConnection(data.id) 
+            // initPeerConnection(data.id) 
             // await startPeerNegotiation(data.id)
             
             await pc[data.id].setRemoteDescription(data.payload)
@@ -337,6 +324,8 @@ export default {
     return {
       remoteMainVideoEl,
       remoteSubVideoEl,
+
+      setSubVideoRef,
       // TESTvideo,
       canvasEl,
 
@@ -347,7 +336,6 @@ export default {
       Detection,
       DetectionBtnText,
       clickBtn,
-      startDetection
     }
   }
 }
@@ -363,13 +351,14 @@ export default {
   overflow-x: auto; /* 添加水平滚动条 */
   background: #ffffff;
 }
-video{
-  // width: 50%;//測試
+video ,canvas{
+  // width: 100%;//測試
   max-width:100%;
   max-height:100%;
   // object-fit: fill; /* 图片填充整个容器，忽略原始宽高比 */
+  object-fit: contain;
   border-radius: 3%;
-  padding: 2%;
+  // padding: 2%; 
 }
 .frame_container{
   margin: 10px;
@@ -381,20 +370,21 @@ video{
   // justify-content: center; /* 使其內容物水平居中 */
 }
 .main_frame {
-  min-width: 600px;
+  min-width: 600px; 
   // height: 100%;//讓高度自動調整
 
   /***** flex 內元素屬性 *****/
-  flex-grow: 1; //設置延展，使之可充滿剩餘空間【寬度自動調整】
+  flex-grow: 1; //設置延展，使之可充滿剩餘空間
   // background: rgb(23, 151, 68, 0.3);
   background: #4f6d7a;
   
   .main_video {
     width: 100%;
     height: calc(100% - 40px);
+    padding: 6px;
 
     /***** flex 內元素屬性 *****/
-    flex-grow: 1; //設置延展，使之可充滿剩餘空間
+    // flex-grow: 1; //設置延展，使之可充滿剩餘空間
     /***** flex 外元素屬性 *****/
     display: flex;
     justify-content: center; /* 內容物水平居中 */
@@ -412,10 +402,8 @@ video{
   }
 }
 .select_frame {
-  width: 25%;
+  width: 20%;
   min-width: 200px;
-  // width: 10%; //測試
-  // min-width: 10px; //測試
   // height: 100%;//讓高度自動調整
 
   /***** flex 外元素屬性 *****/
