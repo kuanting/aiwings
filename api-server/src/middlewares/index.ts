@@ -27,20 +27,20 @@ export const verifyTokens = async (
 ) => {
   // console.log("========================================\nreq = ",req)
   const { access_token, refresh_token }: CookiePayload = req.cookies;
-  console.log("=========== verifyTokens ============")
+  // console.log("=========== verifyTokens ============")
 
   try {
-    console.log("驗證: 客戶端回傳的access_token = ", access_token)
+    // console.log("驗證: 客戶端回傳的access_token = ", access_token)
     await renewTokenAndPassToNext(res, next, access_token);
   } catch (error) {
     try {
-      console.log("access_token驗證失敗\n 驗證: 客戶端回傳的refresh_token = ", refresh_token)
+      // console.log("access_token驗證失敗\n 驗證: 客戶端回傳的refresh_token = ", refresh_token)
       await renewTokenAndPassToNext(res, next, refresh_token);
     } catch (error) {
-      console.log("refresh_token驗證失敗，回傳客戶端 { msg: \"Unauthorize, Please login\" }")
+      // console.log("refresh_token驗證失敗，回傳客戶端 { msg: \"Unauthorize, Please login\" }")
       res.status(401).json({ msg: "Unauthorize, Please login" });
     }
   }
 
-  console.log("=========== verifyTokens END ============")
+  // console.log("=========== verifyTokens END ============")
 };

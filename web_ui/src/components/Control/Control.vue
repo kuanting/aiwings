@@ -33,10 +33,11 @@ export default {
   .tabs__pane {
     width: 100%;
     overflow-y: auto;
-    height: calc((100vh - 60px) - ((100vh - 60px) * 0.6) - 37.82px - 16px);
-    @media (min-width: 800px) {
-      height: calc((100vh - 60px) - ((100vh - 60px) / 2) - 37.82px - 16px);
-    }
+    height: 100%;
+    // height: calc((100vh - 60px) - ((100vh - 60px) * 0.6) - 37.82px - 16px);
+    // @media (min-width: 800px) {
+    //   height: calc((100vh - 60px) - ((100vh - 60px) / 2) - 37.82px - 16px);
+    // }
   }
 }
 </style>
