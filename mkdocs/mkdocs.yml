@@ -13,3 +13,5 @@ theme:
         - javascript
         - java
         - python
+
+use_directory_urls: false 
