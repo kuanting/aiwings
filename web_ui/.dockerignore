@@ -1,7 +1,5 @@
-# 排除環境設定【包括密碼等等重要資訊】
-.env*
-
 # 排除docker相關文件
+.docker.env
 .dockerignore
 Dockerfile
 docker-compose.yaml
@@ -19,9 +17,14 @@ docker-compose.yaml
 .editorconfig
 .eslintignore
 
+# 排除原有的前端建置靜態網頁資料
+# 靜態網頁資料會再docker build時再建置
+dist/
+
 # 排除不必要的文檔文件
 # .env.local.example
 *.example
 .github/
-docs/
+functions/
+.firebaserc
 README.md

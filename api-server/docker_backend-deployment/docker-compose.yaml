@@ -1,0 +1,74 @@
+# 使用 3.9 版的設定檔，通常新版本會有新的功能，並支援新的設定參數
+version: '3.9'
+
+# ---------- rabbitMQ install ---------
+# docker run --name rabbitmq -d --restart always -p 15672:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=1234 rabbitmq:management
+# -------------------------------------
+
+# ---------- mysql install ---------
+# docker run --name my_MySQL --restart always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=MyPassword -d mysql:8.0
+# 再手動新增
+# -------------------------------------
+
+# ---------- backend install ---------
+# docker run --name back_end -p 3080:3080 --restart=always -d api_server:1.0
+# -------------------------------------
+
+# 使用方法
+# docker-compose up -d
+
+services:
+  rabbitmq_service:
+    container_name: rabbitmq
+    image: rabbitmq:management
+    restart: always  
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_SERVICE_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_SERVICE_PASSWORD}
+      # 若未設定，預設使用者名稱和密碼為guest/ guest
+      # ${RABBITMQ_SERVICE_USER}來自環境變數.env檔案內容
+
+  mysql_service:
+    container_name: mysql
+    # # for mac M1, need to add platform
+    # platform: linux/x86_64
+    image: mysql:8.0.27
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - '3307:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: password # root password 可自行設定
+      MYSQL_DATABASE: drone_cloud_test
+      MYSQL_USER: ${MYSQL_SERVICE_USER}
+      MYSQL_PASSWORD: ${MYSQL_SERVICE_PASSWORD}
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    
+
+  backend:
+    container_name: back-end
+    image: 2023aiotlab/api_server
+    restart: always
+    # 令 docker-compose up backend 時會先建立並啟動服務名rabbitmq和mysql
+    depends_on: 
+      - rabbitmq_service
+      - mysql_service
+    ports:
+      - '3080:3080'
+    environment:
+      - RABBITMQ_SERVICE_SERVICE_HOST=rabbitmq_service
+      - MYSQL_SERVICE_SERVICE_HOST=mysql_service
+      # rabbitmq_service、mysql_service是前面建立好的服務
+      # environment的優先權大於env_file
+    env_file:
+      - ./.env
+    # 透過environment或env_file加入系統環境變數的話，就要到容器中修改系統環境變數，用掛載的話則是容易更改【思考後覺得不必要】
+    # 其他容器服務名稱好像要透過系統環境變數，才可被解析成區域IP
+    # volumes:
+    #   - ./.env.docker:/app/.env
+    # - ./src:/app/src
+    
