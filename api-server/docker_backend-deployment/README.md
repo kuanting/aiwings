@@ -8,7 +8,7 @@ After the backend is successfully set up, if the frontend has not been deployed 
 
 If you wish to install the backend application and the frontend application on the same computer, you can refer to `aiwings/docker-deployment/` for instructions.
 
-### Applicable scenario
+## Applicable scenario
 
 - Wish to deploy **the frontend application and backend application separately on different computers**.
 - Regardless of whether RabbitMQ and MySQL are already installed, you can follow the instructions below for the operation.
@@ -52,26 +52,26 @@ MYSQL_SERVICE_PASSWORD=mysql
 **If you haven't installed RabbitMQ or MySQL yet:** 
 - You can set the usernames and passwords for your new MySQL and RabbitMQ here.
 
-      Note: If you want using docker-compose.yml to install MySQL, the username for MySQL don't set as 'root'. 
+      Note: If you want using docker-compose.yml to install MySQL, the value of MYSQL_SERVICE_USER don't set as 'root'. 
 
 - Default usernames and passwords: 
   - RabbitMQ: guest/guest
   - MySQL: user/mysql
 
 **If you already install RabbitMQ:**
-- Change the value of `RABBITMQ_SERVICE_SERVICE_HOST` to your RabbitMQ server IP. 
+- Change the value of `RABBITMQ_SERVICE_SERVICE_HOST` to your RabbitMQ server IP. (The IP don't use 127.0.0.1 or localhost)
 - If your RabbitMQ server backend not using default port '5672', Change the value of `RABBITMQ_SERVICE_SERVICE_PORT` to your RabbitMQ server port. 
 
 **If you already install MySQL:**
-- Change the value of `MYSQL_SERVICE_SERVICE_HOST` to your MySQL server IP. 
+- Change the value of `MYSQL_SERVICE_SERVICE_HOST` to your MySQL server IP. (The IP don't use 127.0.0.1 or localhost)
 - If your MySQL server not using default port '3306', Change the value of `MYSQL_SERVICE_SERVICE_PORT` to your MySQL server port. 
 - Because not using the provided docker-compose.yml to create MySQL, you can use 'root' user to connect your MySQL.
 
 ### `docker-compose.yml` file
 
 **If you haven't installed RabbitMQ or MySQL yet:**
-- Don't change anything.
-- You only can change your MySQL 'root' user's password if you want.
+- It can be used directly without changing anything.
+- You can change your MySQL 'root' user's password if you want.
   - Default 'root' password: **MYSQL_ROOT_PASSWORD=password**
 
 **If you already install MySQL:**
@@ -82,7 +82,7 @@ MYSQL_SERVICE_PASSWORD=mysql
 - Comment out or delete the entire rabbitmq_service in docker-compose.yml.
 - And change the MySQL connection parameters in the .env file.
 
-### How to install
+## How to install
 
 1. Open Command Prompt
 
@@ -98,8 +98,4 @@ MYSQL_SERVICE_PASSWORD=mysql
 
     ![image](https://i.imgur.com/EIO8YXy.png)
 
-4. Restart back-end container.
-
-    ![image](https://i.imgur.com/4WTBVM9.png)
-
-5. If you haven't install frontend, please refer to `aiwings/web_ui/docker_front-deployment/` for instructions on how to deploy the frontend.
+4. If you haven't install frontend, please refer to `aiwings/web_ui/docker_front-deployment/` for instructions on how to deploy the frontend.

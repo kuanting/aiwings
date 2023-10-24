@@ -47,18 +47,18 @@ MYSQL_SERVICE_PASSWORD=mysql
 **If you haven't installed RabbitMQ or MySQL yet:** 
 - You can set the usernames and passwords for your new MySQL and RabbitMQ here.
 
-      Note: If you want using docker-compose.yml to install MySQL, the username for MySQL don't set as 'root'. 
+      Note: If you want using docker-compose.yml to install MySQL, the value of MYSQL_SERVICE_USER don't set as 'root'. 
 
 - Default usernames and passwords: 
   - RabbitMQ: guest/guest
   - MySQL: user/mysql
 
 **If you already install RabbitMQ:**
-- Change the value of `RABBITMQ_SERVICE_SERVICE_HOST` to your RabbitMQ server IP. 
+- Change the value of `RABBITMQ_SERVICE_SERVICE_HOST` to your RabbitMQ server IP. (The IP don't use 127.0.0.1 or localhost)
 - If your RabbitMQ server backend not using default port '5672', Change the value of `RABBITMQ_SERVICE_SERVICE_PORT` to your RabbitMQ server port. 
 
 **If you already install MySQL:**
-- Change the value of `MYSQL_SERVICE_SERVICE_HOST` to your MySQL server IP. 
+- Change the value of `MYSQL_SERVICE_SERVICE_HOST` to your MySQL server IP. (The IP don't use 127.0.0.1 or localhost)
 - If your MySQL server not using default port '3306', Change the value of `MYSQL_SERVICE_SERVICE_PORT` to your MySQL server port. 
 - Because not using the provided docker-compose.yml to create MySQL, you can use 'root' user to connect your MySQL.
 
@@ -77,8 +77,10 @@ You can change SSL certificate.
   - Note: Your SSL certificate folder must include two separate files named `certificate.crt` and `private.key`.
 
 **If you haven't installed RabbitMQ or MySQL yet:**
-- Don't change anything.
-- You only can change your MySQL 'root' user's password if you want.
+- It can be used directly without changing anything. 
+- You can set your app's IP by changing the value of `URL_FRONTEND` to your IP or domain. 
+  - Default frontend address: **URL_FRONTEND=localhost**
+- You also can change your MySQL 'root' user's password if you want.
   - Default 'root' password: **MYSQL_ROOT_PASSWORD=password**
 
 **If you already install MySQL:**
@@ -89,7 +91,7 @@ You can change SSL certificate.
 - Comment out or delete the entire rabbitmq_service in docker-compose.yml.
 - And change the MySQL connection parameters in the .env file.
 
-### How to install
+## How to install
 
 1. Open Command Prompt
 
@@ -105,8 +107,4 @@ You can change SSL certificate.
 
     ![image](https://i.imgur.com/w3DohxC.png)
 
-4. Restart back-end container.
-
-    ![image](https://i.imgur.com/4WTBVM9.png)
-
-5. To access the web application, simply navigate to `http://<localhost, your IP, or your domain>` in your web browser.
+4. To access the web application, simply navigate to `http://<localhost, your IP, or your domain>` in your web browser.
