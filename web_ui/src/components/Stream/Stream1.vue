@@ -1,50 +1,51 @@
 <template>
   <div class="wrap">
-    <div class="main_frame">
-      <div class="main_video">
-        <video
+    
+    <div class="main_frame frame_container" > 
+      <!------------------------------------------->
+      <div class="main_video" >
+        <!-- <video
           ref="remoteMainVideoEl"
           poster="../../assets/live-stream.png"
           autoplay
-        ></video>
+        ></video> -->
         <canvas ref="canvasEl" class="boundingBox"></canvas>
       </div>
       <div class="info_dashboard">
-        <h1>
-          Information display<br />
+        <p>
+          Information display
           TEST
-        </h1>
+        </p>
+        <button @click="clickBtn()">{{ DetectionBtnText }}</button>
       </div>
+      <!------------------------------------------->
     </div>
-    <div class="select_frame">
-      <div class="subvideo_content">
+    <div class="select_frame frame_container">
+      <!------------------------------------------->
+      <!-- <div class="subvideo_content"> -->
         <div v-for="index in droneArr" class="subVideoStream">
-          <!-- <div class="details">
-            <h2>{{ index.id }}</h2>
-          </div> -->
-          <div
-            class="video"
-            @click="
-              select_drone_video(index.id), startPeerNegotiation(index.id)
-            "
-          >
-            <video
-              :ref="el => {
-                remoteSubVideoEl[index.id] = el;
-              }"
-              poster="../../assets/live-stream.png"
-              autoplay="true"
-            ></video>
+          <div class="details">
+            <h3>{{ index.id }}</h3>
           </div>
+          <video
+            :ref="el => setSubVideoRef(el, index.id)"
+            poster="../../assets/live-stream.png"
+            muted 
+            autoplay
+            @click="
+              select_drone_video(index.id)
+            "
+          ></video>
         </div>
-      </div>
+      <!-- </div> -->
+      <!------------------------------------------->
     </div>
   </div>
 </template>
 
 <script>
 import { useStore } from 'vuex'
-import { onBeforeUnmount, ref, computed } from '@vue/runtime-core'
+import { onBeforeUnmount, onMounted, ref, computed } from '@vue/runtime-core'
 import socket from '../../lib/websocket'
 import detection from '../../lib/detection'
 import {
@@ -63,7 +64,7 @@ export default {
     const remoteSubVideoEl = []
 
     // const TESTvideo = ref(null)
-    // const canvasEl = ref(null) // for 顯示偵測結果
+    const canvasEl = ref(null) // for 顯示偵測結果
 
     let pc = []
     let recorder
@@ -71,7 +72,6 @@ export default {
     let remoteStream
     let dummyStream
     let localDisplayStream
-    let select_droneID
     const store = useStore()
     const rabbitmqIsInit = computed(() => store.getters.getRabbitmqIsInit)
     const userInfo = computed(() => store.getters.getUserInfo)
@@ -79,20 +79,56 @@ export default {
     const user = computed(() => store.getters.getUserInfo)
     const setLogs = (log) => store.dispatch('setLogs', log)
 
-    const select_drone_video = (droneID) => {
-      console.log('click', droneID)
-      // remoteMainVideoEl.value.srcObject = remoteSubVideoEl
+    /*************** */
+    const Detection = ref(false)
+    const DetectionBtnText = computed(()=>{
+      return Detection.value ? "停止偵測" : "開始偵測"
+    })
+    const clickBtn = ()=>{
+      Detection.value = !Detection.value
+      if(Detection.value){
+        detection.startDetection()
+      }else{
+        detection.stopDetection()
+      }
     }
+    /*************** */
+
+    const setSubVideoRef = (el, id) => {
+      remoteSubVideoEl[id] = el;
+      startPeerNegotiation(id)
+      // console.log("---detection.setupCanvasContainer(影像, 畫布)---")
+      // // detection.setupCanvasContainer(remoteMainVideoEl.value, canvasEl.value)
+      // detection.setupCanvasContainer(remoteSubVideoEl[id], canvasEl.value)
+
+    }
+
+    /**********/
+
+    const select_drone_video = (droneID) => {
+      console.log('click', droneID,"，將此子畫面映射到主畫面上")
+      if(remoteSubVideoEl[droneID].srcObject){
+        // remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
+
+        console.log("---detection.setupCanvasContainer(影像, 畫布)---")
+        // detection.setupCanvasContainer(remoteMainVideoEl.value, canvasEl.value)
+        detection.setupCanvasContainer(remoteSubVideoEl[droneID], canvasEl.value)
+        
+        // detection.start(remoteMainVideoEl.value, canvasEl.value)
+        detection.start(remoteSubVideoEl[droneID], canvasEl.value)
+      }
+    }
+    
 
     const rabbitmqInit = () => {
       // setLogs(`Websocket connected: ${socket.id}`)
-      console.log("----rabbitmqInit---\nsocket.id = ",socket.id)
+      // console.log("----rabbitmqInit---\nsocket.id = ",socket.id)
       for (let i in user.value.droneId) {
         setLogs(`Drone ID: ${user.value.droneId[i]}`)
         console.log(user.value.droneId[i])
       }
       socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)
-      console.log("socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)\n---------------")
+      // console.log("socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)\n---------------")
     }
     // Trigger RabbitMQ when the first come or refresh pages
     if (!rabbitmqIsInit.value) {
@@ -109,7 +145,7 @@ export default {
       setLogs(`Queue created: ${queueName}`)
     })
 
-    const onIceCandidate = (droneID)=>(event) => {
+    const onIceCandidate = (droneID, event) => {
       if (event.candidate) {
         setTimeout(() => {
           socket.emit('send-webrtc', {
@@ -123,60 +159,54 @@ export default {
     }
 
     // handle receive media track event
-    const onTrack = (droneID) => (event) => {
+    const onTrack = (droneID, event) => {
       console.log("----onTrack()---接收影像----droneID=",droneID)
       //consoloe.log()
       console.log('ontrack event.streams[0]: ', event.streams[0])
       setLogs('Received track')
+      console.log("event.streams[0].getTracks(): ",event.streams[0].getTracks())
       // recordButton.isReady = true
       remoteStream = event.streams[0]
       remoteSubVideoEl[droneID].srcObject = remoteStream
-      // TESTvideo.value.srcObject  = localStream
-      // console.log('localStream = ', localStream)
-
-      // detection.setupCanvasContainer(remoteSubVideoEl.value, canvasEl.value)
-      // detection.start(remoteSubVideoEl.value, canvasEl.value)
     }
 
     // handle connection change
     const onIceConnectionStateChange = (droneID) => {
+      console.log("----onIceConnectionStateChange---","\n現在的ICE連線狀態是: ",pc[droneID].iceConnectionState)
       setLogs(`ICE connection Change: ${pc[droneID].iceConnectionState}`)
-      if (pc[droneID].iceConnectionState === 'disconnected') {
-        if (recordButton.isRecording) {
-          recordButton.isRecording = false
-          recorder.stop()
-          localDisplayStream.getTracks().forEach((track) => track.stop())
-        }
-        recordButton.isReady = false
-        remoteStream.getTracks().forEach((track) => track.stop())
+      if (pc[droneID].iceConnectionState === 'disconnected') {     
+        console.log("ICE連線斷開")   
+        // remoteStream.getTracks().forEach((track) => track.stop())
+        remoteStream = null
         remoteSubVideoEl[droneID].srcObject = new MediaStream()
-
-        // // clean stream canvas
-        // detection.cleanBoundingBox(canvasEl.value)
-        // detection.stopDetection()
+          
+        // clean stream canvas
+        detection.cleanBoundingBox(canvasEl.value)
+        detection.stopCanvasVideo()
       }
     }
 
     const onIceConnectionGatheringChange = (droneID) => {
+      // console.log("---onIceConnectionGatheringChange--", "\niceGatheringState = ",pc[droneID].iceGatheringState)
       setLogs(`ICE gathering Change: ${pc[droneID].iceGatheringState}`)
     }
 
     // peer connection initialization
     const initPeerConnection = (droneID) => {
-      console.log("initPeerConnection: droneId=", droneID)
+      // console.log("initPeerConnectsion: droneId=", droneID)
 
       if (pc[droneID]?.connectionState) {
         setLogs('Close previous peer connection')
         pc[droneID].close()
       }
       pc[droneID] = createPeerConnection()
-      console.log('Create peer connection: ', pc[droneID])
+      // console.log('Create peer connection: ', pc[droneID])
       setLogs('Create peer connection')
       // pc.onicecandidate = onIceCandidate(pc, droneId)
-      pc[droneID].onicecandidate = onIceCandidate(droneID)
-      pc[droneID].ontrack = onTrack(droneID)
-      pc[droneID].oniceconnectionstatechange = onIceConnectionStateChange(droneID)
-      pc[droneID].onicegatheringstatechange = onIceConnectionGatheringChange(droneID)
+      pc[droneID].onicecandidate = (event) => onIceCandidate(droneID, event)
+      pc[droneID].ontrack = (event) => onTrack(droneID, event)
+      pc[droneID].oniceconnectionstatechange = () => onIceConnectionStateChange(droneID)
+      pc[droneID].onicegatheringstatechange = () => onIceConnectionGatheringChange(droneID)
       if (localStream) {
         localStream.getTracks().forEach((track) => pc[droneID].addTrack(track))
         setLogs('Add local tracks to peer connection')
@@ -187,25 +217,21 @@ export default {
     }
 
     const startPeerNegotiation = async (droneID) => {
-      console.log("*************startPeerNegotiation***********")
       // remoteSubVideoEl.value.srcObject = localStream
-      console.log(`droneID=${droneID}, \nremoteSubVideoEl[droneID] = `,remoteSubVideoEl[droneID])
-      select_droneID = droneID
+      // console.log(`droneID=${droneID}, \nremoteSubVideoEl[droneID] = `,remoteSubVideoEl[droneID])
+      // select_droneID = droneID
 
       if(pc[droneID]==null){
+        console.log(`*****startPeerNegotiation(${droneID})*****`)
         initPeerConnection(droneID)
         const offer = await createOfferAndSetLocalSDP(pc[droneID])
-        console.log('offer: ', offer)
+        // console.log('offer: ', offer)
         setLogs('Create offer & set offer becomes local SDP')
         //Fixedme here，這裡要改成傳droneIDs })
+        // socket.emit('send-webrtc', { droneID: droneID,  type: 'offer',  payload: offer})
         setLogs('Send offer')
+        console.log(`****startPeerNegotiation(${droneID})**END*****`)
       }
-
-      console.log(">>>",remoteMainVideoEl.value)
-      if(remoteSubVideoEl[droneID].srcObject){
-        remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
-      }
-      
     }
 
     // webRTC establish workflow
@@ -234,22 +260,31 @@ export default {
         dummyStream = canvas.captureStream()
 
         // setup bounding box poster
-        // const streamCtx = canvasEl.value.getContext('2d')
-        // streamCtx.font = '20pt Arial'
-        // streamCtx.fillText('Waiting Stream Signal', 20, 50)
+        const streamCtx = canvasEl.value.getContext('2d')
+        // streamCtx.width = 100
+        // streamCtx.height = 100
+        streamCtx.fillStyle = "blue"; //設置填充色為藍色
+        streamCtx.fillRect(0, 0, streamCtx.width, streamCtx.height)
+        streamCtx.fillStyle = "black"; //設置填充色為黑色
+        streamCtx.font = '10pt Arial'
+        streamCtx.fillText('Waiting Stream Signal', 20, 50)
       })
       .finally(() => {
         socket.on('webrtc-topic', async (data) => {
-          console.log(data)
+          console.log("接收的資料 = ",data)
+
           if (data.type === 'offer') {
+            console.log('Received offer')
             setLogs('Received offer')
-            initPeerConnection(select_droneID) // 需要手機端傳送id資訊 ＋＋
-            await pc[select_droneID].setRemoteDescription(data.payload)
+            // initPeerConnection(data.id) 
+            // await startPeerNegotiation(data.id)
+            
+            await pc[data.id].setRemoteDescription(data.payload)
             setLogs('Set offer becomes remote SDP')
-            const answer = await createAnswerAndSetLocalSDP(pc[select_droneID])
+            const answer = await createAnswerAndSetLocalSDP(pc[data.id])
             setLogs('Create answer & set answer becomes local SDP')
             socket.emit('send-webrtc', {
-              droneID: select_droneID,  //id要改成能從手機端接收到
+              droneID: data.id,  
               type: 'answer',
               payload: answer
             })
@@ -257,15 +292,20 @@ export default {
           }
 
           if (data.type === 'answer') {
+            console.log('Received answer')
             setLogs('Received answer')
-            await pc[select_droneID].setRemoteDescription(data.payload)
+            await pc[data.id].setRemoteDescription(data.payload)
             setLogs('Set answer becomes remote SDP')
           }
 
           if (data.type === 'candidate') {
-            await pc[select_droneID].addIceCandidate(data.payload)
+            
+            await pc[data.id].addIceCandidate(data.payload)
             setLogs('Add received candidate')
+            console.log('Add received candidate answer')
           }
+
+          console.log("________WebRTC交換結束__________")
         })
       })
 
@@ -284,11 +324,18 @@ export default {
     return {
       remoteMainVideoEl,
       remoteSubVideoEl,
+
+      setSubVideoRef,
       // TESTvideo,
+      canvasEl,
 
       droneArr,
       select_drone_video,
       startPeerNegotiation,
+
+      Detection,
+      DetectionBtnText,
+      clickBtn,
     }
   }
 }
@@ -297,94 +344,73 @@ export default {
 <style lang="scss" scoped>
 .wrap {
   width: 100%;
-  height: calc(100vh - 10px);
+  height: calc(100vh - 60px);
+  // position: fixed; //將其參考空間設定為「視窗」
+  /* flex外元素屬性 */
   display: flex;
-  position: fixed;
-  background: #c7c4c4ca;
+  overflow-x: auto; /* 添加水平滚动条 */
+  background: #ffffff;
+}
+video ,canvas{
+  // width: 100%;//測試
+  max-width:100%;
+  max-height:100%;
+  // object-fit: fill; /* 图片填充整个容器，忽略原始宽高比 */
+  object-fit: contain;
+  border-radius: 3%;
+  // padding: 2%; 
+}
+.frame_container{
+  margin: 10px;
+  border-radius: 3%;
+  padding: 10px;
+  /***** flex 外元素屬性 *****/
+  display: flex;
+  flex-direction: column; //使其內容物以垂直排序
+  // justify-content: center; /* 使其內容物水平居中 */
 }
 .main_frame {
-  border-radius: 3%;
-  // background: rgb(23, 151, 68, 0.3);
-  width: 70%;
-  height: 93%;
-  padding: 10px;
-  margin: 1%;
-  background: #6f6e6eca;
+  min-width: 600px; 
+  // height: 100%;//讓高度自動調整
 
+  /***** flex 內元素屬性 *****/
+  flex-grow: 1; //設置延展，使之可充滿剩餘空間
+  // background: rgb(23, 151, 68, 0.3);
+  background: #4f6d7a;
+  
   .main_video {
-    display: flex;
     width: 100%;
-    height: 80%;
-    border-radius: 3%;
-    // background-image: url('../../assets/live-stream.png');
-    background-size: 100% 100%;
-    @media (min-width: 300px) {
-      visibility: visible;
-    }
-    video {
-      object-fit: fill;
-      width: 100%;
-      background-size: 100% 100%;
-      height: auto;
-      border-radius: 5%;
-      // background-image: url('../../assets/live-stream.png');
-    }
-  }
-  .info_dashboard {
-    background-color: rgb(90, 55, 194);
+    height: calc(100% - 40px);
+    padding: 6px;
+
+    /***** flex 內元素屬性 *****/
+    // flex-grow: 1; //設置延展，使之可充滿剩餘空間
+    /***** flex 外元素屬性 *****/
     display: flex;
-    margin: 2%;
-    width: auto;
-    height: 15%;
-    border-radius: 3%;
+    justify-content: center; /* 內容物水平居中 */
+
+    // background: #7ba9ffca;
+  }
+  .info_dashboard{
+    // width: 100px; 
+    height: 40px;
+    padding: 3px;
+    /***** flex 外元素屬性 *****/
+    display: flex; 
+
+    background-color: #c0d6df;
   }
 }
 .select_frame {
-  /* background: blue; */
-  width: 25%;
-  height: 100%;
-  padding: 10px;
-  margin: 1%;
-  display: flex;
-  flex-direction: column;
-  flex: 0 0;
-  flex-basis: auto;
-  background: #6f6e6eca;
-  border-radius: 3%;
-  .subvideo_content {
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-  }
-  .subVideoStream {
-    display: flex;
-    width: 100%;
-    height: 30%;
-    padding: 10px;
-    margin-right: 5%;
-  }
-  // .details {
-  //   background-color: rgba(1, 313, 3, 0.5);
-  //   width: 30%;
-  //   height: 100%;
-  //   align-items: center;
-  //   border-radius: 5%;
-  //   margin: 10px;
-  // }
+  width: 20%;
+  min-width: 200px;
+  // height: 100%;//讓高度自動調整
 
-  .video {
-    width: 100%;
-    height: 100%;
-    // background-image: url('../../assets/live-stream.png');
-    // background-size: 100% 100%;
-    border-radius: 5%;
-    margin: 10px;
-    video {
-      object-fit: fill;
-      width: 100%;
-      height: 100%;
-      border-radius: 5%;
-    }
-  }
-}
+  /***** flex 外元素屬性 *****/
+  display: flex;
+  flex-direction: column; // 使其內容元素軸線方向為由上到下
+  overflow: auto;
+  
+  background: #6c96a8;
+}  
 </style>

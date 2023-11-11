@@ -7,6 +7,7 @@
     <a-radio-button value="STABILIZE">STABILIZE</a-radio-button>
     <a-radio-button value="GUIDED">GUIDED</a-radio-button>
     <a-radio-button value="RTL">RTL</a-radio-button>
+    <a-radio-button value="CIRCLE">CIRCLE</a-radio-button>
   </a-radio-group>
 </template>
 
