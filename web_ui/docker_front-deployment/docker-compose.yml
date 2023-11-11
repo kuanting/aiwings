@@ -1,0 +1,23 @@
+# 使用 3.8 版的設定檔，通常新版本會有新的功能，並支援新的設定參數
+version: '3'
+
+# docker run --name front_end -p 2000:80 -p 443:443 -e URL_FRONTEND=10.126.4.21 -e URL_BACKEND=10.126.4.21 -d web_ui:1.0
+# 以下指令等同上方docker run 指令效果
+# 再CMD輸入 docker-compose up -d 即可啟動以下指令
+services:
+  front_end:
+    container_name: front-end
+    restart: always
+    image: 2023aiotlab/web_ui
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - URL_FRONTEND=localhost
+      - URL_BACKEND=backend_IP
+  # volumes:
+  # - ./ssl/:/etc/nginx/ssl/
+
+# -d|detach：在後台運行。此為docker run 命令，屬容器級別
+# docker-compose.yml檔案 屬於服務級別
+# 若要在後台運行，在docker-compose up 後面加上 -d

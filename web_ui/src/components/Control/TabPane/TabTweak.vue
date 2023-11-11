@@ -52,20 +52,20 @@ export default {
   setup() {
     const store = useStore()
     const coords = computed(() => store.getters['drone/getDroneCoords'])
-    // const altitude = computed(() => store.getters['drone/getAltitude'])
     const drone = computed(() => store.getters['drone/getDroneInfo']) //++
 
+    const TESTalt = computed(() => store.getters['drone/getAltitude'])
     const isTakeoff = computed(() => store.getters['drone/getTakeoffStatus'])
     const userInfo = computed(() => store.getters.getUserInfo)
     const droneArr = userInfo.value.droneId
     // let defaultSelected = userInfo.value.droneId[0].id
-    let defaultSelected
+    const defaultSelected = ref(false)
 
     // new add
     if (userInfo.value.droneId[0]){
-      defaultSelected = userInfo.value.droneId[0].id
+      defaultSelected.value = userInfo.value.droneId[0].id
     }else{
-      defaultSelected = 'No droone'
+      defaultSelected.value = 'No drone'
     }
 
     let droneList = []
@@ -76,21 +76,12 @@ export default {
     const options = ref(droneList)
 
     const handleChange = (value) => {
-      let defaultSelected = value
+      defaultSelected.value = value.value
       const drone_selected = computed(() =>
         store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
       )
       //dronechange表示選擇的droneID的data，drone變數表示的是全部的drone data
       console.log('changeDroneInfo', drone_selected.value)
-    }
-    const newLatitide = (direction) => {
-      const latitude = +coords.value[1]
-      return latitude + direction * 0.00001
-    }
-
-    const newLongitude = (direction) => {
-      const longitude = +coords.value[0]
-      return longitude + direction * 0.00001
     }
 
     /**
@@ -104,20 +95,22 @@ export default {
       }
       // let longitude = +coords.value[0]
       // let latitude = +coords.value[1]
-      let longitude = drone.value[defaultSelected].longitude
-      let latitude = drone.value[defaultSelected].latitude
+      let longitude = Number(drone.value[defaultSelected.value].longitude)
+      let latitude = Number(drone.value[defaultSelected.value].latitude)
+      console.log("latitude = ",latitude)
       if (axis === 'X') {
-        // longitude = newLongitude(direction)
-        longitude += direction * 0.00001
+        longitude += direction * 0.00003
       }
       if (axis === 'Y') {
-        // latitude = newLatitide(direction)
-        latitude += direction * 0.00001
+        latitude += direction * 0.00003
       }
+
+      // console.log("取得高度  = ",TESTalt.value(defaultSelected.value))
+
       socket.emit('send-drone', {
-        droneID: defaultSelected,
+        droneID: defaultSelected.value,
         cmd: 'GOTO',
-        altitude: drone.value[defaultSelected].altitude,
+        altitude: drone.value[defaultSelected.value].altitude,
         lng: longitude,
         lat: latitude
       })
@@ -128,8 +121,9 @@ export default {
     return {
       sendDroneCommand,
       value: ref({
-        value: defaultSelected
+        value: defaultSelected.value
       }),
+      defaultSelected,
       options,
       handleChange
     }
