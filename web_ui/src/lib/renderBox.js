@@ -14,6 +14,11 @@ export const renderBoxes = (source, canvasRef, boxes_data, scores_data, classes_
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
   // ctx.drawImage(source, 0, 0, ctx.canvas.width, ctx.canvas.height)
 
+  // 因為模型的輸入張量為[1, 640, 640, 3]，所以設定canvas畫布的初始大小為 640 x 640 
+  // 偵測結果將繪製到 640 x 640 的畫布，然後畫布再縮放延展成 canvasRef 的大小
+  ctx.canvas.height = 640
+  ctx.canvas.width = 640
+
   // console.log("ratios =",ratios)
 
   const colors = new Colors();
