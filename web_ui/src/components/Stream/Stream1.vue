@@ -2,24 +2,9 @@
   <div class="wrap">
     
     <div class="main_frame frame_container" > 
-      <!------------------------------------------->
-      <div class="main_video" >
-        <!-- <video
-          ref="remoteMainVideoEl"
-          poster="../../assets/live-stream.png"
-          autoplay
-        ></video> -->
-        <canvas ref="canvasEl" class="boundingBox"></canvas>
-      </div>
-      <div class="info_dashboard">
-        <p>
-          Information display
-          TEST
-        </p>
-        <button @click="clickBtn()">{{ DetectionBtnText }}</button>
-      </div>
-      <!------------------------------------------->
+      <mainVideoDetection :srcObject="VideoSrcObject"/>     
     </div>
+
     <div class="select_frame frame_container">
       <!------------------------------------------->
       <!-- <div class="subvideo_content"> -->
@@ -40,6 +25,7 @@
       <!-- </div> -->
       <!------------------------------------------->
     </div>
+
   </div>
 </template>
 
@@ -47,7 +33,7 @@
 import { useStore } from 'vuex'
 import { onBeforeUnmount, onMounted, ref, computed } from '@vue/runtime-core'
 import socket from '../../lib/websocket'
-import detection from '../../lib/detection'
+// import detection from '../../lib/detection'
 import {
   createPeerConnection,
   createAnswerAndSetLocalSDP,
@@ -56,15 +42,21 @@ import {
 } from '../../lib/webRTC'
 import { message } from 'ant-design-vue'
 
+
+import mainVideoDetection from './mainVideoDetection.vue'
+
 export default {
   name: 'monitor',
+  components:{
+    mainVideoDetection
+  },
 
   setup() {
+    // *******************************
     const remoteMainVideoEl = ref(null)
     const remoteSubVideoEl = []
 
-    // const TESTvideo = ref(null)
-    const canvasEl = ref(null) // for 顯示偵測結果
+    // const canvasEl = ref(null) // for 顯示偵測結果
 
     let pc = []
     let recorder
@@ -79,28 +71,13 @@ export default {
     const user = computed(() => store.getters.getUserInfo)
     const setLogs = (log) => store.dispatch('setLogs', log)
 
-    /*************** */
-    const Detection = ref(false)
-    const DetectionBtnText = computed(()=>{
-      return Detection.value ? "停止偵測" : "開始偵測"
-    })
-    const clickBtn = ()=>{
-      Detection.value = !Detection.value
-      if(Detection.value){
-        detection.startDetection()
-      }else{
-        detection.stopDetection()
-      }
-    }
+    /******* 傳遞給子組件的媒體流 *******/
+    const VideoSrcObject = ref(null) 
     /*************** */
 
     const setSubVideoRef = (el, id) => {
       remoteSubVideoEl[id] = el;
       startPeerNegotiation(id)
-      // console.log("---detection.setupCanvasContainer(影像, 畫布)---")
-      // // detection.setupCanvasContainer(remoteMainVideoEl.value, canvasEl.value)
-      // detection.setupCanvasContainer(remoteSubVideoEl[id], canvasEl.value)
-
     }
 
     /**********/
@@ -109,13 +86,7 @@ export default {
       console.log('click', droneID,"，將此子畫面映射到主畫面上")
       if(remoteSubVideoEl[droneID].srcObject){
         // remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
-
-        console.log("---detection.setupCanvasContainer(影像, 畫布)---")
-        // detection.setupCanvasContainer(remoteMainVideoEl.value, canvasEl.value)
-        detection.setupCanvasContainer(remoteSubVideoEl[droneID], canvasEl.value)
-        
-        // detection.start(remoteMainVideoEl.value, canvasEl.value)
-        detection.start(remoteSubVideoEl[droneID], canvasEl.value)
+        VideoSrcObject.value = remoteSubVideoEl[droneID].srcObject //++
       }
     }
     
@@ -175,14 +146,11 @@ export default {
       console.log("----onIceConnectionStateChange---","\n現在的ICE連線狀態是: ",pc[droneID].iceConnectionState)
       setLogs(`ICE connection Change: ${pc[droneID].iceConnectionState}`)
       if (pc[droneID].iceConnectionState === 'disconnected') {     
-        console.log("ICE連線斷開")   
+        console.log("ICE連線斷開 清除影像")   
         // remoteStream.getTracks().forEach((track) => track.stop())
         remoteStream = null
         remoteSubVideoEl[droneID].srcObject = new MediaStream()
-          
-        // clean stream canvas
-        detection.cleanBoundingBox(canvasEl.value)
-        detection.stopCanvasVideo()
+        VideoSrcObject.value = null
       }
     }
 
@@ -240,14 +208,8 @@ export default {
         console.log("getLocalStream() 成功")
         localStream = mediaStream
 
-        //TESTvideo.value.srcObject  = localStream
-
         // remoteSubVideoEl.value.srcObject = localStream
-        // console.log("remoteSubVideoEl.value = ",remoteSubVideoEl.value,
-        //               "TESTvideo.value = ",TESTvideo.value)
 
-        // document.getElementById('Tvideo').srcObject = localStream
-        // console.log("document.getElementById('Tvideo') = ",document.getElementById('Tvideo').srcObject)
       })
       .catch((error) => {
         message.error(
@@ -260,14 +222,15 @@ export default {
         dummyStream = canvas.captureStream()
 
         // setup bounding box poster
-        const streamCtx = canvasEl.value.getContext('2d')
-        // streamCtx.width = 100
-        // streamCtx.height = 100
-        streamCtx.fillStyle = "blue"; //設置填充色為藍色
-        streamCtx.fillRect(0, 0, streamCtx.width, streamCtx.height)
-        streamCtx.fillStyle = "black"; //設置填充色為黑色
-        streamCtx.font = '10pt Arial'
-        streamCtx.fillText('Waiting Stream Signal', 20, 50)
+        // // const streamCtx = canvasEl.value.getContext('2d')
+        // const streamCtx = mainCanvasRef.value.getContext('2d')
+        // // streamCtx.width = 100
+        // // streamCtx.height = 100
+        // streamCtx.fillStyle = "blue"; //設置填充色為藍色
+        // streamCtx.fillRect(0, 0, streamCtx.width, streamCtx.height)
+        // streamCtx.fillStyle = "black"; //設置填充色為黑色
+        // streamCtx.font = '10pt Arial'
+        // streamCtx.fillText('Waiting Stream Signal', 20, 50)
       })
       .finally(() => {
         socket.on('webrtc-topic', async (data) => {
@@ -326,16 +289,13 @@ export default {
       remoteSubVideoEl,
 
       setSubVideoRef,
-      // TESTvideo,
-      canvasEl,
+      // canvasEl,
 
       droneArr,
       select_drone_video,
       startPeerNegotiation,
 
-      Detection,
-      DetectionBtnText,
-      clickBtn,
+      VideoSrcObject,
     }
   }
 }
@@ -351,14 +311,16 @@ export default {
   overflow-x: auto; /* 添加水平滚动条 */
   background: #ffffff;
 }
-video ,canvas{
-  // width: 100%;//測試
-  max-width:100%;
-  max-height:100%;
-  // object-fit: fill; /* 图片填充整个容器，忽略原始宽高比 */
-  object-fit: contain;
-  border-radius: 3%;
-  // padding: 2%; 
+.subVideoStream{
+  video ,canvas{
+    // width: 100%;//測試
+    max-width:100%;
+    max-height:100%;
+    // object-fit: fill; /* 图片填充整个容器，忽略原始宽高比 */
+    // object-fit: contain;
+    border-radius: 3%;
+    // padding: 2%; 
+  }
 }
 .frame_container{
   margin: 10px;
@@ -377,29 +339,10 @@ video ,canvas{
   flex-grow: 1; //設置延展，使之可充滿剩餘空間
   // background: rgb(23, 151, 68, 0.3);
   background: #4f6d7a;
-  
-  .main_video {
-    width: 100%;
-    height: calc(100% - 40px);
-    padding: 6px;
 
-    /***** flex 內元素屬性 *****/
-    // flex-grow: 1; //設置延展，使之可充滿剩餘空間
-    /***** flex 外元素屬性 *****/
-    display: flex;
-    justify-content: center; /* 內容物水平居中 */
 
-    // background: #7ba9ffca;
-  }
-  .info_dashboard{
-    // width: 100px; 
-    height: 40px;
-    padding: 3px;
-    /***** flex 外元素屬性 *****/
-    display: flex; 
-
-    background-color: #c0d6df;
-  }
+  /***** 定位 *****/
+  position: relative;
 }
 .select_frame {
   width: 20%;
