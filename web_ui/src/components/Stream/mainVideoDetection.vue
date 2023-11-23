@@ -1,19 +1,34 @@
 <template>
-  <div class="AAAA" ref="AAAA" style="padding-bottom: 40px;">
+  <div class="MainVideoComponent" ref="MainVideoComponent" style="padding-bottom: 60px;">
+    <!-- MainVideoComponent框的padding-bottom高度是要留給info_dashboard的 -->
 
     <div class="mainV">
       <video ref="mainVideoRef" :srcObject="srcObject" autoplay ></video>
       <canvas ref="mainCanvasRef"></canvas>
     </div>
 
-    <div class="info_dashboard">
+    <p style="position: absolute;">{{ select_droneID }}</p>
+
+    <div class="info_dashboard" style="height: 60px; font-size: 13px;"> 
+      <!-- 這個info_dashboard框的height要小於等於MainVideoComponent框的padding-bottom高度 -->
       <p>
-        Information display
-        TEST ==
+        <span>TIME:</span>{{ SpecificDroneInfo.timeStamp }}, 
+        <span>GPS:</span>({{SpecificDroneInfo.longitude}} , {{SpecificDroneInfo.latitude}}), 
+        <span>HEADING:</span>{{SpecificDroneInfo.heading}}, 
+        <span>ALTITUDE:</span>{{SpecificDroneInfo.latitude}} m, 
+        <span>SPEED:</span>{{SpecificDroneInfo.speed}} m/s, 
+        <span>STATUS:</span>{{ SpecificDroneInfo.isArmed }},  
+        <span>MODE:</span>{{ SpecificDroneInfo.mode }}, 
+        <span>VOLTAGE:</span> {{ SpecificDroneInfo.voltage }}, 
+        <span>BATTERY:</span> {{ SpecificDroneInfo.percentage }}, 
+        <span>ROLL:</span>{{ SpecificDroneInfo.roll }}, 
+        <span>PITCH:</span>{{ SpecificDroneInfo.pitch }}, 
+        <span>GPS COUNTS:</span>{{ SpecificDroneInfo.gpsCount }}, 
+        <span>GPS HPOP:</span>{{ SpecificDroneInfo.hpop }}
       </p>
       <button @click="clickBtn()">{{ DetectionBtnText }}</button>
       <button @click="isCocoSsd = !isCocoSsd" :disabled="Detection">{{ usingModelText }}</button>
-      <button @click="RotateVideo()">RotateVideo</button>
+      <button @click="RotateVideo()">Rotate Video</button>
     </div>  
     
   </div>
@@ -22,20 +37,21 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch } from '@vue/runtime-core'
+import { useStore } from 'vuex'
+import { ref, computed } from '@vue/runtime-core'
 import detection from '../../lib/detection'
 
-
 export default {
-  name: 'monitor',
+  name: 'monitor_mainVideoDetection',
   props: {
     /* srcObject：來自父組件的媒體流 */
     srcObject: MediaStream,
+    select_droneID: String,
   },
 
   setup(props) {
     /*********************************/
-    const AAAA =ref(null)
+    const MainVideoComponent =ref(null)
     const mainVideoRef = ref(null) 
     const mainCanvasRef = ref(null) // for 顯示偵測結果  
 
@@ -72,8 +88,8 @@ export default {
 
       if(rotate.value%180){
         // 轉為橫向時，變更最大寬高
-        const rotatedMaxWidth = AAAA.value.clientHeight - parseFloat(AAAA.value.style.paddingBottom); // 最大寬度變成容器的高度
-        const rotatedMaxHeight = AAAA.value.clientWidth;                                              // 最大高度變成容器的寬度
+        const rotatedMaxWidth = MainVideoComponent.value.clientHeight - parseFloat(MainVideoComponent.value.style.paddingBottom); // 最大寬度變成容器的高度
+        const rotatedMaxHeight = MainVideoComponent.value.clientWidth;                                              // 最大高度變成容器的寬度
         mainVideoRef.value.style.maxWidth = `${rotatedMaxWidth}px`;
         mainVideoRef.value.style.maxHeight = `${rotatedMaxHeight}px`;
       }else{
@@ -86,20 +102,32 @@ export default {
       mainCanvasRef.value.style.height = `${mainVideoRef.value.offsetHeight}px`
       mainCanvasRef.value.style.width = `${mainVideoRef.value.offsetWidth}px`
     }
+
+    /**************** 取得指定droneId的狀態資料 ********************* */
+    const store = useStore()
+    // 定義要顯示的drone資訊基本欄位
+    const droneInfoInit = { 
+      timeStamp: '', roll: null, yaw: null, pitch: null, voltage: null, percentage: null, hpop: null, gpsCount: null, mode: '', isArmed: '', heading: null, latitude: null, longitude: null, altitude: null, speed: null, status: { altitude: 3, isTakeoff: false }, destination: { lng: null, lat: null} 
+    }
+    // 取得當前select_droneID的無人機資訊，如果 undefined 則顯示 droneInfoInit
+    const SpecificDroneInfo =  computed(() => {
+      return store.getters['drone/getSpecificDroneInfo'](props.select_droneID)
+            || droneInfoInit
+    })
+    /**************************************************************** */
     
     return {
-      AAAA,
+      MainVideoComponent,
       mainVideoRef,
       mainCanvasRef,
-
       Detection,
       DetectionBtnText,
       clickBtn,
-
       isCocoSsd,
-      usingModelText,
-      
+      usingModelText,      
       RotateVideo,
+
+      SpecificDroneInfo,
     }
   }
 }
@@ -110,15 +138,15 @@ export default {
 <style lang="scss" scoped>
 /* scoped: 避免目前元件的 style 會污染到子元件的 style */
 
-.AAAA{
+.MainVideoComponent{
   height: 100%;
   width: 100%;
-  /***** 定位 *****/
+  /***** 作為父層被定位 *****/
   position: relative;
   // padding-bottom: 40px; // 底部空出 40px 給 info_dashboard，上方剩餘空間給 mainV，寫在html
   /***** flex 外元素屬性 *****/
   display: flex;
-  
+
   // background-color: #f43b3b;
 }
 
@@ -155,7 +183,7 @@ export default {
   background-color: #c0d6df;
 
   width: 100%; 
-  height: 40px;
+  // height: 60px; 寫在html
   padding: 3px;
 
   /***** flex 外元素屬性 *****/
@@ -164,5 +192,9 @@ export default {
   /* 定位父層 div 以便定在最下方 */
   position: absolute;
   bottom: 0;
+}
+
+span {
+  color: rgb(125, 57, 12);
 }
 </style>

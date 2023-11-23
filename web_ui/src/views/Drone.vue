@@ -38,6 +38,9 @@ import socket from '../lib/websocket'
 import { useStore } from 'vuex'
 import { message } from 'ant-design-vue'
 import { computed, onBeforeUnmount } from '@vue/runtime-core'
+
+import { transformDataFormat } from '../lib/transformDataFormat'
+
 export default {
   name: 'Drone',
   components: {
@@ -54,53 +57,26 @@ export default {
     const user = computed(() => store.getters.getUserInfo)
     const saveLogs = (log) => store.dispatch('setLogs', log)
 
-    const droneList = user.value.droneId
-    for (let i in droneList) {
-      const droneInfo = {
-        [droneList[i].id]: {
-          timeStamp: '',
-          roll: '',
-          yaw: '',
-          pitch: '',
-          voltage: '',
-          percentage: '',
-          hpop: '',
-          gpsCount: '',
-          mode: '',
-          isArmed: '',
-          heading: '',
-          latitude: '',
-          longitude: '',
-          altitude: '',
-          speed: '',
-          status: {
-            altitude: 3,
-            //isTakeoff 預設要改成false
-            isTakeoff: false
-          },
-          destination: {
-            lng: 0,
-            lat: 0
-          }
-        }
-      }
-      store.dispatch('drone/setDroneInfo', droneInfo)
-    }
+    /*************** rabbitmqInit *****************/
     const rabbitmqInit = () => {
       // console.log('user: ', user.value.droneId[0])
-      console.log(socket.id)
+      // console.log("rabbitmqInit() \n socket.id = ",socket.id)
       saveLogs(`Websocket connected: ${socket.id}`)
       for (let i in user.value.droneId) {
         saveLogs(`Drone ID: ${user.value.droneId[i]}`)
       }
-      socket.emit('establish-rabbitmq-connection-drone', user.value.droneId) //webSocket監聽到此事件後，會建立rabbitNq的Queue
+      socket.emit('establish-rabbitmq-connection-drone', user.value.droneId) //傳送此事件到後端，後端webSocket監聽到此事件後，會建立所有droneId的 rabbitMq Queue
     }
+
     // Trigger RabbitMQ when the first come or refresh pages
+    console.log("rabbitmqIsInit.value = ",rabbitmqIsInit.value)
     if (!rabbitmqIsInit.value) {
       rabbitmqInit()
       store.dispatch('setRabbitmqIsInit', true)
     }
-    // Websocket event listening
+
+    
+    /************ Websocket event listening *************/
     socket.on('connect', () => rabbitmqInit())
     socket.on('disconnect', (reason) => {
       saveLogs(`Websocket disconnected: ${reason}`)
@@ -110,76 +86,12 @@ export default {
     })
 
     socket.on('drone-topic', (data) => {
+      // console.log("監聽無人機傳遞的資訊")
       if (data.type === 'message') {
         // console.log('Here: ', data.drone_info.drone_id)
         // console.log('droneInfo from backend: ', data)
-        const {
-          drone_info: {
-            drone_id: drone_id,
-            timestamp: timeStamp,
-            attitude: { yaw, roll, pitch },
-            battery: { voltage, percentage },
-            gps_status: { hpop, gps_count: gpsCount },
-            heartbeat: { flight_mode: mode, is_armed: isArmed },
-            location: {
-              heading,
-              lat: latitude,
-              lng: longitude,
-              relative_alt: altitude
-            },
-            speed: { air_speed: speed }
-          }
-        } = data
-
-        //改成這種形態
-        const droneInfo = {
-          [drone_id]: {
-            timeStamp,
-            roll,
-            yaw,
-            pitch,
-            voltage,
-            percentage,
-            hpop,
-            gpsCount,
-            mode,
-            isArmed,
-            heading,
-            latitude,
-            longitude,
-            altitude,
-            speed,
-            status: {
-              altitude: 3,
-              //isTakeoff 預設要改成false
-              isTakeoff: false
-            },
-            destination: {
-              lng: 0,
-              lat: 0
-            }
-          }
-        }
-        // console.log(droneInfo)
-        // const droneInfo_origin = {
-        //     timeStamp,
-        //     roll,
-        //     yaw,
-        //     pitch,
-        //     voltage,
-        //     percentage,
-        //     hpop,
-        //     gpsCount,
-        //     mode,
-        //     isArmed,
-        //     heading,
-        //     latitude,
-        //     longitude,
-        //     altitude,
-        //     speed
-        //   }
-
-        //setDroneInfo 是加在vuex/drone module
+        let droneInfo= transformDataFormat(data) // 轉換資料格式為適用於多台無人機的格式
+        // 轉換後的資料格式為：droneInfo = {[drone_id]: {......}}
         store.dispatch('drone/setDroneInfo', droneInfo)
       }
       if (data.type === 'cmd_ack') {
@@ -207,7 +119,8 @@ export default {
 
     // Remove listener to prevent multiple listening
     onBeforeUnmount(() => {
-      // store.dispatch('setRabbitmqIsInit', false)
+      console.log("------ onBeforeUnmount ----")
+      store.dispatch('setRabbitmqIsInit', false)
 
       socket.off('connect')
       socket.off('disconnect')

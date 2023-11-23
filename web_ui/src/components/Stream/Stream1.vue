@@ -2,7 +2,7 @@
   <div class="wrap">
     
     <div class="main_frame frame_container" > 
-      <mainVideoDetection :srcObject="VideoSrcObject"/>     
+      <mainVideoDetection :srcObject="VideoSrcObject" :select_droneID="select_droneID"/>     
     </div>
 
     <div class="select_frame frame_container">
@@ -44,6 +44,7 @@ import { message } from 'ant-design-vue'
 
 
 import mainVideoDetection from './mainVideoDetection.vue'
+import { transformDataFormat } from '../../lib/transformDataFormat'
 
 export default {
   name: 'monitor',
@@ -52,6 +53,8 @@ export default {
   },
 
   setup() {
+    const saveLogs = (log) => store.dispatch('setLogs', log)
+
     // *******************************
     const remoteMainVideoEl = ref(null)
     const remoteSubVideoEl = []
@@ -81,16 +84,17 @@ export default {
     }
 
     /**********/
-
+    const select_droneID = ref()
     const select_drone_video = (droneID) => {
       console.log('click', droneID,"，將此子畫面映射到主畫面上")
+      select_droneID.value = droneID
       if(remoteSubVideoEl[droneID].srcObject){
         // remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
         VideoSrcObject.value = remoteSubVideoEl[droneID].srcObject //++
       }
     }
     
-
+    /**************** */
     const rabbitmqInit = () => {
       // setLogs(`Websocket connected: ${socket.id}`)
       // console.log("----rabbitmqInit---\nsocket.id = ",socket.id)
@@ -99,7 +103,7 @@ export default {
         console.log(user.value.droneId[i])
       }
       socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)
-      // console.log("socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)\n---------------")
+      socket.emit('establish-rabbitmq-connection-drone', user.value.droneId) //傳送此事件到後端，後端webSocket監聽到此事件後，會建立所有droneId的 rabbitMq Queue
     }
     // Trigger RabbitMQ when the first come or refresh pages
     if (!rabbitmqIsInit.value) {
@@ -114,6 +118,38 @@ export default {
     })
     socket.on('queue-created', (queueName) => {
       setLogs(`Queue created: ${queueName}`)
+    })
+    socket.on('drone-topic', (data) => {
+      // console.log("監聽無人機傳遞的資訊")
+      if (data.type === 'message') {
+        let droneInfo= transformDataFormat(data) // 轉換資料格式為適用於多台無人機的格式
+        // 轉換後的資料格式為：droneInfo = {[drone_id]: {......}}
+        store.dispatch('drone/setDroneInfo', droneInfo)
+      }
+
+      // ???????
+      if (data.type === 'cmd_ack') {
+        if (data.cmd_result.includes('ACCEPTED')) {
+          message.success(data.cmd_result)
+        } else {
+          message.error(data.cmd_result)
+        }
+        saveLogs(data.cmd)
+      }
+
+      if (data.type === 'mission_ack') {
+        if (data.mission_result.includes('ACCEPTED')) {
+          message.success(data.mission_result)
+        } else {
+          message.error(data.mission_result)
+        }
+        saveLogs(data.mission_result)
+      }
+
+      if (data.type === 'apm_text') {
+        saveLogs(data.text)
+      }
+
     })
 
     const onIceCandidate = (droneID, event) => {
@@ -179,7 +215,7 @@ export default {
         localStream.getTracks().forEach((track) => pc[droneID].addTrack(track))
         setLogs('Add local tracks to peer connection')
       } else {
-        dummyStream.getTracks().forEach((track) => pc[droneID].addTrack(track))
+        // dummyStream.getTracks().forEach((track) => pc[droneID].addTrack(track))
         setLogs('No local stream,add dummy track to peer connection')
       }
     }
@@ -190,7 +226,7 @@ export default {
       // select_droneID = droneID
 
       if(pc[droneID]==null){
-        console.log(`*****startPeerNegotiation(${droneID})*****`)
+        // console.log(`*****startPeerNegotiation(${droneID})*****`)
         initPeerConnection(droneID)
         const offer = await createOfferAndSetLocalSDP(pc[droneID])
         // console.log('offer: ', offer)
@@ -198,7 +234,7 @@ export default {
         //Fixedme here，這裡要改成傳droneIDs })
         // socket.emit('send-webrtc', { droneID: droneID,  type: 'offer',  payload: offer})
         setLogs('Send offer')
-        console.log(`****startPeerNegotiation(${droneID})**END*****`)
+        // console.log(`****startPeerNegotiation(${droneID})**END*****`)
       }
     }
 
@@ -273,6 +309,10 @@ export default {
       })
 
     onBeforeUnmount(() => {
+      console.log("------ onBeforeUnmount , setRabbitmqIsInit', false----")
+      store.dispatch('setRabbitmqIsInit', false)
+      // 離開網頁時，會觸發端的disconnect，後端會清除所有消費者訂閱，所以將setRabbitmqIsInit狀態更新為init
+
        // Remove listener to prevent multiple listening
       socket.off('connect')
       socket.off('disconnect')
@@ -296,6 +336,7 @@ export default {
       startPeerNegotiation,
 
       VideoSrcObject,
+      select_droneID,
     }
   }
 }
