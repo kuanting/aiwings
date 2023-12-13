@@ -43,7 +43,7 @@ export async function connectToDatabase() {
       logger.info("Connect to database successfully!");
       return conn // 如果連線成功，回傳conn；如果失敗，進入catch(err){}
     } catch (err) {
-      logger.info(err)
+      logger.error(err)
     }
     // Retry the connection after a 5-second delay.
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -191,20 +191,20 @@ export async function isEmailExists(conn: any, email: string) {
 ***************************************************/
 // const a = await isDroneIdExistsByUuid(conn, 'fifi@example.com','fifi')
 // console.log(a)
-export async function isDroneIdExistsByUuid(conn: any, uuid: any, droneid: string) {
+export async function isDroneIdExistsByUuid(conn: any, uuid: any, droneId: string) {
   try {
-    logger.info(`Check if the specified user has the droneId '${droneid}'.`)
+    logger.info(`Check if the specified user has the droneId '${droneId}'.`)
     let sql =
       `SELECT 1 FROM drones 
       WHERE drones.user_id = UUID_TO_BIN(?) AND drones.drone_id = ?
       limit 1` // Since each user's drone is unique and non-repeating, you can end the search once found.
-    const result: any = await executeSQLStatement(conn, sql, uuid, droneid)
+    const result: any = await executeSQLStatement(conn, sql, uuid, droneId)
 
     if (result.length > 0) {
-      logger.info(`ID name: '${droneid}' already exists.`)
+      logger.info(`ID name: '${droneId}' already exists.`)
       return true
     } else {
-      logger.info(`ID name: '${droneid}' is not registered.`)
+      logger.info(`ID name: '${droneId}' is not registered.`)
       return false
     }
   } catch (err) {

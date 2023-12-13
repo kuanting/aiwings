@@ -1,42 +1,42 @@
 <template>
   <div class="container">
-    <div v-for="(droneID, index) in droneArr" :key="index" class="box">
+    <div v-for="(userDrone, index) in userDrones" :key="index" class="box">
       <a-popover
-        v-model:popOverState="popOverState"
+        placement="topLeft"
         title="Drone Information"
         trigger="click"
         overlayClassName="popover"
       >
         <template #content>
           <h3>
-            <span>{{ index }}</span>
+            <span>{{ userDrone.id }}</span>
+            <!-- userDrone:  {id: "droneId name", isAdmin: "true or false"} -->
           </h3>
-          <li><span>TIME:</span> {{ droneArr[index].timeStamp }}</li>
+          <li><span>TIME:</span> {{ dronesInfo[userDrone.id].timeStamp }}</li>
           <li>
-            <span>GPS:</span> {{ droneArr[index].longitude }}
-            {{ droneArr[index].latitude }}
+            <span>GPS:</span> {{ dronesInfo[userDrone.id].longitude }}
+            {{ dronesInfo[userDrone.id].latitude }}
           </li>
-          <li><span>HEADING:</span> {{ droneArr[index].heading }}</li>
-          <li><span>ALTITUDE(m):</span> {{ droneArr[index].altitude }}</li>
-          <li><span>SPEED(m/s): </span> {{ droneArr[index].speed }}</li>
-          <li><span>STATUS:</span> {{ droneArr[index].isArmed }}</li>
-          <li><span>MODE:</span> {{ droneArr[index].mode }}</li>
-          <li><span>VOLTAGE:</span> {{ droneArr[index].voltage }}</li>
-          <li><span>BATTERY:</span> {{ droneArr[index].percentage }}</li>
-          <li><span>ROLL:</span> {{ droneArr[index].roll }}</li>
-          <li><span>PITCH:</span> {{ droneArr[index].pitch }}</li>
-          <li><span>GPS COUNTS:</span> {{ droneArr[index].gpsCount }}</li>
-          <li><span>GPS HPOP:</span> {{ droneArr[index].hpop }}</li>
+          <li><span>HEADING:</span> {{ dronesInfo[userDrone.id].heading }}</li>
+          <li><span>ALTITUDE(m):</span> {{ dronesInfo[userDrone.id].altitude }}</li>
+          <li><span>SPEED(m/s): </span> {{ dronesInfo[userDrone.id].speed }}</li>
+          <li><span>STATUS:</span> {{ dronesInfo[userDrone.id].isArmed }}</li>
+          <li><span>MODE:</span> {{ dronesInfo[userDrone.id].mode }}</li>
+          <li><span>VOLTAGE:</span> {{ dronesInfo[userDrone.id].voltage }}</li>
+          <li><span>BATTERY:</span> {{ dronesInfo[userDrone.id].percentage }}</li>
+          <li><span>ROLL:</span> {{ dronesInfo[userDrone.id].roll }}</li>
+          <li><span>PITCH:</span> {{ dronesInfo[userDrone.id].pitch }}</li>
+          <li><span>GPS COUNTS:</span> {{ dronesInfo[userDrone.id].gpsCount }}</li>
+          <li><span>GPS HPOP:</span> {{ dronesInfo[userDrone.id].hpop }}</li>
         </template>
           <img
             src="../../assets/drone1.gif"
             alt="drone_gif"
-            @click="showSelected(index)"
-            @mouseover="mouseOverEvent(index)"
-            @mouseout="mouseOutEvent(index)"
+            @click="showSelected(userDrone.id)"
+            @mouseover="mouseOverEvent(userDrone.id)"
+            @mouseout="mouseOutEvent(userDrone.id)"
             class="cover-fit"
           />
-        {{ droneID.id }}
       </a-popover>
     </div>
   </div>
@@ -44,48 +44,39 @@
 
 <script>
 import { useStore } from 'vuex'
-import { computed, reactive } from '@vue/runtime-core'
+import { computed, reactive, ref } from '@vue/runtime-core'
 // import useMapbox from '../../hooks/useMapbox'
-import { watch } from 'vue'
 
 export default {
   name: 'droneInfoDashBoard',
 
   setup() {
     const store = useStore()
-    const drone = computed(() => store.getters['drone/getDroneInfo'])
-    let popOverState = reactive({})
-    //Drone array store the each drone information
-    let droneArr = reactive(drone.value)
-    // console.log('droneARR: ', droneArr)
-    // console.log('drone.value: ', drone.value)
-    watch(drone, (newValue, oldValue) => {
-      // console.log('new: ', newValue)
-      // console.log('old: ', oldValue)
-      //reactive 要用object.assign()
-      Object.assign(droneArr, newValue)
-      // console.log('after: ', droneArr)
-    })
+    const user = computed(() => store.getters.getUserInfo)    
+    const dronesInfo = computed(() => store.getters['drone/getDroneInfo'] )
 
-    // watch(droneArr, (newValue, oldValue) => {
-    //   console.log('watch droneArr(old): ', oldValue)
-    //   console.log('watch droneArr(new): ', newValue)
-    // })
-    for (let i in droneArr) {
-      // console.log('droneARR:! ', droneArr)
-      let droneInfo = droneArr[i]
-      // console.log('droneInfo', droneInfo)
-      popOverState[i] = droneInfo
-      // console.log('popoverState', popOverState)
-      // console.log('popoverState[i]:', popOverState[i])
+    /****** 初始化 所有drone 的狀態資訊 *****/ 
+    // 定義要顯示的drone資訊基本欄位
+    const droneInfoInit = { 
+      timeStamp: '', roll: null, yaw: null, pitch: null, voltage: null, percentage: null, hpop: null, gpsCount: null, mode: '', isArmed: '', heading: null, latitude: null, longitude: null, altitude: null, speed: null, status: { altitude: 3, isTakeoff: false }, destination: { lng: null, lat: null} 
     }
+    // 初始化所有drone 的狀態資訊欄
+    // const userDrones = computed(()=> { return user.value.droneId })
+    const userDrones = user.value.droneId
+    for (let i in userDrones) {
+      const droneInfo = {
+        [userDrones[i].id]: droneInfoInit
+      }
+      store.dispatch('drone/setDroneInfo', droneInfo)
+    }
+    /********************************** */
 
     const showSelected = (id) => {
       const droneInfo = store.getters['drone/getSpecificDroneInfo'](id)
       if (droneInfo === undefined) {
         console.log('Need to open your drone to get info')
       } else {
-        console.log('d')
+        console.log('Show information of the drone')
       }
     }
     const mouseOverEvent = (droneID) => {
@@ -100,12 +91,12 @@ export default {
     }
 
     return {
-      droneArr,
+      dronesInfo,
+      userDrones,
+      
       showSelected,
-      popOverState,
       mouseOverEvent,
       mouseOutEvent,
-      drone
     }
   }
 }
