@@ -75,11 +75,13 @@ MYSQL_SERVICE_PASSWORD=mysql
   - Default 'root' password: **MYSQL_ROOT_PASSWORD=password**
 
 **If you already install MySQL:**
-- Comment out or delete the entire mysql_service in docker-compose.yml.
+- Comment out or delete the entire mysql_service in docker-compose.yml.【line 41~56】
+- Comment out or delete the **mysql_service option** in the depends_on of the backend.【Line 66】
 - And change the MySQL connection parameters in the .env file.
 
 **If you already install RabbitMQ:**
-- Comment out or delete the entire rabbitmq_service in docker-compose.yml.
+- Comment out or delete the entire rabbitmq_service in docker-compose.yml.【line 28~39】
+- Comment out or delete the **rabbitmq_service option** in the depends_on of the backend.【Line 65】
 - And change the MySQL connection parameters in the .env file.
 
 ## How to install

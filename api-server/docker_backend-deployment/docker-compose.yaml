@@ -17,6 +17,13 @@ version: '3.9'
 # 使用方法
 # docker-compose up -d
 
+
+
+
+
+
+# --------------------------------------------------------------------------
+
 services:
   rabbitmq_service:
     container_name: rabbitmq
@@ -60,8 +67,8 @@ services:
     ports:
       - '3080:3080'
     environment:
-      - RABBITMQ_SERVICE_SERVICE_HOST=rabbitmq_service
-      - MYSQL_SERVICE_SERVICE_HOST=mysql_service
+      - RABBITMQ_SERVICE_SERVICE_HOST=${RABBITMQ_SERVICE_SERVICE_HOST}
+      - MYSQL_SERVICE_SERVICE_HOST=${MYSQL_SERVICE_SERVICE_HOST}
       # rabbitmq_service、mysql_service是前面建立好的服務
       # environment的優先權大於env_file
     env_file:
