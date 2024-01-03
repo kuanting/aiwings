@@ -12,9 +12,11 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    environment:
-      - URL_FRONTEND=localhost
-      - URL_BACKEND=backend_IP
+    env_file:
+      - .env.frontend.local
+    # environment:
+    #   URL_FRONTEND: ${URL_FRONTEND}
+    #   URL_BACKEND: ${URL_BACKEND}
   # volumes:
   # - ./ssl/:/etc/nginx/ssl/
 
