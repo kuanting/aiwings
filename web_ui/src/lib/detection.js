@@ -1,27 +1,27 @@
-import '@tensorflow/tfjs-backend-cpu'
-// if chrome version 113 above you can use webgpu
-import '@tensorflow/tfjs-backend-webgpu';
-import '@tensorflow/tfjs-backend-webgl'
-
-// tfjs-node需要 AVX 處理器，並且 tfjs-node 函式庫使用 AVX 指令來提高其操作效能。如果你的CPU不支援AVX，你將無法使用tfjs-node。
-// import tf from'@tensorflow/tfjs-node'
-import * as tf from '@tensorflow/tfjs'
 import { reactive } from '@vue/runtime-core'
 
+/***************** 引入 TensorFlow.js 函式庫 和 TensorFlow.js 的後端 *******************/
+import * as tf from '@tensorflow/tfjs'
+import '@tensorflow/tfjs-backend-cpu'
+import '@tensorflow/tfjs-backend-webgpu'; // if chrome version 113 above you can use webgpu
+import '@tensorflow/tfjs-backend-webgl'
+// tfjs-node需要 AVX 處理器，並且 tfjs-node 函式庫使用 AVX 指令來提高其操作效能。如果你的CPU不支援AVX，你將無法使用tfjs-node。
+// import tf from'@tensorflow/tfjs-node'
 
-let isUsingCocoSsd = false // true => 用cocoSsd進行物件偵測
-let detectEnabled = false
-/********* cocoSSD model *********/
+
+/******************* cocoSSD model *******************/
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
 let cocoSsd_model
-/********* yolov8n model *********/
+/******************* yolov8n model *******************/
+// Note：網頁加載的根路徑在 vue 專案中的 'public/' 底下，所以http://localhost/yolov8n_web_model/model.json，此yolov8n_web_model位於public資料夾底下
 const model_URL = `${window.location.href}/yolov8n_web_model/model.json` 
-// Note：加載的根路徑在 vue 專案中的 'public/' 底下，所以http://localhost/yolov8n_web_model/model.json，此yolov8n_web_model位於public資料夾底下
 const yolov8n_model = reactive({
   net: null,
   inputShape: [1, 0, 0, 3],
 })
 
+let isUsingCocoSsd = false // true => 用cocoSsd進行物件偵測
+let detectEnabled = false
 
 /**
  * Load model and started to detect

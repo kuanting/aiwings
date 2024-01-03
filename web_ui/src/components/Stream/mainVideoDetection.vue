@@ -4,10 +4,13 @@
 
     <div class="mainV">
       <video ref="mainVideoRef" :srcObject="srcObject" autoplay ></video>
-      <canvas ref="mainCanvasRef"></canvas>
+      <canvas ref="mainCanvasRef"></canvas>   
     </div>
 
-    <p style="position: absolute;">{{ select_droneID }}</p>
+    <p style="position: absolute;">
+      {{ select_droneID || 'Please select drone.'}}
+      <downloadFrame :mainVideoRef="mainVideoRef" />
+    </p>
 
     <div class="info_dashboard" style="height: 60px; font-size: 13px;"> 
       <!-- 這個info_dashboard框的height要小於等於MainVideoComponent框的padding-bottom高度 -->
@@ -30,7 +33,6 @@
       <button @click="isCocoSsd = !isCocoSsd" :disabled="Detection">{{ usingModelText }}</button>
       <button @click="RotateVideo()">Rotate Video</button>
     </div>  
-    
   </div>
 
 
@@ -40,6 +42,7 @@
 import { useStore } from 'vuex'
 import { ref, computed } from '@vue/runtime-core'
 import detection from '../../lib/detection'
+import downloadFrame from './downloadFrame.vue'
 
 export default {
   name: 'monitor_mainVideoDetection',
@@ -47,6 +50,10 @@ export default {
     /* srcObject：來自父組件的媒體流 */
     srcObject: MediaStream,
     select_droneID: String,
+  },
+
+  components:{
+    downloadFrame
   },
 
   setup(props) {
