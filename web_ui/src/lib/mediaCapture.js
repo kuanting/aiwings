@@ -1,3 +1,6 @@
+import user from '../services/user'
+import { notification } from 'ant-design-vue'
+
 /**
  * 從指定的 HTML5 <video> 元素的影像錄影並下載
  * @param {HTMLVideoElement} video
@@ -10,6 +13,8 @@ export class videoElementRecorder {
     this.id = id
     this.chunks = [];
     this.mediaRecorder = null;
+    this.testBlob = null
+
     this.initMediaRecorder(); // 初始化 MediaRecorder
   }
 
@@ -18,14 +23,24 @@ export class videoElementRecorder {
     this.mediaRecorder = new MediaRecorder(stream); // 創建一个 MediaRecorder 對象
 
     // 定義mediaRecorder的事件被觸發時的處理方法
-    this.mediaRecorder.onstart = () => this.chunks = []; // 初始化陣列
-    this.mediaRecorder.ondataavailable = e => this.chunks.push(e.data); // 取得目前存取的byteArray【在結束錄製時才會觸發】
+    this.mediaRecorder.onstart = () => {
+      this.chunks = []; // 初始化陣列
+      this.testBlob = null
+    }
+    this.mediaRecorder.ondataavailable = e => { //有足夠的音頻或視頻數據被緩衝，或結束錄製時，ondataavailable 事件就會觸發。【這樣避免了數鴂Blob過大】
+      console.log("e.data = ",e.data) //型態是blob
+      this.testBlob = e.data
+      this.chunks.push(e.data); // 將blob存入陣列
+    }
     this.mediaRecorder.onstop = () => {
+      console.log("this.chunks[0].stream() = ",this.chunks[0].stream()) //返回值：ReadableStream，讀取時傳回 Blob 的內容
+
       const blob = new Blob(this.chunks, { type: "video/webm" });
       if(blob){
         const currentTime = getDateTimeString()
         console.log(`結束錄製時間: ${currentTime}`);
         downloadBlob(blob, `${this.id} ${currentTime}.webm`)
+        saveBlobToBackend(blob, "userName", this.id, `${currentTime}.webm`)
       }
     };
   }
@@ -52,19 +67,27 @@ export class videoElementRecorder {
   getRecordingStatus(){
     return this.mediaRecorder.state
   }
+
+  getVideoBlob()
+  {
+    return this.testBlob
+  }
 }
 
 
+// 也可以後端去取得用戶名稱，只是會變成一直開啟關閉DB連線不太好，還沒想到更好的方法
 /**
  * 從指定的 HTML5 <video> 元素的影像連續截圖並下載。
  * @param {HTMLVideoElement} video
  * @param {HTMLCanvasElement} canvas
+ * @param {String} userName
  * @param {String} id
  */
 export class videoElementScreenshot {
-  constructor(video, canvas, id) {
+  constructor(video, canvas, userName, id) {
     this.video = video;
     this.canvas = canvas;
+    this.userName = userName
     this.id = id;
     this.continuousCapture = false
     // this.myReqId = null
@@ -122,7 +145,8 @@ export class videoElementScreenshot {
     this.canvas.toBlob(async(blob)=>{
       // console.log("blob = ",blob)
       if(blob){
-        downloadBlob(blob, `${this.id} ${currentTime}.png`) //前端網頁存取
+        // downloadBlob(blob, `${this.id} ${currentTime}.png`) //前端網頁存取
+        saveBlobToBackend(blob, this.userName, this.id, `${currentTime}.png`) //上傳到後端存取
       }
     })
   }
@@ -159,3 +183,57 @@ export function getDateTimeString(){
 
   return `${year}${month}${day}_${hours}${minutes}${seconds}.${milliseconds}`
 }
+
+/**
+ * 將截圖儲存到後端【no 影片，影片檔案太大不合適】
+ * @param {Blob} blob
+ * @param {String} droneID
+ * @param {string} filename
+ */
+export async function saveBlobToBackend(blob, userName, droneID, filename){
+  if(blob){
+    let fd = new FormData(); // 創建 FormData 來傳送 blob
+    fd.append('files', blob);
+    fd.append('userName', userName);
+    fd.append('droneID', droneID);
+    fd.append('fileName', filename);
+    // console.log("fd.get('files') = ",fd.get('files'))     
+
+    const { data, status } = await user.saveDroneVideoBlob(fd)
+    console.log("message from backend: ",data.msg)
+
+    if(status >= 400){
+      notification.success({ message: data.msg }) 
+    }
+  }
+}
+
+
+/** 分段上傳(還在測試) */
+// export async function uploadFileByChunks(blob, userName, droneID, filename){
+//   if(!blob){
+//     console.log("沒有數續")
+//     return
+//   }
+//   console.log("有Blob", blob.length
+//   )
+//   for(let i=0;  i<blob.length
+//     ; i++){
+//     let fd = new FormData(); // 創建 FormData 來傳送 blob
+//     fd.append('files', blob[i]);
+//     fd.append('userName', userName);
+//     fd.append('droneID', droneID);
+//     fd.append('fileName', filename);
+
+//     if(i == (blob.length-1))
+//       fd.append('isEND', true);
+//     else
+//       fd.append('isEND', false);
+
+
+//     const { data } = await user.testSaveVideo(fd)
+//     console.log("message from backend: ",data.msg)
+
+//   }
+
+// }

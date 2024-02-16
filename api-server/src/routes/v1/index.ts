@@ -20,6 +20,16 @@ router.post("/user/edit_droneId", verifyTokens, user.editUserDroneId);
 router.post("/user/add_drones", verifyTokens, user.addNewDrone);
 router.post("/user/delete_drones", verifyTokens, user.deleteDrone);
 
+var multer  = require('multer')
+const upload = multer()
+router.post("/user/saveDroneVideoBlob", verifyTokens, upload.array("files"), user.saveDroneVideoBlob);
+
+
+// // 分段接收(還在測試)
+// router.post("/user/test", verifyTokens, upload.array("files"), user.test);
+
+
+
 // router.get('/drone/records', verifyTokens, drone.getFlightRecords);
 // router.get('/drone/records/:id', verifyTokens, drone.getFlightRecord);
 // router.post('/drone/records', verifyTokens, drone.saveFlightRecords);
