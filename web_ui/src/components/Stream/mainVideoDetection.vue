@@ -7,9 +7,8 @@
       <canvas ref="mainCanvasRef"></canvas>   
     </div>
 
-    <p style="position: absolute;">
+    <p style="position: absolute;   background-color: rgba(255, 255, 255, 0.2);">
       {{ select_droneID || 'Please select drone.'}}
-      <downloadFrame :mainVideoRef="mainVideoRef" />
     </p>
 
     <div class="info_dashboard" style="height: 60px; font-size: 13px;"> 
@@ -42,7 +41,6 @@
 import { useStore } from 'vuex'
 import { ref, computed } from '@vue/runtime-core'
 import detection from '../../lib/detection'
-import downloadFrame from './downloadFrame.vue'
 
 export default {
   name: 'monitor_mainVideoDetection',
@@ -50,10 +48,6 @@ export default {
     /* srcObject：來自父組件的媒體流 */
     srcObject: MediaStream,
     select_droneID: String,
-  },
-
-  components:{
-    downloadFrame
   },
 
   setup(props) {
