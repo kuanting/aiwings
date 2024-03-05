@@ -46,6 +46,7 @@
 import { useStore } from 'vuex'
 import { computed, reactive, ref } from '@vue/runtime-core'
 // import useMapbox from '../../hooks/useMapbox'
+import { droneInfoInit } from '../../lib/transformDataFormat'
 
 export default {
   name: 'droneInfoDashBoard',
@@ -55,12 +56,7 @@ export default {
     const user = computed(() => store.getters.getUserInfo)    
     const dronesInfo = computed(() => store.getters['drone/getDroneInfo'] )
 
-    /****** 初始化 所有drone 的狀態資訊 *****/ 
-    // 定義要顯示的drone資訊基本欄位
-    const droneInfoInit = { 
-      timeStamp: '', roll: null, yaw: null, pitch: null, voltage: null, percentage: null, hpop: null, gpsCount: null, mode: '', isArmed: '', heading: null, latitude: null, longitude: null, altitude: null, speed: null, status: { altitude: 3, isTakeoff: false }, destination: { lng: null, lat: null} 
-    }
-    // 初始化所有drone 的狀態資訊欄
+    /****** 初始化 所有drone 的狀態資訊欄 *****/ 
     // const userDrones = computed(()=> { return user.value.droneId })
     const userDrones = user.value.droneId
     for (let i in userDrones) {
