@@ -2,7 +2,7 @@
   <div class="wrap">
     
     <div class="main_frame frame_container" > 
-      <mainVideoDetection :srcObject="VideoSrcObject" :select_droneID="select_droneID"/>     
+      <MainVideoArea :srcObject="VideoSrcObject" :select_droneID="select_droneID"/>     
     </div>
 
     <div class="sub_frame frame_container">
@@ -44,14 +44,14 @@ import {
   getLocalStream
 } from '../../lib/webRTC'
 import { message } from 'ant-design-vue'
-import mainVideoDetection from './mainVideoDetection.vue'
+import MainVideoArea from './MainVideoArea.vue'
 import { transformDataFormat } from '../../lib/transformDataFormat'
 import mediaAllDownloader from './mediaAllDownloader.vue'
 
 export default {
   name: 'monitor',
   components:{
-    mainVideoDetection,
+    MainVideoArea,
     mediaAllDownloader
   },
 

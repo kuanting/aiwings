@@ -41,9 +41,10 @@
 import { useStore } from 'vuex'
 import { ref, computed } from '@vue/runtime-core'
 import detection from '../../lib/detection'
+import { droneInfoInit } from '../../lib/transformDataFormat'
 
 export default {
-  name: 'monitor_mainVideoDetection',
+  name: 'MainVideoArea',
   props: {
     /* srcObject：來自父組件的媒體流 */
     srcObject: MediaStream,
@@ -106,10 +107,6 @@ export default {
 
     /**************** 取得指定droneId的狀態資料 ********************* */
     const store = useStore()
-    // 定義要顯示的drone資訊基本欄位
-    const droneInfoInit = { 
-      timeStamp: '', roll: null, yaw: null, pitch: null, voltage: null, percentage: null, hpop: null, gpsCount: null, mode: '', isArmed: '', heading: null, latitude: null, longitude: null, altitude: null, speed: null, status: { altitude: 3, isTakeoff: false }, destination: { lng: null, lat: null} 
-    }
     // 取得當前select_droneID的無人機資訊，如果 undefined 則顯示 droneInfoInit
     const SpecificDroneInfo =  computed(() => {
       return store.getters['drone/getSpecificDroneInfo'](props.select_droneID)

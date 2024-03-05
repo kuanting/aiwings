@@ -25,3 +25,7 @@ pnpm-debug.log*
 
 #firebase
 .firebase
+
+
+# Ignore test files
+**/test.*
