@@ -132,6 +132,11 @@ export default createStore({
     getRabbitmqAdminIsInit(state) {
       return state.rabbitmqAdminIsInit
     },
+    getUserDroneIdNames(state){
+      return state.user.droneId.map(item => item.id);
+      // return state.user.droneId.filter(item => item.id);
+      // return state.user.droneId.filter(item => ({ id: item.id }));
+    }
   },
   modules: {
     // Dedicate modules for drone-related
