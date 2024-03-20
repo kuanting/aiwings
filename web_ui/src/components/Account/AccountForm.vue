@@ -12,9 +12,10 @@
       type="email"
     />
     <!-- 顯示所有droneID的編輯組件 -->
-    <div v-for="(drone,index) in userDroneIdNames" :key="drone" class="droneId__wrapper">
-      <DroneIdEditor :droneId="drone"/>
+    <div v-for="droneId in userDroneIdNames" :key="droneId" style="width: 100%;">
+      <DroneIdEditor :droneId="droneId"/>
     </div>
+    <a-divider />
   </div>
 
   
@@ -86,16 +87,5 @@ export default {
     margin-bottom: 2rem;
   }
 
-  .droneId__wrapper {
-    width: 100%;
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    margin: 5px;
-
-    .droneId__button {
-      margin-left: 5px;
-    }
-  }
 }
 </style>

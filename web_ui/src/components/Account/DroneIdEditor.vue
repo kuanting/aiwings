@@ -1,6 +1,6 @@
 <template>
   <!-- <div v-for="(drone,index) in userAllDroneIdName" :key="drone" class="droneId__wrapper"> -->
-  <div class="droneId__wrapper">    
+  <div class="droneId__wrapper">     
     <a-input
       ref="inputRef"
       v-model:value= "editingValue"
@@ -15,13 +15,13 @@
     <!-- 編輯droneID按鈕 -->
     <a-button
       class="droneId__button"
-      type="primary"
+      :type="isEditing ? 'primary' : 'default'"
       html-type="button"
       :loading="isSubmitting"
 
-      shape="round"
-      size="default"
+      size="large"
       @click="()=>handleDroneIdEdit()"
+      style=" margin-right: 5px;"
     >
       <EditOutlined v-if="!isEditing"/>
       <CheckOutlined v-if="isEditing"/>
@@ -49,7 +49,7 @@ import { nextTick } from '@vue/runtime-core'
 import user from '../../services/user'
 import Button from '../UI/Button.vue'
 import { notification } from 'ant-design-vue'
-import { DeleteOutlined, EditOutlined, CheckOutlined} from '@ant-design/icons-vue'
+import { DeleteOutlined, EditOutlined, CheckOutlined, MoreOutlined} from '@ant-design/icons-vue'
 
 // import Enroll from '../Enroll_drones/Enroll.vue'
 
@@ -60,7 +60,8 @@ export default {
     // Enroll,
     DeleteOutlined,
     EditOutlined,
-    CheckOutlined
+    CheckOutlined,
+    MoreOutlined
   },
   props:{
     /* 將顯示在輸入框的Id */
@@ -74,7 +75,7 @@ export default {
     const isEditing = ref(false)
     const isSubmitting = ref(false)
 
-
+    const suffix = ref("~")
     /* 按下編輯按鈕觸發的函式 */
     const handleDroneIdEdit = async () => {
       console.log("---handleDroneIdEdit 函式---") 
@@ -155,6 +156,8 @@ export default {
       isEditing,
       isSubmitting,
 
+      suffix,
+
       handleDroneIdEdit,
       // handleDroneIdEditCancel,
       deleteDrone,
@@ -164,28 +167,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.content__wrapper {
-  padding-top: 3rem;
-  width: 400px;
+.droneId__wrapper {
+  width: calc(100% + 40px);
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin: 0 15px;
-
-  .content__input {
-    margin-bottom: 2rem;
-  }
-
-  .droneId__wrapper {
-    width: 100%;
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    margin: 5px;
-
-    .droneId__button {
-      margin-left: 5px;
-    }
-  }
+  flex-wrap: nowrap;
+  align-items: center;
+  margin-bottom: 20px;
 }
 </style>
