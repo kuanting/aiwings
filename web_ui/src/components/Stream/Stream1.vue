@@ -396,7 +396,7 @@ export default {
   flex-direction: column;
   
   .mediaAllDownloader{
-    padding-left: 5px;
+    // padding-left: 5px;
     margin-bottom: 7px;
     border-radius: 3%;
     background: #7aaabf;

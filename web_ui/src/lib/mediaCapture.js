@@ -4,16 +4,18 @@ import { notification } from 'ant-design-vue'
 /**
  * 從指定的 HTML5 <video> 元素的影像錄影並下載
  * @param {HTMLVideoElement} video
- * @param {String} id
+ * @param {String} id - droneID
+ * @param {String} saveLocation - 其值為 "frontend(預設)" 或 "backend"
  */
 
 export class videoElementRecorder {
-  constructor(video, id) {
+  constructor(video, id, saveLocation="frontend") {
     this.video = video;
     this.id = id
     this.chunks = [];
     this.mediaRecorder = null;
     this.testBlob = null
+    this.saveLocation = saveLocation
 
     this.initMediaRecorder(); // 初始化 MediaRecorder
   }
@@ -39,8 +41,11 @@ export class videoElementRecorder {
       if(blob){
         const currentTime = getDateTimeString()
         console.log(`結束錄製時間: ${currentTime}`);
-        downloadBlob(blob, `${this.id} ${currentTime}.webm`)
-        saveBlobToBackend(blob, "userName", this.id, `${currentTime}.webm`)
+        if (this.saveLocation == "frontend"){
+          downloadBlob(blob, `${this.id} ${currentTime}.webm`)
+        }else if(this.saveLocation == "backend"){
+          saveBlobToBackend(blob, "userName", this.id, `${currentTime}.webm`)
+        }
       }
     };
   }
@@ -81,15 +86,17 @@ export class videoElementRecorder {
  * @param {HTMLVideoElement} video
  * @param {HTMLCanvasElement} canvas
  * @param {String} userName
- * @param {String} id
+ * @param {String} id - droneID
+ * @param {String} saveLocation - 其值為 "frontend(預設)" 或 "backend"
  */
 export class videoElementScreenshot {
-  constructor(video, canvas, userName, id) {
+  constructor(video, canvas, userName, id, saveLocation="frontend") {
     this.video = video;
     this.canvas = canvas;
     this.userName = userName
     this.id = id;
     this.continuousCapture = false
+    this.saveLocation = saveLocation
     // this.myReqId = null
   }
   
@@ -145,8 +152,12 @@ export class videoElementScreenshot {
     this.canvas.toBlob(async(blob)=>{
       // console.log("blob = ",blob)
       if(blob){
-        // downloadBlob(blob, `${this.id} ${currentTime}.png`) //前端網頁存取
-        saveBlobToBackend(blob, this.userName, this.id, `${currentTime}.png`) //上傳到後端存取
+        if(this.saveLocation == "frontend"){
+          downloadBlob(blob, `${this.id} ${currentTime}.png`) //前端網頁存取
+        }
+        else if(this.saveLocation == "backend"){
+          saveBlobToBackend(blob, this.userName, this.id, `${currentTime}.png`) //上傳到後端存取
+        }
       }
     })
   }
@@ -185,7 +196,7 @@ export function getDateTimeString(){
 }
 
 /**
- * 將截圖儲存到後端【no 影片，影片檔案太大不合適】
+ * 將截圖儲存到後端【no 影片，影片檔案太大不合適，大檔案影片尚未成功】
  * @param {Blob} blob
  * @param {String} droneID
  * @param {string} filename
