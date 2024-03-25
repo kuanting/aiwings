@@ -1,19 +1,67 @@
 <template>
   <div class="media-capture-section">
     <div class="feature-box">
-      Screenshot
-      <button class="btn-Start" @click="oneScreenshot()">CaptureOne</button>
+      <IconAnimate 
+        :method="selectedMethod.value=='1' ? 'record' : 'camera'"
+        :isStart="isStart" 
+      />
+      <div style="display: flex; flex-wrap: wrap; align-items: center;">
+        <a-select
+          v-model:value="selectedMethod"
+          label-in-value
+          :options="saveMethodOptions"
+          @change="handleMethodChange"
+          :disabled="isStart"
+          dropdownClassName=""
+          style="width: 170px"
+          size="small"
+        ></a-select>
+        
+        <a-select
+          v-model:value="selectedLocation"
+          label-in-value
+          :options="saveLocationOptions"
+          @change="handleLocationChange"
+          :disabled="isStart"
+          dropdownClassName=""
+          style="width: 110px; height: 20px"
+          size="small"
+        ></a-select>
+
+        <!-- 截圖 -->
+        <a-button v-if="selectedMethod.label == saveMethodOptions[2].label"
+          class="btn-Start"
+          size="small"
+          html-type="button"
+          @click="oneScreenshot()"
+          style="width: 55px;"
+        >
+          Capture <DownloadOutlined />
+        </a-button>
+
+        <!-- 連續截圖或錄影 -->
+        <div v-else>
+          <a-button v-if="!isStart"
+            class="btn-Start"
+            size="small"
+            html-type="button"
+            @click="saveFrames()"
+          >
+            start
+          </a-button>
+          <a-button v-if="isStart"
+          class="btn-Start"
+          size="small"
+          html-type="button"
+          @click="saveFrames()"
+          >
+            stop <DownloadOutlined />
+          </a-button>
+        </div>
+      </div>
     </div>
-    <div class="feature-box">
-      Continuous Screenshot
-      <button v-if="!isContinuousCapture" class="btn-Start" @click="allStartContinuousCapture()" >Start</button>
-      <button v-else class="btn-Stop" @click="allStopContinuousCapture()" >Stop</button>
-    </div>
-    <div class="feature-box">
-      Record
-      <button v-if="!isRecording" class="btn-Start" @click="allStartRecord()">Start</button>
-      <button v-else class="btn-Stop" @click="allStopRecord()">Stop</button>
-    </div>
+
+
     <div v-for="drone in droneArr">
       <!-- 創建從網頁端截圖影像並下載所需的 <canvas> 元素 -->
       <canvas :ref="el => canvasRefMap[drone.id]=el" style="display: none;"></canvas>
@@ -25,24 +73,30 @@
 import { useStore } from 'vuex'
 import { onMounted, ref, reactive, computed } from '@vue/runtime-core'
 import { notification } from 'ant-design-vue'
+import { DownloadOutlined } from '@ant-design/icons-vue'
 
 import {videoElementRecorder , videoElementScreenshot} from '../../lib/mediaCapture'
+import IconAnimate from './IconAnimate.vue'
+
 export default {
   name: 'downloadFrame',
   props: {
     /* srcObject：來自父組件的所有影像Element */
     videoRefs: Array,
   },
-
+  components:{
+    DownloadOutlined,
+    IconAnimate
+  },
   setup(props) {
     const store = useStore()
     const userInfo = computed(() => store.getters.getUserInfo)
     const username = computed(() => store.getters.getUsername)
     const droneArr = userInfo.value.droneId
 
-    const isContinuousCapture = ref(false)
-    const isRecording = ref(false)
-    /*******************************************************/
+    // const isContinuousCapture = ref(false)
+    // const isRecording = ref(false)
+    /*******************************************************/   
     const canvasRefMap = reactive({}) // 存放所有canvas標籤的Ref
     const videoRecords = reactive({})         // 存放所有id的videoElementRecorder
     const continueScreenshots = reactive({})  // 存放所有id的videoElementScreenshot
@@ -58,12 +112,56 @@ export default {
         continueScreenshots[drone.id] = new videoElementScreenshot(props.videoRefs[drone.id], canvasRefMap[drone.id], username, drone.id)
       }
     })
+    
+    /*******************************************************/
+    // a-select 的 選項格式：{value: 數字或字串, label: 數字或字串, key: 數字或字串(會自動同value)}
+    // label 才是顯示的名稱
+    const saveMethodOptions = reactive([
+      {value: "1", label: "Record" },
+      {value: "2", label: "Continuous Screenshot" },
+      {value: "3", label: "Screenshot" }
+    ])
+    const selectedMethod = ref(saveMethodOptions[0]) // 預設顯示saveMethodOptions的第1項的label字樣  
+    const handleMethodChange = (value)=>{
+      console.log("handleMethodChange value = ",value, value.value)
+      selectedMethod.value = value
+    }
+
+    const saveLocationOptions = reactive([
+      {value: "frontend", label: "Download" },       // 前端網頁下載儲存
+      {value: "backend", label: "Backend Save" },   // 儲存到後端
+    ])
+    const selectedLocation = ref(saveLocationOptions[0]) // 預設顯示saveLocationOptions的第1項的label字樣  
+    const handleLocationChange = (value)=>{
+      console.log("handleLocationChange value = ",value, value.value)
+      selectedLocation.value = value
+    }
+
+    /*******************************************************/
+    const isStart = ref(false)
+
+    const saveFrames = ()=>{
+      const currentMethod = selectedMethod.value.label
+      if(!isStart.value){
+        // Start "Record"
+        if(currentMethod == saveMethodOptions[0].label) allStartRecord()
+        // Start "Continuous Screenshot"
+        else if(currentMethod == saveMethodOptions[1].label) allStartContinuousCapture()
+      }else{
+        // Stop "Record"
+        if(currentMethod == saveMethodOptions[0].label) allStopRecord()
+        // Stop "Continuous Screenshot"
+        else if(currentMethod == saveMethodOptions[1].label) allStopContinuousCapture()
+      }
+    }
+    /*******************************************************/
 
     /*******************************************************/
     const allStartContinuousCapture = () =>{
       const noImageId = reactive([])
       for(const drone of droneArr){
         if(props.videoRefs[drone.id].srcObject?.active == true){
+          continueScreenshots[drone.id].saveLocation=selectedLocation.value.value
           continueScreenshots[drone.id].startContinuousCapture()
         }else{
           console.log(`id :${drone.id} 沒有影像`)
@@ -73,8 +171,10 @@ export default {
 
       if(noImageId.length == droneArr.length)
         notification.info({ message: `No images available for capture`})
-      else
-        isContinuousCapture.value = true
+      else{
+        isStart.value = true
+      }
+        // isContinuousCapture.value 
     }
 
     const allStopContinuousCapture = () =>{
@@ -85,7 +185,8 @@ export default {
           console.log(`id :${drone.id} 沒有啟動連續截圖`)
         }
       }
-      isContinuousCapture.value = false
+      isStart.value = false
+      // isContinuousCapture.value 
     }
 
     /************** 影像錄製 *********************** */
@@ -94,6 +195,7 @@ export default {
       for(const drone of droneArr){
         // 錄影開始
         if(props.videoRefs[drone.id].srcObject){
+          videoRecords[drone.id].saveLocation=selectedLocation.value.value
           videoRecords[drone.id].startRecord()
         }else{
           console.log(`id :${drone.id} 沒有影像`)
@@ -103,8 +205,10 @@ export default {
 
       if(noImageId.length == droneArr.length)
         notification.info({ message: `No video available for recording`})
-      else
-        isRecording.value = true
+      else{
+        isStart.value = true
+      }
+        // isRecording.value 
     }
 
     const allStopRecord = ()=>{
@@ -116,33 +220,41 @@ export default {
           console.log(`id :${drone.id} 沒有錄影`)
         }
       }
-      isRecording.value = false
+      isStart.value = false
+      // isRecording.value 
     }
 
     /************** 影像截圖 *********************** */
     const oneScreenshot = ()=>{
+      const noImageId = reactive([])
       for(const drone of droneArr){
         if(props.videoRefs[drone.id].srcObject){
           // 單個截圖
+          continueScreenshots[drone.id].saveLocation = selectedLocation.value.value
           continueScreenshots[drone.id].screenshot()
         }else{
           console.log(`id :${drone.id} 沒有影像`)
+          noImageId.push(drone.id)
         }
-      }      
+      }
+      if(noImageId.length == droneArr.length)
+        notification.info({ message: `No video available for capturing`})
     }
 
     return {
+      selectedMethod,
+      saveMethodOptions,
+      handleMethodChange,
+      selectedLocation,
+      saveLocationOptions,
+      handleLocationChange,
+
+      isStart,
+      saveFrames,
+
       droneArr,
       canvasRefMap,
 
-      isContinuousCapture,
-      isRecording,
-
-      allStartContinuousCapture,
-      allStopContinuousCapture,
-      // create_mediaRecorder,
-      allStartRecord,
-      allStopRecord,
       oneScreenshot
     }
   }
