@@ -4,10 +4,12 @@
 
     <div class="mainV">
       <video ref="mainVideoRef" :srcObject="srcObject" autoplay ></video>
-      <canvas ref="mainCanvasRef"></canvas>
+      <canvas ref="mainCanvasRef"></canvas>   
     </div>
 
-    <p style="position: absolute;">{{ select_droneID }}</p>
+    <p style="position: absolute;   background-color: rgba(255, 255, 255, 0.2);">
+      {{ select_droneID || 'Please select drone.'}}
+    </p>
 
     <div class="info_dashboard" style="height: 60px; font-size: 13px;"> 
       <!-- 這個info_dashboard框的height要小於等於MainVideoComponent框的padding-bottom高度 -->
@@ -30,7 +32,6 @@
       <button @click="isCocoSsd = !isCocoSsd" :disabled="Detection">{{ usingModelText }}</button>
       <button @click="RotateVideo()">Rotate Video</button>
     </div>  
-    
   </div>
 
 
@@ -40,9 +41,10 @@
 import { useStore } from 'vuex'
 import { ref, computed } from '@vue/runtime-core'
 import detection from '../../lib/detection'
+import { droneInfoInit } from '../../lib/transformDataFormat'
 
 export default {
-  name: 'monitor_mainVideoDetection',
+  name: 'MainVideoArea',
   props: {
     /* srcObject：來自父組件的媒體流 */
     srcObject: MediaStream,
@@ -105,10 +107,6 @@ export default {
 
     /**************** 取得指定droneId的狀態資料 ********************* */
     const store = useStore()
-    // 定義要顯示的drone資訊基本欄位
-    const droneInfoInit = { 
-      timeStamp: '', roll: null, yaw: null, pitch: null, voltage: null, percentage: null, hpop: null, gpsCount: null, mode: '', isArmed: '', heading: null, latitude: null, longitude: null, altitude: null, speed: null, status: { altitude: 3, isTakeoff: false }, destination: { lng: null, lat: null} 
-    }
     // 取得當前select_droneID的無人機資訊，如果 undefined 則顯示 droneInfoInit
     const SpecificDroneInfo =  computed(() => {
       return store.getters['drone/getSpecificDroneInfo'](props.select_droneID)

@@ -2,13 +2,12 @@
   <a-form
     ref="formRef"
     name="dynamic_form_item"
+    layout="vertical"
     :model="dynamicValidateForm"
-    v-bind="formItemLayoutWithOutLabel"
   >
     <a-form-item
       v-for="(drone, index) in dynamicValidateForm.drones"
       :key="drone.key"
-      v-bind="index === 0 ? formItemLayout : {}"
       :label="index === 0 ? 'DroneID' : ''"
       :name="['drones', index, 'value']"
       :rules="{
@@ -16,11 +15,12 @@
         message: 'drone can not be null',
         trigger: 'change'
       }"
+      style="width: calc(100% + 40px);"
     >
       <a-input
         v-model:value="drone.value"
         placeholder="Input your droneID"
-        style="width: 80%; margin-right: 10px"
+        style="width: calc(100% - 40px); margin-right: 10px"
       />
       <MinusCircleOutlined
         v-if="dynamicValidateForm.drones.length > 1"
@@ -29,13 +29,13 @@
         @click="removeDrone(drone)"
       />
     </a-form-item>
-    <a-form-item v-bind="formItemLayoutWithOutLabel">
-      <a-button type="dashed" style="width: 80%" @click="addDrone">
+    <a-form-item>
+      <a-button type="dashed" style="width: 100%;" @click="addDrone">
         <PlusOutlined />
         Add Drone
       </a-button>
     </a-form-item>
-    <a-form-item v-bind="formItemLayoutWithOutLabel">
+    <a-form-item style="text-align: center;">
       <a-button type="primary" html-type="submit" @click="submitForm"
         >Submit</a-button
       >
@@ -47,7 +47,7 @@
 import { notification } from 'ant-design-vue'
 import user from '../../services/user'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons-vue'
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, reactive, ref , computed} from 'vue'
 import store from '../../store'
 export default defineComponent({
   components: {
@@ -57,36 +57,6 @@ export default defineComponent({
 
   setup() {
     const formRef = ref()
-    const formItemLayout = {
-      labelCol: {
-        xs: {
-          span: 24
-        },
-        sm: {
-          span: 4
-        }
-      },
-      wrapperCol: {
-        xs: {
-          span: 24
-        },
-        sm: {
-          span: 20
-        }
-      }
-    }
-    const formItemLayoutWithOutLabel = {
-      wrapperCol: {
-        xs: {
-          span: 24,
-          offset: 0
-        },
-        sm: {
-          span: 20,
-          offset: 4
-        }
-      }
-    }
     const dynamicValidateForm = reactive({
       drones: []
     })
@@ -102,26 +72,31 @@ export default defineComponent({
             droneId.push(element.value)
           })
           // console.log('enroll.vue: ', droneId)
+          // 將表單中的所有 droneID 新增置後端
           const { data } = await user.enrollDroneId({ droneId: droneId })
-          //here
-          console.log("here: ", droneId)
-          //這邊有問題
-          //update 【更新store】
-          for (let drone of droneId){
-            console.log(drone)
-            store.commit('addNewDroneID', drone)
-          }
-          //origin
-          // store.commit(droneId)
-          // store.commit('setUserDroneID', droneId)
-
           notification.success({
             message: data.msg
           })
+
+          // 更新store
+          updateUserInfo()
+          // 新增ID後，清空表單
+          dynamicValidateForm.drones = []
         })
         .catch((error) => {
           console.log('error', error)
         })
+    }
+
+    const userInfo = computed(() => store.getters.getUserInfo)
+    const droneArr = computed(() => userInfo.value.droneId)
+    /** 更新store 【更新全域變數與後端同步】 */
+    const updateUserInfo =async()=>{
+      const { data } = await user.getUserInfo()
+      store.dispatch('setUserInfo', data) 
+      //origin
+      // store.commit(droneId)
+      // store.commit('setUserDroneID', droneId)
     }
 
     const resetForm = () => {
@@ -144,8 +119,10 @@ export default defineComponent({
 
     return {
       formRef,
-      formItemLayout,
-      formItemLayoutWithOutLabel,
+      // formItemLayout,
+      // formItemLayoutWithOutLabel,
+      droneArr,
+
       dynamicValidateForm,
       submitForm,
       resetForm,
@@ -172,6 +149,6 @@ export default defineComponent({
   opacity: 0.5;
 }
 .ant-form {
-  width: 500px;
+  width: 100%;
 }
 </style>

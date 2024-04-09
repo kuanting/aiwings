@@ -26,5 +26,31 @@
    async deleteDroneId(droneId) {
      return await axios.post('/user/delete_drones', droneId)
    },
+
+   // Save video screenshots of front-end users to the back-end
+  async saveDroneVideoBlob(formData) {
+    return await axios.post(
+      '/user/saveDroneVideoBlob', 
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    )
+  },
+
+  // 分段上傳(還在測試)
+  // async testSaveVideo(formData) {
+  //   return await axios.post(
+  //     '/user/test', 
+  //     formData,
+  //     {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     }
+  //   )
+  // }
  }
  

@@ -33,8 +33,8 @@ services:
       - '5672:5672'
       - '15672:15672'
     environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_SERVICE_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_SERVICE_PASSWORD}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_SERVICE_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_SERVICE_PASSWORD}
       # 若未設定，預設使用者名稱和密碼為guest/ guest
       # ${RABBITMQ_SERVICE_USER}來自環境變數.env檔案內容
 
@@ -48,7 +48,7 @@ services:
     ports:
       - '3306:3306'
     environment:
-      MYSQL_ROOT_PASSWORD: password # root password 可自行設定
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: drone_cloud_test
       MYSQL_USER: ${MYSQL_SERVICE_USER}
       MYSQL_PASSWORD: ${MYSQL_SERVICE_PASSWORD}
@@ -64,14 +64,22 @@ services:
     depends_on: 
       - rabbitmq_service
       - mysql_service
+      # rabbitmq_service、mysql_service是前面建立好的服務
     ports:
       - '3080:3080'
     environment:
-      - RABBITMQ_SERVICE_SERVICE_HOST=${RABBITMQ_SERVICE_SERVICE_HOST}
-      - MYSQL_SERVICE_SERVICE_HOST=${MYSQL_SERVICE_SERVICE_HOST}
-      # rabbitmq_service、mysql_service是前面建立好的服務
-    env_file:
-      - ./.env
+      # RabbitMQ connection parameters
+      RABBITMQ_SERVICE_SERVICE_HOST: ${RABBITMQ_SERVICE_SERVICE_HOST}
+      RABBITMQ_SERVICE_SERVICE_PORT: ${RABBITMQ_SERVICE_SERVICE_PORT}
+      RABBITMQ_SERVICE_USER: ${RABBITMQ_SERVICE_USER}
+      RABBITMQ_SERVICE_PASSWORD: ${RABBITMQ_SERVICE_PASSWORD}
+      # MySQL connection parameters
+      MYSQL_SERVICE_SERVICE_HOST: ${MYSQL_SERVICE_SERVICE_HOST}
+      MYSQL_SERVICE_SERVICE_PORT: ${MYSQL_SERVICE_SERVICE_PORT}
+      MYSQL_SERVICE_USER: ${MYSQL_SERVICE_USER}
+      MYSQL_SERVICE_PASSWORD: ${MYSQL_SERVICE_PASSWORD}
+    # env_file:
+    #   - ./.env
     # 透過environment或env_file加入系統環境變數的話，就要到容器中修改系統環境變數，用掛載的話則是容易更改【思考後覺得不必要】
     # 其他容器服務名稱好像要透過系統環境變數，才可被解析成區域IP
     # volumes:
@@ -90,8 +98,8 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      - URL_FRONTEND=localhost
-      - URL_BACKEND=backend
+      URL_FRONTEND: ${URL_FRONTEND}
+      URL_BACKEND: backend
     # volumes:
     # - ./ssl/:/etc/nginx/ssl/
 

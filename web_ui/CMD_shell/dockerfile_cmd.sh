@@ -1,4 +1,4 @@
-# shell 脚本
+# shell 脚本【注意：須以 LF 行尾順序格式進行存檔】
 # dockerfile中，只有最後一個CMD會生效，所以如果要多個指令，必須用shell腳本
 
 
