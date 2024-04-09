@@ -2,12 +2,15 @@
   <div class="wrap">
     
     <div class="main_frame frame_container" > 
-      <mainVideoDetection :srcObject="VideoSrcObject" :select_droneID="select_droneID"/>     
+      <MainVideoArea :srcObject="VideoSrcObject" :select_droneID="select_droneID"/>     
     </div>
 
-    <div class="select_frame frame_container">
-      <!------------------------------------------->
-      <!-- <div class="subvideo_content"> -->
+    <div class="sub_frame frame_container">
+      <div class="mediaAllDownloader">
+        <mediaAllDownloader :videoRefs="remoteSubVideoEl" />
+      </div>
+      <div class="select_frame ">  
+        <!------------------------------------------->
         <div v-for="index in droneArr" class="subVideoStream">
           <div class="details">
             <h3>{{ index.id }}</h3>
@@ -22,8 +25,8 @@
             "
           ></video>
         </div>
-      <!-- </div> -->
-      <!------------------------------------------->
+        <!------------------------------------------->
+      </div>
     </div>
 
   </div>
@@ -41,15 +44,15 @@ import {
   getLocalStream
 } from '../../lib/webRTC'
 import { message } from 'ant-design-vue'
-
-
-import mainVideoDetection from './mainVideoDetection.vue'
+import MainVideoArea from './MainVideoArea.vue'
 import { transformDataFormat } from '../../lib/transformDataFormat'
+import mediaAllDownloader from './mediaAllDownloader.vue'
 
 export default {
   name: 'monitor',
   components:{
-    mainVideoDetection
+    MainVideoArea,
+    mediaAllDownloader
   },
 
   setup() {
@@ -381,20 +384,33 @@ export default {
   // background: rgb(23, 151, 68, 0.3);
   background: #4f6d7a;
 
-
   /***** 定位 *****/
   position: relative;
 }
-.select_frame {
+.sub_frame{
   width: 20%;
-  min-width: 200px;
-  // height: 100%;//讓高度自動調整
-
+  min-width: 260px;
+  background: #6c96a8;
   /***** flex 外元素屬性 *****/
   display: flex;
-  flex-direction: column; // 使其內容元素軸線方向為由上到下
-  overflow: auto;
+  flex-direction: column;
   
-  background: #6c96a8;
-}  
+  .mediaAllDownloader{
+    // padding-left: 5px;
+    margin-bottom: 7px;
+    border-radius: 3%;
+    background: #7aaabf;
+  }
+  .select_frame {
+    width:100%;
+    min-width: 200px;
+    // height: 100%;//讓高度自動調整
+
+    /***** flex 外元素屬性 *****/
+    display: flex;
+    flex-direction: column; // 使其內容元素軸線方向為由上到下
+    overflow: auto;
+  } 
+}
+ 
 </style>
