@@ -16,9 +16,7 @@ export default () => {
   io.on("connection", (socket: Socket) => {
     logger.info(`Websocket connected: ${socket.id}`);
     let droneId: { id: string }[];
-    // let queues: Replies.AssertQueue[] = [];
-    let queues_drone: Replies.AssertQueue[] = [];
-    let queues_webrtc: Replies.AssertQueue[] = [];
+    let queues: Replies.AssertQueue[] = [];
     let consumers: Replies.Consume[] = [];
     let adminQueue: Replies.AssertQueue;
 
@@ -35,26 +33,53 @@ export default () => {
           { durable: false }
         );
         // 2. Create topic queue
-        await assertTopicQueue(socket.id, droneId, "drone", queues_drone) // queue name: "`${socket.id}-${droneId[key].id}-drone`"
+        await assertTopicQueue() // queue name: "`${socket.id}-${droneId[key].id}-drone`"
         // 3. Bind topic queue (phone)
-        await bindTopicQueue(droneId, "drone", queues_drone);
+        await bindTopicQueue();
         // 4. Started to recieved message
         await consumeTopicQueue();
 
-        queues_drone.forEach((queue) => {
+        queues.forEach((queue) => {
           // Telling frontend that queues have been created
           socket.emit("queue-created", queue.queue);
         });
       } catch (error) {
         logger.error(error);
       }
+      async function assertTopicQueue() {
+        for (let key in droneId) {
+          // console.log("Create topic queue >>", `${socket.id}-${droneId[key].id}-drone`)
+          const queue = await channel.assertQueue(
+            `${socket.id}-${droneId[key].id}-drone`,
+            {
+              autoDelete: true,
+              durable: false,
+            }
+          );
+          queues.push(queue);
+        }
+      }
+
+      //Assert a routing path from an exchange to a queue: the exchange named by source will relay messages to the queue named,
+      // according to the type of the exchange and the pattern given.
+      async function bindTopicQueue() {
+        for (let i = 0; i < queues.length; i++) {
+          // console.log("queue =", queues[i].queue, "/ bind =", `${droneId[i].id}.phone.drone`)
+          await channel.bindQueue(
+            queues[i].queue,
+            RABBITMQ.EXCHANGE_NAME,
+            `${droneId[i].id}.phone.drone`
+          );
+        }
+      }
+
 
       async function consumeTopicQueue() {
-        for (let i = 0; i < queues_drone.length; i++) {
+        for (let i = 0; i < queues.length; i++) {
           //if divisible means the topic is "drone" else means "webrtc"
           // 建立消費者，制定其監聽的對象佇列，並指定收到佇列內的消息時要執行的callback函式
           const consume = await channel.consume(
-            queues_drone[i].queue,
+            queues[i].queue,
             (msg) => {
               if (msg) {
                 // console.log('drone-topic messages: ', JSON.parse(msg.content.toString()))
@@ -85,33 +110,57 @@ export default () => {
           { durable: false }
         );
         // 2. Create topic queue
-        await assertTopicQueue(socket.id, droneId, "webrtc",queues_webrtc) // queue name: "`${socket.id}-${droneId[key].id}-webrtc`"
+        await assertTopicQueue();// queue name: "`${socket.id}-${droneId[key].id}-webrtc`"
         // 3. Bind topic queue (phone)
-        await bindTopicQueue(droneId, "webrtc", queues_webrtc);
+        await bindTopicQueue();
         // 4. Started to recieved message
         await consumeTopicQueue();
 
-        queues_webrtc.forEach((queue) => {
+        queues.forEach((queue) => {
           // Telling frontend that queues have been created
           socket.emit("queue-created", queue.queue);
         });
       } catch (error) {
         logger.error(error);
       }
+      async function assertTopicQueue() {
+        for (let key in droneId) {
+          // console.log("Create topic queue >>", `${socket.id}-${droneId[key].id}-webrtc`)
+          const queue = await channel.assertQueue(
+            `${socket.id}-${droneId[key].id}-webrtc`,
+            {
+              autoDelete: true,
+              durable: false,
+            }
+          );
+          queues.push(queue);
+        }
+      }
+      //Assert a routing path from an exchange to a queue: the exchange named by source will relay messages to the queue named,
+      // according to the type of the exchange and the pattern given.
+      async function bindTopicQueue() {
+        for (let i = 0; i < queues.length; i++) {
+          // console.log("queue =", queues[i].queue, "/ bind =", `${droneId[i].id}.phone.webrtc`)
+          await channel.bindQueue(
+            queues[i].queue,
+            RABBITMQ.EXCHANGE_NAME,
+            `${droneId[i].id}.phone.webrtc`
+          );
+        }
+      }
 
 
       async function consumeTopicQueue() {
-        for (let i = 0; i < queues_webrtc.length; i++) {
-          // 建立消費者，制定其監聽的對象佇列，並指定收到佇列內的消息時要執行的callback函式
+        for (let i = 0; i < queues.length; i++) {
+          //if divisible means the topic is "drone" else means "webrtc"
           const consume = await channel.consume(
-            queues_webrtc[i].queue,
+            queues[i].queue,
             (msg) => {
               if (msg) {
-                console.log('webrtc messages: ', Object.assign(JSON.parse(msg.content.toString()), droneId[i]))
+                // console.log('webrtc-topic messages: ')
                 socket.emit(
                   //webrtc-topic
                   `${RABBITMQ.QUEUE_TOPICS[1]}-topic`,
-                  // JSON.parse(msg.content.toString())
                   Object.assign(JSON.parse(msg.content.toString()), droneId[i])
                 );
               }
@@ -119,6 +168,7 @@ export default () => {
             { noAck: true }
           );
           consumers.push(consume);
+
         }
       }
     });
@@ -167,9 +217,9 @@ export default () => {
 
 
     // WebRTC-related
-    socket.on("send-webrtc", (data) => {
+    socket.on("send-webrtc", (data: any) => {
       // console.log("socket-> send-webrtc: ", data);
-      console.log("socket-> send-webrtc---ID: ", data.droneID);
+      console.log("socket-> send-webrtc---ID: ", data.droneID, data.type);
 
       channel.publish(
         RABBITMQ.EXCHANGE_NAME,
@@ -184,8 +234,8 @@ export default () => {
         if (consumers.length) {
           await cancelConsuming();
           // queues = [];
-          queues_drone = [];
-          queues_webrtc = [];
+          queues = [];
+          queues = [];
           consumers = [];
           logger.info(`${socket.id} cancel consume message trigger by event`);
         }
@@ -201,8 +251,8 @@ export default () => {
         if (consumers.length) {
           await cancelConsuming();
           // queues = [];
-          queues_drone = [];
-          queues_webrtc = [];
+          queues = [];
+          queues = [];
           consumers = [];
           logger.info(
             `${socket.id} cancel consume message trigger by disconnection`
@@ -219,50 +269,5 @@ export default () => {
       }
     }
 
-
-    // 自定義型別
-    type UserDroneId = {id: string};
-    /* ***********************************************************
-    * Create topic queue
-    * 將用戶的所有 droneId 聲明成佇列，並統一放入queues陣列中
-    * drone_or_webrtc: 決定用於傳送drone或是webrtc 
-    * ***********************************************************/
-    async function assertTopicQueue(socketId:string, droneId: UserDroneId[], drone_or_webrtc:string, queues:Replies.AssertQueue[]) {
-      for (let key in droneId) {
-        // 聲明一個佇列（如果不存在則建立）
-        const queue = await channel.assertQueue(
-          `${socketId}-${droneId[key].id}-${drone_or_webrtc}`,
-          {
-            autoDelete: true, // 是否自动删除
-            durable: false,   // 是否持久化
-          }
-        );
-        queues.push(queue);
-      }
-    }
-
-    /************************************************************
-     * Assert a routing path from an exchange to a queue: the exchange named by source will relay messages to the queue named, according to the type of the exchange and the pattern given. 
-     * 為佇列建立 Binding key 
-     * ***********************************************************/
-
-    async function bindTopicQueue(droneId: {id: string}[], drone_or_webrtc:string, queues:Replies.AssertQueue[]) {
-      for (let i = 0; i < queues.length; i++) {
-        await channel.bindQueue(
-          queues[i].queue,
-          RABBITMQ.EXCHANGE_NAME,
-          `${droneId[i].id}.phone.${drone_or_webrtc}`
-        );
-      }
-    }
-     /************************************************************
-     * 
-     * ***********************************************************/
-    
-
   })
-  
-
- 
-
 };
