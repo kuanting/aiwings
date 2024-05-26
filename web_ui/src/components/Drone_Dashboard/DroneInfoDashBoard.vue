@@ -29,75 +29,74 @@
           <li><span>GPS COUNTS:</span> {{ dronesInfo[userDrone.id].gpsCount }}</li>
           <li><span>GPS HPOP:</span> {{ dronesInfo[userDrone.id].hpop }}</li>
         </template>
-          <img
-            src="../../assets/drone1.gif"
-            alt="drone_gif"
-            @click="showSelected(userDrone.id)"
-            @mouseover="mouseOverEvent(userDrone.id)"
-            @mouseout="mouseOutEvent(userDrone.id)"
-            class="cover-fit"
-          />
+        <img
+          src="../../assets/drone1.gif"
+          alt="drone_gif"
+          @click="showSelected(userDrone.id)"
+          @mouseover="mouseOverEvent(userDrone.id)"
+          @mouseout="mouseOutEvent(userDrone.id)"
+          class="cover-fit"
+        />
       </a-popover>
     </div>
   </div>
 </template>
 
 <script>
-import { useStore } from 'vuex'
-import { computed, reactive, ref } from '@vue/runtime-core'
+import { useStore } from "vuex";
+import { computed, reactive, ref } from "@vue/runtime-core";
 // import useMapbox from '../../hooks/useMapbox'
-import { droneInfoInit } from '../../lib/transformDataFormat'
+import { droneInfoInit } from "../../lib/transformDataFormat";
 
 export default {
-  name: 'droneInfoDashBoard',
+  name: "droneInfoDashBoard",
 
   setup() {
-    const store = useStore()
-    const user = computed(() => store.getters.getUserInfo)    
-    const dronesInfo = computed(() => store.getters['drone/getDroneInfo'] )
+    const store = useStore();
+    const user = computed(() => store.getters.getUserInfo);
+    const dronesInfo = computed(() => store.getters["drone/getDroneInfo"]);
 
-    /****** 初始化 所有drone 的狀態資訊欄 *****/ 
+    /****** 初始化 所有drone 的狀態資訊欄 *****/
     // const userDrones = computed(()=> { return user.value.droneId })
-    const userDrones = user.value.droneId
+    const userDrones = user.value.droneId;
     for (let i in userDrones) {
       const droneInfo = {
-        [userDrones[i].id]: droneInfoInit
-      }
-      store.dispatch('drone/setDroneInfo', droneInfo)
+        [userDrones[i].id]: droneInfoInit,
+      };
+      store.dispatch("drone/setDroneInfo", droneInfo);
     }
     /********************************** */
 
     const showSelected = (id) => {
-      const droneInfo = store.getters['drone/getSpecificDroneInfo'](id)
+      const droneInfo = store.getters["drone/getSpecificDroneInfo"](id);
       if (droneInfo === undefined) {
-        console.log('Need to open your drone to get info')
+        console.log("Need to open your drone to get info");
       } else {
-        console.log('Show information of the drone')
+        console.log("Show information of the drone");
       }
-    }
+    };
     const mouseOverEvent = (droneID) => {
       // console.log('mouseover')
-      let droneGIF = document.getElementById(droneID)
-      droneGIF.style.width = '150px'
-    }
+      let droneGIF = document.getElementById(droneID);
+      droneGIF.style.width = "150px";
+    };
 
     const mouseOutEvent = (droneID) => {
-      let droneGIF = document.getElementById(droneID)
-      droneGIF.style.width = '100px'
-    }
+      let droneGIF = document.getElementById(droneID);
+      droneGIF.style.width = "100px";
+    };
 
     return {
       dronesInfo,
       userDrones,
-      
+
       showSelected,
       mouseOverEvent,
       mouseOutEvent,
-    }
-  }
-}
+    };
+  },
+};
 </script>
-
 
 <style lang="scss" scoped>
 .container {
@@ -138,7 +137,7 @@ export default {
 }
 </style>
 
-<style lang="scss" >
+<style lang="scss">
 .popover .ant-popover-content .ant-popover-inner .ant-popover-inner-content {
   background-color: transparent;
 }
@@ -186,7 +185,7 @@ export default {
   }
 
   &::before {
-    content: '';
+    content: "";
     width: 100%;
     height: 100%;
     position: absolute;
