@@ -114,6 +114,7 @@ export default {
       setLogs(`Websocket disconnected: ${reason}`);
     });
     socket.on("queue-created", (queueName) => {
+      // console.log(`Queue created: ${queueName}`);
       setLogs(`Queue created: ${queueName}`);
     });
     socket.on("drone-topic", (data) => {
@@ -233,7 +234,7 @@ export default {
       // select_droneID = droneID
 
       if (pc[droneID] == null) {
-        console.log(`*****startPeerNegotiation(${droneID})*****`);
+        // console.log(`*****startPeerNegotiation(${droneID})*****`);
         initPeerConnection(droneID);
         // const offer = await createOfferAndSetLocalSDP(pc[droneID]);
         // console.log('offer: ', offer)
@@ -245,32 +246,6 @@ export default {
       }
     };
 
-    // webRTC establish workflow
-    // getLocalStream()
-    //   .then((mediaStream) => {
-    //     // console.log("getLocalStream() 成功");
-    //     // localStream = mediaStream;
-    //     // remoteSubVideoEl.value.srcObject = localStream
-    //   })
-    //   .catch((error) => {
-    //     // message.error(`Cannot add local stream to peer by reason of ${error.message}`);
-    //     // // create dummy stream
-    //     // const canvas = document.createElement("canvas");
-    //     // const ctx = canvas.getContext("2d");
-    //     // ctx.fillRect(0, 0, canvas.width, canvas.height);
-    //     // dummyStream = canvas.captureStream();
-    //     // setup bounding box poster
-    //     // // const streamCtx = canvasEl.value.getContext('2d')
-    //     // const streamCtx = mainCanvasRef.value.getContext('2d')
-    //     // // streamCtx.width = 100
-    //     // // streamCtx.height = 100
-    //     // streamCtx.fillStyle = "blue"; //設置填充色為藍色
-    //     // streamCtx.fillRect(0, 0, streamCtx.width, streamCtx.height)
-    //     // streamCtx.fillStyle = "black"; //設置填充色為黑色
-    //     // streamCtx.font = '10pt Arial'
-    //     // streamCtx.fillText('Waiting Stream Signal', 20, 50)
-    //   })
-    //   .finally(() => {
     socket.on("webrtc-topic", async (data) => {
       // console.log("接收的資料 = ", data, "data.id=", data.id);
 
@@ -307,7 +282,6 @@ export default {
         console.log("Add received candidate answer");
       }
     });
-    // });
 
     onBeforeUnmount(() => {
       console.log("------ onBeforeUnmount , setRabbitmqIsInit', false----");
@@ -320,10 +294,6 @@ export default {
       socket.off("queue-created");
       socket.off("webrtc-topic");
       socket.off("drone-topic");
-      // setTimeout(() => {
-      //   localStream?.getTracks().forEach((track) => track.stop());
-      //   dummyStream?.getTracks().forEach((track) => track.stop());
-      // }, 1000);
     });
 
     return {
