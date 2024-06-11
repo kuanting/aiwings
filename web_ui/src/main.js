@@ -8,6 +8,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
+import vuex from 'vuex'
 import store from './store'
 import 'ant-design-vue/dist/antd.css'
 import {
@@ -48,6 +49,7 @@ createApp(App)
   .use(Result)
   .use(Divider)
   .use(Tooltip)
+  .use(vuex)
   .use(store)
   .use(router)
   .use(Select)

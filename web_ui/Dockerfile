@@ -14,6 +14,12 @@ COPY package*.json ./
 RUN npm install 
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
+
+# 不論專案修改期間為何ip，打包時都使用http://localhost:3080
+env VITE_APP_BACKEND_SERVICE_PROTOCOL=http
+env VITE_APP_BACKEND_SERVICE_SERVICE_HOST=localhost
+env VITE_APP_BACKEND_SERVICE_SERVICE_PORT=3080
+
 # build app for production with minification
 RUN npm run build
 
@@ -40,6 +46,11 @@ COPY ./nginx_config/nginx.conf /etc/nginx/nginx.conf
 
 # 複製複合指令文件
 COPY ./CMD_shell/dockerfile_cmd.sh /
+
+# 設定默認環境變數
+env URL_FRONTEND=localhost
+env URL_BACKEND=localhost 
+# URL_BACKEND默認值，僅在後端是在本地執行(不是用docker image建立)時才可用，且本地執行時，後端預設入口為http://ocalhost:3080
 
 # 暴露Nginx的默認端口80
 EXPOSE 80

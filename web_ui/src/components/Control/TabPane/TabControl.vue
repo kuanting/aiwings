@@ -3,7 +3,7 @@
     <div class="container__vertical">
       <!-- new add select drone -->
       <a-select
-        v-model:value="value"
+        v-model:value="selectValue"
         label-in-value
         style="width: 120px"
         :options="options"
@@ -94,7 +94,7 @@ export default {
     const isArm = ref(false)
     const isTakeoff = computed(
       () => {
-        return drone.value[defaultSelected.value].altitude > 0.5
+        return drone.value[defaultSelected.value]?.altitude > 0.5
       }
     )
     
@@ -132,6 +132,8 @@ export default {
     const handleChange = (value) => {
       //defaultSelected 要用來表示目前所選擇要操作的droneID
       //且socket.emit("send-drone") 的時候 要回傳dorneID
+
+      // console.log("value = ",value) // 選擇test2無人機： value = {value: 'test2', label: 'test2', key: 'test2'}
       
       defaultSelected.value = value.value
       const drone_selected = computed(() =>
@@ -330,7 +332,7 @@ export default {
       //   value: defaultSelected
       // }),
 
-      value: ref({
+      selectValue: ref({
         value: defaultSelected.value
       }),
       defaultSelected,
