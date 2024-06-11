@@ -23,6 +23,7 @@ export function transformDataFormat(data) {
   //改成這種形態
   const transformData = {
     [drone_id]: {
+      ...droneInfoInit, // 根據定義的預設格式
       timeStamp,
       roll,
       yaw,
@@ -38,17 +39,28 @@ export function transformDataFormat(data) {
       longitude,
       altitude,
       speed,
-      status: {
-        altitude: 3,
-        //isTakeoff 預設要改成false
-        isTakeoff: false
-      },
-      destination: {
-        lng: 0,
-        lat: 0
-      }
     }
   }
   return transformData;
 }
 
+// 定義 drone 的訊息預設格式
+export const droneInfoInit = { 
+  timeStamp: '', 
+  roll: null, 
+  yaw: null, 
+  pitch: null, 
+  voltage: null, 
+  percentage: null, 
+  hpop: null, 
+  gpsCount: null, 
+  mode: '', 
+  isArmed: '', 
+  heading: null, 
+  latitude: null, 
+  longitude: null, 
+  altitude: null, 
+  speed: null, 
+  status: { altitude: 3, isTakeoff: false }, //isTakeoff 預設要改成false
+  destination: { lng: null, lat: null} 
+}
