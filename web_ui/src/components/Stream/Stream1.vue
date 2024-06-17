@@ -118,7 +118,7 @@ export default {
       setLogs(`Queue created: ${queueName}`);
     });
     socket.on("drone-topic", (data) => {
-      console.log("監聽無人機傳遞的資訊");
+      // console.log("監聽無人機傳遞的資訊");
       if (data.type === "message") {
         let droneInfo = transformDataFormat(data); // 轉換資料格式為適用於多台無人機的格式
         // 轉換後的資料格式為：droneInfo = {[drone_id]: {......}}
