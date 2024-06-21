@@ -56,6 +56,11 @@ MYSQL_ROOT_PASSWORD=password
 # """
 URL_FRONTEND=localhost
 # URL_BACKEND=backend
+
+# """
+# Connecting a local SSL certificate to a frontend container internally.
+# """
+SSL_folder = './ssl/'
 ```
 
 #### If not Yet Installed RabbitMQ or MySQL:
@@ -93,13 +98,16 @@ You can change SSL certificate.
 
 - If you are using a domain name and need to bind your domain's SSL certificate, you can do so using the following method.
 
-- Remove the comments from the following lines, and replace './ssl/' with the path to your SSL certificate folder."
+- Uncomment lines 103-104 as shown below:
 
   ```yml
   volumes:
-  - ./ssl/:/etc/nginx/ssl/
+  - ${SSL_folder}:/etc/nginx/ssl/
   ```
-  - Note: Your SSL certificate folder must include two separate files named `certificate.crt` and `private.key`.
+
+  In your `.env` file, the default local SSL certificate folder is located under the relative ssl folder. Therefore, if you need to use your own SSL certificate, you must place your SSL certificate files into the `./ssl/` folder or update the SSL certificate folder path configured in the `.env` file to your SSL certificate folder path.
+
+  - Note: Your SSL certificate folder must contain two files named `certificate.crt` and `private.key` (with matching names). These files will be mapped to the /etc/nginx/ssl/ directory inside the Nginx container.
 
 #### If not Yet Installed RabbitMQ or MySQL:
 - It can be used directly without changing anything. 
