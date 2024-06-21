@@ -62,7 +62,7 @@ export default defineComponent({
       drones: [],
     });
 
-    console.log("在Enroll, 新增前store.state.user = ", store.state.user);
+    // console.log("在Enroll, 新增前store.state.user = ", store.state.user);
 
     const submitForm = async function () {
       formRef.value

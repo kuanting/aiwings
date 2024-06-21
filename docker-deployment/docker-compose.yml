@@ -101,7 +101,7 @@ services:
       URL_FRONTEND: ${URL_FRONTEND}
       URL_BACKEND: backend
     # volumes:
-    # - ./ssl/:/etc/nginx/ssl/
+    # - ${SSL_folder}:/etc/nginx/ssl/
 
 # -d|detach：在後台運行。此為docker run 命令，屬容器級別
 # docker-compose.yml檔案 屬於服務級別

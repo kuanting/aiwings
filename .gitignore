@@ -92,3 +92,7 @@ Thumbs.db
 
 # key
 key/
+
+# SSL certificate
+*.crt
+*.key

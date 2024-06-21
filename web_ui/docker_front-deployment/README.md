@@ -34,6 +34,11 @@ Before embarking on the Docker containerized deployment of the aiwings frontend 
 # """
 URL_FRONTEND=localhost
 URL_BACKEND=localhost
+
+# """
+# Connecting a local SSL certificate to a frontend container internally.
+# """
+SSL_folder = './ssl/'
 ```
 
 - You can set the `URL_FRONTEND` value to your IP or domain to configure the web address for the aiwings frontend application.
@@ -47,6 +52,7 @@ URL_BACKEND=localhost
         Note: If you forget to set the value of 'URL_BACKEND' to your backend IP or domain, after creating the frontend application, it will not be able to connect to the backend.
 
         Note: Make sure your frontend computer can ping to your backend address.
+        
 ### `docker-compose.yml` file
 
 - The docker-compose.yml file defines the containerized deployment configuration for the aiwings application. Through this file, you can quickly accomplish the deployment of aiwings.
@@ -57,13 +63,16 @@ You can change SSL certificate.
 
 - If you are using a domain name and need to bind your domain's SSL certificate, you can do so using the following method.
 
-- Remove the comments from the following lines, and replace './ssl/' with the path to your SSL certificate folder."
+- Uncomment lines 103-104 as shown below:
 
   ```yml
   volumes:
-  - ./ssl/:/etc/nginx/ssl/
+  - ${SSL_folder}:/etc/nginx/ssl/
   ```
-  - Note: Your SSL certificate folder must include two separate files named `certificate.crt` and `private.key`.
+
+ In your `.env` file, the default local SSL certificate folder is located under the relative ssl folder. Therefore, if you need to use your own SSL certificate, you must place your SSL certificate files into the `./ssl/` folder or update the SSL certificate folder path configured in the `.env` file to your SSL certificate folder path.
+
+  - Note: Your SSL certificate folder must contain two files named `certificate.crt` and `private.key` (with matching names). These files will be mapped to the /etc/nginx/ssl/ directory inside the Nginx container.
 
 ## How to install
 
