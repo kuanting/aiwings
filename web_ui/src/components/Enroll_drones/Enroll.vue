@@ -74,7 +74,7 @@ export default defineComponent({
           });
           // console.log('enroll.vue: ', droneId)
           // 將表單中的所有 droneID 新增置後端
-          const { data } = await user.enrollDroneId({ droneId: droneId });
+          const { data } = await user.enrollDroneId(droneId);
           notification.success({
             message: data.msg,
           });

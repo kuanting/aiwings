@@ -147,22 +147,24 @@ export default {
     console.log("------ [user.ts] ------ editUserDroneId() ------");
     const { droneId }: EditIDPayload = req.body;
     // console.log("更改後的droneId: ", req.body.droneId);
+    // console.log("原始的ID: ':droneId' = ",req.params.droneId)
     // console.log("原本的droneId: ", req.body.originDroneId);
     // console.log("res.locals.uuid: ", res.locals.uuid)
+    
     try {
       let conn = await db();
       /*Confirm if the changed DroneId exists.*/
       if (await isDroneIdExistsByUuid(conn, res.locals.uuid, req.body.droneId)) {
         console.log("This DroneId name already exists.")
-        res.json({ msg: "This Drone ID already exists!" });
-      } else {
-        /*Change droneId name*/
-        await update_droneID(conn, droneId, res.locals.uuid, req.body.originDroneId);
-        closeConnect(conn)
-        logger.info("Drone ID updated")
-        res.json({ msg: "Drone ID updated" });
+        return res.json({ msg: "This Drone ID already exists!" });
       }
 
+      /*Edit droneId name*/
+      await update_droneID(conn, droneId, res.locals.uuid, req.params.droneId);
+      closeConnect(conn)
+      logger.info("Drone ID updated")
+      res.json({ msg: "Drone ID updated" });
+      
     } catch (error) {
       logger.error(error);
       res.status(500).json({ msg: "Internal server error" });
@@ -172,7 +174,7 @@ export default {
   /***************************************************
    * Add new drones for user
   ***************************************************/
-  async addNewDrone(req: Request, res: Response) {
+  async addNewDrones(req: Request, res: Response) {
     console.log("------ [user.ts] ------ addNewDrone() ------",);
     const { droneId }: AddIDPayload = req.body;
     try {
@@ -198,7 +200,10 @@ export default {
   ***************************************************/
   async deleteDrone(req: Request, res: Response) {
     console.log("------[user.ts] ------ deleteDrone() ------",);
-    const { droneId }: EditIDPayload = req.body;
+    // const { droneId }: EditIDPayload = req.body;
+    const droneId = req.params.droneId
+    // console.log("要刪除的ID: ':droneId' = ",req.params.droneId)
+    
     try {
       //MYSQL
       const conn = await db()

@@ -93,7 +93,7 @@ services:
   front_end:
     container_name: front-end
     restart: always
-    image: 2023aiotlab/web_ui
+    image: web_ui:4.3
     ports:
       - "80:80"
       - "443:443"
