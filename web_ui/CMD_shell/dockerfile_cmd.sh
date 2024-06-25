@@ -6,8 +6,9 @@
 
 # 替換前端URL，改為https協議，自定義的IP
 find '/app/dist' -name '*.js' -exec sed -i -e 's,http://localhost:3080,'"https://$URL_FRONTEND"',g' {} \;
-# 替換後端URL
+# 替換前後端URL
 sed -i -e 's,backend_url,'"$URL_BACKEND"',g' /etc/nginx/nginx.conf;
+sed -i -e 's,frontend_url,'"$URL_FRONTEND"',g' /etc/nginx/nginx.conf;
 # 在容器啟動時自動啟動 Nginx
 nginx -g "daemon off;"
 
