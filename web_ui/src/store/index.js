@@ -61,10 +61,10 @@ export default createStore({
     setRabbitmqAdminIsInit(state, payload) {
       state.rabbitmqAdminIsInit = payload
     },
-    setUserDroneID(state, payload){
+    setUserDroneID(state, payload) {
       state.user.droneId = payload
     },
-    setMapboxInfo(state, payload){
+    setMapboxInfo(state, payload) {
       state.mapbox = payload
     }
   },
@@ -76,7 +76,9 @@ export default createStore({
       return state.user
     },
     getUsername(state) {
-      return state.user.email.substr(0, state.user.email.indexOf('@'))
+      // substr 已棄用
+      // return state.user.email ? state.user.email.substring(0, state.user.email.indexOf('@')) :'null'
+      return state.user.email.substring(0, state.user.email.indexOf('@'))
     },
     getIsAuth(state) {
       return state.isAuthenticated
@@ -90,7 +92,7 @@ export default createStore({
     getRabbitmqAdminIsInit(state) {
       return state.rabbitmqAdminIsInit
     },
-    getUserDroneIdNames(state){
+    getUserDroneIdNames(state) {
       return state.user.droneId.map(item => item.id);
     }
   },

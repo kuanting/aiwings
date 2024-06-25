@@ -13,8 +13,9 @@ import '@tensorflow/tfjs-backend-webgl'
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
 let cocoSsd_model
 /******************* yolov8n model *******************/
-// Note：網頁加載的根路徑在 vue 專案中的 'public/' 底下，所以http://localhost/yolov8n_web_model/model.json，此yolov8n_web_model位於public資料夾底下
-const model_URL = `${window.location.href}/yolov8n_web_model/model.json` 
+// Note：網頁加載的根路徑在 vue 專案中的 'public/' 底下，所以http://localhost/model/yolov8n_web_model/model.json，此model/yolov8n_web_model位於public資料夾底下，tf.loadGraphModel(model_URL);可以直接使用相對路徑來獲取
+const model_URL = `model/yolov8n_web_model/model.json`
+
 const yolov8n_model = reactive({
   net: null,
   inputShape: [1, 0, 0, 3],
@@ -31,17 +32,17 @@ let detectEnabled = false
 const startDetection = async (Frame, canvas, isCocoSsd) => {
   isUsingCocoSsd = isCocoSsd
   // 如果 isUsingCocoSsd = true ，下載cocoSsd model，否則下載yolov8n_model
-  if(isUsingCocoSsd && cocoSsd_model == null){
+  if (isUsingCocoSsd && cocoSsd_model == null) {
     console.log("------ cocoSsd model loading------")
     await tf.ready()
     cocoSsd_model = await cocoSsd.load({ base: 'mobilenet_v2' })
     console.log("--------- loading finish ---------")
   }
   else if (yolov8n_model.net == null) {
-    await loadYolov8nModel(model_URL) 
+    await loadYolov8nModel(model_URL)
   }
-  
-  
+
+
   detectEnabled = true; // 允許偵測
   detectVideo(Frame, yolov8n_model, canvas)
 }
@@ -63,16 +64,16 @@ export const detectVideo = (vidSource, model, canvasRef) => {
   /* detectFrame(): Function to detect every frame from video  */
   const detectFrame = async () => {
     // WebRTC：vidSource.srcObject === null
-    if(detectEnabled && vidSource.srcObject != null){
+    if (detectEnabled && vidSource.srcObject != null) {
       // 如果 isUsingCocoSsd = true ，用cocoSsd model進行偵測，否則用yolov8n_model
-      if(isUsingCocoSsd){
+      if (isUsingCocoSsd) {
         detectByCocoSsd(vidSource, canvasRef)
-      }else{
-        await detect(vidSource, model, canvasRef, () => {});
+      } else {
+        await detect(vidSource, model, canvasRef, () => { });
       }
-      
+
       requestAnimationFrame(detectFrame); // get another frame
-    }else{
+    } else {
       // stop detect and clean canvas
       const ctx = canvasRef.getContext('2d')
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -123,7 +124,7 @@ const preprocess = (source, modelWidth, modelHeight) => {
       .resizeBilinear(imgPadded, [modelWidth, modelHeight]) // resize frame // 將已調整為正方形的圖片，用tf提供的Bilinear方法，縮放為模型的輸入尺寸
       .div(255.0) // normalize // 歸一化：將圖片的像素值除以255.0，使像素值縮放到 0 到 1 之間
       .expandDims(0); // add batch // 因為模型的輸入張量為[1,640,640,3]，原本的圖片只有[640,640,3]，所以需要再用expandDims為圖片新增一個新的維度--
-    
+
     // 經過上述變動，將圖片轉換為模型的疏誤張量：[1, modelHeight, modelWidth, 3]
 
   });
@@ -138,7 +139,7 @@ const preprocess = (source, modelWidth, modelHeight) => {
  * @param {HTMLCanvasElement} canvasRef canvas reference
  * @param {VoidFunction} callback function to run after detection process
  */
-export const detect = async (source, model, canvasRef, callback = () => {}) => {
+export const detect = async (source, model, canvasRef, callback = () => { }) => {
   // console.log("yolov8n_model input image shape = ",model.inputShape)
   const [modelWidth, modelHeight] = model.inputShape.slice(1, 3); // get model width and height
 
@@ -150,7 +151,7 @@ export const detect = async (source, model, canvasRef, callback = () => {}) => {
   // console.log("res = ",res.shape) //  [1, 84, 8400]
   // console.log("transRes = ",transRes.shape) // [1, 8400, 84]
 
-  /* 取出所有偵測結果的 boxes [y1, x1, y2, x2] */ 
+  /* 取出所有偵測結果的 boxes [y1, x1, y2, x2] */
   const boxes = tf.tidy(() => {
     const w = transRes.slice([0, 0, 2], [-1, -1, 1]); // get width
     const h = transRes.slice([0, 0, 3], [-1, -1, 1]); // get height
@@ -167,10 +168,10 @@ export const detect = async (source, model, canvasRef, callback = () => {}) => {
         2
       )
       .squeeze(); // 去掉(省略)單維度
-    
+
   }); // process boxes [y1, x1, y2, x2]
-  
-  /* 取出所有偵測結果的分數和類別 */ 
+
+  /* 取出所有偵測結果的分數和類別 */
   const [scores, classes] = tf.tidy(() => {
     // class scores
     const rawScores = transRes.slice([0, 0, 4], [-1, -1, numClass]).squeeze(0); // #6 only squeeze axis 0 to handle only 1 class models
@@ -208,12 +209,12 @@ export const detect = async (source, model, canvasRef, callback = () => {}) => {
 /**
  * 下載 TensorFlow SavedModel 格式的偵測模型
  */
-const loadYolov8nModel = async(model_URL) =>{
+const loadYolov8nModel = async (model_URL) => {
   try {
     console.log(`偵測模型下載中`)
     // load model
     await tf.ready();
-    const model = await tf.loadGraphModel(model_URL); 
+    const model = await tf.loadGraphModel(model_URL);
     // Note：加載的根路徑在 vue 專案中的 'public/' 底下
     // loadLayersModel模式不適用於 TensorFlow SavedModel或其轉換形式。對於這些模型，請使用tf.loadGraphModel()。
 
@@ -221,7 +222,7 @@ const loadYolov8nModel = async(model_URL) =>{
     const dummyInput = tf.ones(model.inputs[0].shape);
     const warmupResults = model.execute(dummyInput);
 
-    console.log("此模型的輸入張量 yolov8.inputs[0].shape = ",model.inputs[0].shape)
+    // console.log("此模型的輸入張量 yolov8.inputs[0].shape = ", model.inputs[0].shape)
     yolov8n_model.net = Object.freeze(model)
     yolov8n_model.inputShape = model.inputs[0].shape
 
@@ -230,7 +231,7 @@ const loadYolov8nModel = async(model_URL) =>{
 
     console.log("模型加載成功: ", Object.freeze(model))
   } catch (error) {
-    console.error(`模型加载失败: ${error}`);  
+    console.error(`模型加载失败: ${error}`);
   }
 }
 
@@ -245,7 +246,7 @@ export default {
 }
 
 
-const detectByCocoSsd = async(vidSource, canvasRef)=>{
+const detectByCocoSsd = async (vidSource, canvasRef) => {
   // cocoSsd 如果用webgpu會跳warning，但還是可以偵測的樣子
   const ctx = canvasRef.getContext('2d')
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)

@@ -41,6 +41,9 @@
             <a-menu-item key="records">
               <router-link to="records">Records</router-link>
             </a-menu-item>
+            <a-menu-item key="monitor">
+                  <router-link to="monitor">Monitor</router-link>
+            </a-menu-item>
             <a-menu-item key="logout">
               <router-link to="logout">Logout</router-link>
             </a-menu-item>

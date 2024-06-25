@@ -62,7 +62,7 @@ export default defineComponent({
       drones: [],
     });
 
-    console.log("在Enroll, 新增前store.state.user = ", store.state.user);
+    // console.log("在Enroll, 新增前store.state.user = ", store.state.user);
 
     const submitForm = async function () {
       formRef.value
@@ -74,7 +74,7 @@ export default defineComponent({
           });
           // console.log('enroll.vue: ', droneId)
           // 將表單中的所有 droneID 新增置後端
-          const { data } = await user.enrollDroneId({ droneId: droneId });
+          const { data } = await user.enrollDroneId(droneId);
           notification.success({
             message: data.msg,
           });
