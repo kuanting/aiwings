@@ -16,13 +16,14 @@ router.post("/auth/logout", auth.logout);
 
 router.get("/user/me", verifyTokens, user.getUserInfo);
 // router.get("/user/login", verifyTokens, user.loginUser);
-router.post("/user/edit_droneId", verifyTokens, user.editUserDroneId);
-router.post("/user/add_drones", verifyTokens, user.addNewDrone);
-router.post("/user/delete_drones", verifyTokens, user.deleteDrone);
+router.put("/user/drones", verifyTokens, user.addNewDrones);
+router.put("/user/drones/:droneId", verifyTokens, user.editUserDroneId);
+router.delete("/user/drones/:droneId", verifyTokens, user.deleteDrone);
 
+// save image from DroneVideoBlob
 var multer  = require('multer')
 const upload = multer()
-router.post("/user/saveDroneVideoBlob", verifyTokens, upload.array("files"), user.saveDroneVideoBlob);
+router.post("/user/upload/images", verifyTokens, upload.array("files"), user.saveDroneVideoBlob);
 
 
 // // 分段接收(還在測試)
