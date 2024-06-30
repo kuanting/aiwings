@@ -1,4 +1,4 @@
-DRONE_ID = "airsim_simulation"
+DRONE_ID = "airsim3_simulation"
 
 # key for droneMessage
 ROUTING_KEY_DRONE = DRONE_ID + ".phone.drone"
@@ -9,6 +9,6 @@ ROUTING_KEY_WEBRTC = DRONE_ID + ".phone.webrtc"
 BINDING_KEY_WEBRTC = DRONE_ID + ".web.webrtc"
 
 # RabbitMQ connection parameters
-RabbitMQ_HOST = "10.126.1.20"
+RabbitMQ_HOST = "192.168.50.76"
 RabbitMQ_USERNAME = "guest"
 RabbitMQ_PASSWORD = "guest"
