@@ -58,7 +58,7 @@ services:
 
   backend:
     container_name: back-end
-    image: 2023aiotlab/api_server
+    build: ../api-server
     restart: always
     # 令 docker-compose up backend 時會先建立並啟動服務名rabbitmq和mysql
     depends_on: 
@@ -93,7 +93,7 @@ services:
   front_end:
     container_name: front-end
     restart: always
-    image: web_ui:4.3
+    build: ../web_ui
     ports:
       - "80:80"
       - "443:443"
