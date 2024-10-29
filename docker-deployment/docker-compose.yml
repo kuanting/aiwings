@@ -46,5 +46,3 @@ services:
       - "80:80"
       - "443:443"
     env_file: *env_file
-    # volumes:
-    # - ${SSL_folder}:/etc/nginx/ssl/
