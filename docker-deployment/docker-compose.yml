@@ -1,6 +1,6 @@
 services:
-  rabbitmq_service:
-    container_name: rabbitmq
+  rabbitmq:
+    container_name: aiwings-rabbitmq
     image: rabbitmq:management
     restart: always
     ports:
@@ -12,8 +12,8 @@ services:
       # 若未設定，預設使用者名稱和密碼為guest/ guest
       # ${RABBITMQ_SERVICE_USER}來自環境變數.env檔案內容
 
-  mysql_service:
-    container_name: mysql
+  mysql:
+    container_name: aiwings-mysql
     # # for mac M1, need to add platform
     # platform: linux/x86_64
     image: mysql:8.0.27
@@ -29,15 +29,13 @@ services:
     # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
     # (this is just an example, not intended to be a production configuration)
 
-  backend:
-    container_name: back-end
+  server:
+    container_name: aiwings-server
     build: ../api-server
     restart: always
-    # 令 docker-compose up backend 時會先建立並啟動服務名rabbitmq和mysql
     depends_on:
-      - rabbitmq_service
-      - mysql_service
-      # rabbitmq_service、mysql_service是前面建立好的服務
+      - rabbitmq
+      - mysql
     ports:
       - "3080:3080"
     environment:
@@ -58,18 +56,15 @@ services:
     # volumes:
     #   - ./.env.docker:/app/.env
 
-  front_end:
-    container_name: front-end
-    restart: always
+  web:
+    container_name: aiwings-web
     build: ../web_ui
+    restart: always
     ports:
       - "80:80"
       - "443:443"
     environment:
-      URL_FRONTEND: ${URL_FRONTEND}
-      URL_BACKEND: backend
+      URL_FRONTEND: localhost
+      URL_BACKEND: server
     # volumes:
     # - ${SSL_folder}:/etc/nginx/ssl/
-# -d|detach：在後台運行。此為docker run 命令，屬容器級別
-# docker-compose.yml檔案 屬於服務級別
-# 若要在後台運行，在docker-compose up 後面加上 -d
