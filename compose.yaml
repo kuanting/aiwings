@@ -1,0 +1,48 @@
+# Shared env_file configuration for all services
+# Learn more about extentions at https://docs.docker.com/reference/compose-file/extension/
+x-env_file: &env_file
+  # Set default variables with .env.example
+  - path: .env.example
+
+  # Override variables with .env
+  - path: .env
+    required: false
+
+services:
+  rabbitmq:
+    container_name: aiwings-rabbitmq
+    image: rabbitmq:management
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file: *env_file
+
+  mysql:
+    container_name: aiwings-mysql
+    image: mysql:8.0.27
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    env_file: *env_file
+
+  server:
+    container_name: aiwings-server
+    build: api-server
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
+      - mysql
+    ports:
+      - "3080:3080"
+    env_file: *env_file
+
+  web:
+    container_name: aiwings-web
+    build: web_ui
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file: *env_file
