@@ -3,7 +3,7 @@
 # --------------------------------------------------------------------
 # 使用Node.js 的 lts-alpine 版本作為基礎映像【基於輕量級的 Alpine Linux 發行版】，並設置別名builder
 # 別名用於紀錄這個階段的輸出結果，可被拷貝到下個階段，有助於減小最終映像的大小。
-FROM node:lts-alpine as build-stage
+FROM node:lts-alpine AS build-stage
 
 # 設定之後docker執行的指令，會基於"容器內"的哪個資料夾【如果沒有就創建一個】
 # make the 'app' folder the current working directory
@@ -16,9 +16,9 @@ RUN npm install
 COPY . .
 
 # 不論專案修改期間為何ip，打包時都使用http://localhost:3080
-env VITE_APP_BACKEND_SERVICE_PROTOCOL=http
-env VITE_APP_BACKEND_SERVICE_SERVICE_HOST=localhost
-env VITE_APP_BACKEND_SERVICE_SERVICE_PORT=3080
+ENV VITE_APP_BACKEND_SERVICE_PROTOCOL=http
+ENV VITE_APP_BACKEND_SERVICE_SERVICE_HOST=localhost
+ENV VITE_APP_BACKEND_SERVICE_SERVICE_PORT=3080
 
 # build app for production with minification
 RUN npm run build
@@ -30,7 +30,7 @@ RUN npm run build
 # --------------------------------------------------------------------
 # 第二階段: 生產【拷貝第一階段的輸出並用nginx打包，創建一個較小的映像】
 # --------------------------------------------------------------------
-FROM nginx:stable-alpine as production-stage
+FROM nginx:stable-alpine AS production-stage
 
 # 複製上個階段產出的靜態網頁資料夾到這個階段，並放置到nginx讀取網頁的資料夾位置
 # COPY --from=build-stage /app/dist /usr/share/nginx/html
@@ -48,8 +48,8 @@ COPY ./nginx_config/nginx.conf /etc/nginx/nginx.conf
 COPY ./CMD_shell/dockerfile_cmd.sh /
 
 # 設定默認環境變數
-env URL_FRONTEND=localhost
-env URL_BACKEND=localhost 
+ENV URL_FRONTEND=localhost
+ENV URL_BACKEND=localhost
 # URL_BACKEND默認值，僅在後端是在本地執行(不是用docker image建立)時才可用，且本地執行時，後端預設入口為http://ocalhost:3080
 
 # 暴露Nginx的默認端口80
@@ -59,4 +59,3 @@ EXPOSE 443
 
 # 在容器啟動時執行此檔案中的指令
 CMD ["sh", "dockerfile_cmd.sh"]
-
