@@ -66,7 +66,7 @@ export const detectVideo = (vidSource, model, canvasRef) => {
       if (isUsingCocoSsd) {
         detectByCocoSsd(vidSource, canvasRef)
       } else {
-        await detect(vidSource, model, canvasRef, () => {})
+        await detect(vidSource, model, canvasRef)
       }
 
       requestAnimationFrame(detectFrame) // get another frame
@@ -132,9 +132,8 @@ const preprocess = (source, modelWidth, modelHeight) => {
  * @param {HTMLImageElement|HTMLVideoElement} source
  * @param {tf.GraphModel} model loaded YOLOv8 tensorflow.js model
  * @param {HTMLCanvasElement} canvasRef canvas reference
- * @param {VoidFunction} callback function to run after detection process
  */
-export const detect = async (source, model, canvasRef, callback = () => {}) => {
+export const detect = async (source, model, canvasRef) => {
   // console.log("yolov8n_model input image shape = ",model.inputShape)
   const [modelWidth, modelHeight] = model.inputShape.slice(1, 3) // get model width and height
 
@@ -199,8 +198,6 @@ export const detect = async (source, model, canvasRef, callback = () => {}) => {
 
   /* clear memory */
   tf.dispose([res, transRes, boxes, scores, classes, nms])
-
-  // callback();
 
   tf.engine().endScope() // end of scoping
 }
