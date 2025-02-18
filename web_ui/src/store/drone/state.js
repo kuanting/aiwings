@@ -15,7 +15,7 @@ export default {
     // longitude: '',
     // altitude: '',
     // speed: ''
-  },
+  }
   // status: {
   //   altitude: 3,
   //   isTakeoff: false

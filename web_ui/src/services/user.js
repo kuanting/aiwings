@@ -37,21 +37,17 @@ export default {
 
   // Save video screenshots of front-end users to the back-end
   async saveDroneVideoBlob(formData) {
-    return await axios.post(
-      '/user/upload/images',
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+    return await axios.post('/user/upload/images', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
       }
-    )
-  },
+    })
+  }
 
   // 分段上傳(還在測試)
   // async testSaveVideo(formData) {
   //   return await axios.post(
-  //     '/user/test', 
+  //     '/user/test',
   //     formData,
   //     {
   //       headers: {

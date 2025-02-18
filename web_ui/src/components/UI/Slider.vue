@@ -4,12 +4,12 @@
     :max="props.max"
     :min="props.min"
     :marks="props.marks"
-    @afterChange="changeHandler"
+    @after-change="changeHandler"
   />
 </template>
 
 <script>
-import { ref } from '@vue/reactivity'
+import { ref } from 'vue'
 export default {
   name: 'Slider',
   props: {

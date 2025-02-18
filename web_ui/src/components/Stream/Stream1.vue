@@ -1,12 +1,15 @@
 <template>
   <div class="wrap">
     <div class="main_frame frame_container">
-      <MainVideoArea :srcObject="VideoSrcObject" :select_droneID="select_droneID" />
+      <MainVideoArea
+        :src-object="VideoSrcObject"
+        :select_droneID="select_droneID"
+      />
     </div>
 
     <div class="sub_frame frame_container">
       <div class="mediaAllDownloader">
-        <mediaAllDownloader :videoRefs="remoteSubVideoEl" />
+        <mediaAllDownloader :video-refs="remoteSubVideoEl" />
       </div>
       <div class="select_frame">
         <!------------------------------------------->
@@ -29,196 +32,200 @@
 </template>
 
 <script>
-import { useStore } from "vuex";
-import { onBeforeUnmount, onMounted, ref, computed } from "@vue/runtime-core";
-import socket from "../../lib/websocket";
+import { useStore } from 'vuex'
+import { onBeforeUnmount, onMounted, ref, computed } from 'vue'
+import socket from '../../lib/websocket'
 // import detection from '../../lib/detection'
 import {
   createPeerConnection,
   createAnswerAndSetLocalSDP,
   createOfferAndSetLocalSDP,
-  getLocalStream,
-} from "../../lib/webRTC";
-import { message } from "ant-design-vue";
-import MainVideoArea from "./MainVideoArea.vue";
-import { transformDataFormat } from "../../lib/transformDataFormat";
-import mediaAllDownloader from "./mediaAllDownloader.vue";
+  getLocalStream
+} from '../../lib/webRTC'
+import { message } from 'ant-design-vue'
+import MainVideoArea from './MainVideoArea.vue'
+import { transformDataFormat } from '../../lib/transformDataFormat'
+import mediaAllDownloader from './mediaAllDownloader.vue'
 
 export default {
-  name: "monitor",
+  name: 'Monitor',
   components: {
     MainVideoArea,
-    mediaAllDownloader,
+    mediaAllDownloader
   },
 
   setup() {
-    const saveLogs = (log) => store.dispatch("setLogs", log);
+    const saveLogs = (log) => store.dispatch('setLogs', log)
 
     // *******************************
-    const remoteMainVideoEl = ref(null);
-    const remoteSubVideoEl = [];
+    const remoteMainVideoEl = ref(null)
+    const remoteSubVideoEl = []
 
     // const canvasEl = ref(null) // for 顯示偵測結果
 
-    let pc = [];
+    let pc = []
     // let localStream;
     // let dummyStream;
-    let remoteStream;
-    const store = useStore();
-    const rabbitmqIsInit = computed(() => store.getters.getRabbitmqIsInit);
-    const userInfo = computed(() => store.getters.getUserInfo);
-    const droneArr = userInfo.value.droneId;
-    const user = computed(() => store.getters.getUserInfo);
-    const setLogs = (log) => store.dispatch("setLogs", log);
+    let remoteStream
+    const store = useStore()
+    const rabbitmqIsInit = computed(() => store.getters.getRabbitmqIsInit)
+    const userInfo = computed(() => store.getters.getUserInfo)
+    const droneArr = userInfo.value.droneId
+    const user = computed(() => store.getters.getUserInfo)
+    const setLogs = (log) => store.dispatch('setLogs', log)
 
     /******* 傳遞給子組件的媒體流 *******/
-    const VideoSrcObject = ref(null);
+    const VideoSrcObject = ref(null)
     /*************** */
 
     const setSubVideoRef = (el, id) => {
-      remoteSubVideoEl[id] = el;
-      startPeerNegotiation(id);
-    };
+      remoteSubVideoEl[id] = el
+      startPeerNegotiation(id)
+    }
 
     /**********/
-    const select_droneID = ref();
+    const select_droneID = ref()
     const select_drone_video = (droneID) => {
-      console.log("click", droneID, "，將此子畫面映射到主畫面上");
-      select_droneID.value = droneID;
+      console.log('click', droneID, '，將此子畫面映射到主畫面上')
+      select_droneID.value = droneID
       if (remoteSubVideoEl[droneID].srcObject) {
         // remoteMainVideoEl.value.srcObject = remoteSubVideoEl[droneID].srcObject
-        VideoSrcObject.value = remoteSubVideoEl[droneID].srcObject; //++
+        VideoSrcObject.value = remoteSubVideoEl[droneID].srcObject //++
       }
-    };
+    }
 
     /**************** */
     const rabbitmqInit = () => {
       // setLogs(`Websocket connected: ${socket.id}`)
       // console.log("----rabbitmqInit---\nsocket.id = ",socket.id)
       for (let i in user.value.droneId) {
-        setLogs(`Drone ID: ${user.value.droneId[i]}`);
-        console.log(user.value.droneId[i]);
+        setLogs(`Drone ID: ${user.value.droneId[i]}`)
+        console.log(user.value.droneId[i])
       }
-      socket.emit("establish-rabbitmq-connection-webrtc", user.value.droneId);
-      socket.emit("establish-rabbitmq-connection-drone", user.value.droneId); //傳送此事件到後端，後端webSocket監聽到此事件後，會建立所有droneId的 rabbitMq Queue
-    };
+      socket.emit('establish-rabbitmq-connection-webrtc', user.value.droneId)
+      socket.emit('establish-rabbitmq-connection-drone', user.value.droneId) //傳送此事件到後端，後端webSocket監聽到此事件後，會建立所有droneId的 rabbitMq Queue
+    }
     // Trigger RabbitMQ when the first come or refresh pages
     if (!rabbitmqIsInit.value) {
-      rabbitmqInit();
-      store.dispatch("setRabbitmqIsInit", true);
+      rabbitmqInit()
+      store.dispatch('setRabbitmqIsInit', true)
     }
 
     // Websocket event listening
-    socket.on("connect", () => rabbitmqInit());
-    socket.on("disconnect", (reason) => {
-      setLogs(`Websocket disconnected: ${reason}`);
-    });
-    socket.on("queue-created", (queueName) => {
+    socket.on('connect', () => rabbitmqInit())
+    socket.on('disconnect', (reason) => {
+      setLogs(`Websocket disconnected: ${reason}`)
+    })
+    socket.on('queue-created', (queueName) => {
       // console.log(`Queue created: ${queueName}`);
-      setLogs(`Queue created: ${queueName}`);
-    });
-    socket.on("drone-topic", (data) => {
+      setLogs(`Queue created: ${queueName}`)
+    })
+    socket.on('drone-topic', (data) => {
       // console.log("監聽無人機傳遞的資訊");
-      if (data.type === "message") {
-        let droneInfo = transformDataFormat(data); // 轉換資料格式為適用於多台無人機的格式
+      if (data.type === 'message') {
+        let droneInfo = transformDataFormat(data) // 轉換資料格式為適用於多台無人機的格式
         // 轉換後的資料格式為：droneInfo = {[drone_id]: {......}}
-        store.dispatch("drone/setDroneInfo", droneInfo);
+        store.dispatch('drone/setDroneInfo', droneInfo)
       }
 
       // ???????
-      if (data.type === "cmd_ack") {
-        if (data.cmd_result.includes("ACCEPTED")) {
-          message.success(data.cmd_result);
+      if (data.type === 'cmd_ack') {
+        if (data.cmd_result.includes('ACCEPTED')) {
+          message.success(data.cmd_result)
         } else {
-          message.error(data.cmd_result);
+          message.error(data.cmd_result)
         }
-        saveLogs(data.cmd);
+        saveLogs(data.cmd)
       }
 
-      if (data.type === "mission_ack") {
-        if (data.mission_result.includes("ACCEPTED")) {
-          message.success(data.mission_result);
+      if (data.type === 'mission_ack') {
+        if (data.mission_result.includes('ACCEPTED')) {
+          message.success(data.mission_result)
         } else {
-          message.error(data.mission_result);
+          message.error(data.mission_result)
         }
-        saveLogs(data.mission_result);
+        saveLogs(data.mission_result)
       }
 
-      if (data.type === "apm_text") {
-        saveLogs(data.text);
+      if (data.type === 'apm_text') {
+        saveLogs(data.text)
       }
-    });
+    })
 
     const onIceCandidate = (droneID, event) => {
       if (event.candidate) {
-        console.log("onIceCandidate 被觸發");
+        console.log('onIceCandidate 被觸發')
         setTimeout(() => {
-          socket.emit("send-webrtc", {
+          socket.emit('send-webrtc', {
             droneID: droneID,
-            type: "candidate",
-            payload: event.candidate,
-          });
-          setLogs("Send candidate");
-          console.log("■■ Send candidate");
-        }, 1000);
+            type: 'candidate',
+            payload: event.candidate
+          })
+          setLogs('Send candidate')
+          console.log('■■ Send candidate')
+        }, 1000)
       }
-    };
+    }
 
     // handle receive media track event
     const onTrack = (droneID, event) => {
-      console.log("----onTrack()---接收影像----droneID=", droneID);
+      console.log('----onTrack()---接收影像----droneID=', droneID)
       //consoloe.log()
-      console.log("ontrack event.streams[0]: ", event.streams[0]);
-      setLogs("Received track");
-      console.log("event.streams[0].getTracks(): ", event.streams[0].getTracks());
+      console.log('ontrack event.streams[0]: ', event.streams[0])
+      setLogs('Received track')
+      console.log(
+        'event.streams[0].getTracks(): ',
+        event.streams[0].getTracks()
+      )
       // recordButton.isReady = true
-      remoteStream = event.streams[0];
-      remoteSubVideoEl[droneID].srcObject = remoteStream;
-    };
+      remoteStream = event.streams[0]
+      remoteSubVideoEl[droneID].srcObject = remoteStream
+    }
 
     // handle connection change
     const onIceConnectionStateChange = (droneID) => {
       console.log(
-        "----onIceConnectionStateChange---",
-        "\n現在的ICE連線狀態是: ",
+        '----onIceConnectionStateChange---',
+        '\n現在的ICE連線狀態是: ',
         pc[droneID].iceConnectionState
-      );
-      setLogs(`ICE connection Change: ${pc[droneID].iceConnectionState}`);
-      if (pc[droneID].iceConnectionState === "disconnected") {
-        console.log("ICE連線斷開 清除影像");
+      )
+      setLogs(`ICE connection Change: ${pc[droneID].iceConnectionState}`)
+      if (pc[droneID].iceConnectionState === 'disconnected') {
+        console.log('ICE連線斷開 清除影像')
         // remoteStream.getTracks().forEach((track) => track.stop())
-        remoteStream = null;
-        remoteSubVideoEl[droneID].srcObject = new MediaStream();
+        remoteStream = null
+        remoteSubVideoEl[droneID].srcObject = new MediaStream()
 
-        pc[droneID] = null;
-        startPeerNegotiation(droneID);
+        pc[droneID] = null
+        startPeerNegotiation(droneID)
 
-        VideoSrcObject.value = null;
+        VideoSrcObject.value = null
       }
-    };
+    }
 
     const onIceConnectionGatheringChange = (droneID) => {
       // console.log("---onIceConnectionGatheringChange--", "\niceGatheringState = ",pc[droneID].iceGatheringState)
-      setLogs(`ICE gathering Change: ${pc[droneID].iceGatheringState}`);
-    };
+      setLogs(`ICE gathering Change: ${pc[droneID].iceGatheringState}`)
+    }
 
     // peer connection initialization
     const initPeerConnection = (droneID) => {
       // console.log("initPeerConnectsion: droneId=", droneID)
 
       if (pc[droneID]?.connectionState) {
-        setLogs("Close previous peer connection");
-        pc[droneID].close();
+        setLogs('Close previous peer connection')
+        pc[droneID].close()
       }
-      pc[droneID] = createPeerConnection();
+      pc[droneID] = createPeerConnection()
       // console.log('Create peer connection: ', pc[droneID])
-      setLogs("Create peer connection");
+      setLogs('Create peer connection')
       // pc.onicecandidate = onIceCandidate(pc, droneId)
-      pc[droneID].onicecandidate = (event) => onIceCandidate(droneID, event);
-      pc[droneID].ontrack = (event) => onTrack(droneID, event);
-      pc[droneID].oniceconnectionstatechange = () => onIceConnectionStateChange(droneID);
+      pc[droneID].onicecandidate = (event) => onIceCandidate(droneID, event)
+      pc[droneID].ontrack = (event) => onTrack(droneID, event)
+      pc[droneID].oniceconnectionstatechange = () =>
+        onIceConnectionStateChange(droneID)
       pc[droneID].onicegatheringstatechange = () =>
-        onIceConnectionGatheringChange(droneID);
+        onIceConnectionGatheringChange(droneID)
       // if (localStream) {
       //   localStream.getTracks().forEach((track) => pc[droneID].addTrack(track));
       //   setLogs("Add local tracks to peer connection");
@@ -226,7 +233,7 @@ export default {
       //   // dummyStream.getTracks().forEach((track) => pc[droneID].addTrack(track))
       //   setLogs("No local stream,add dummy track to peer connection");
       // }
-    };
+    }
 
     const startPeerNegotiation = async (droneID) => {
       // remoteSubVideoEl.value.srcObject = localStream
@@ -235,7 +242,7 @@ export default {
 
       if (pc[droneID] == null) {
         // console.log(`*****startPeerNegotiation(${droneID})*****`);
-        initPeerConnection(droneID);
+        initPeerConnection(droneID)
         // const offer = await createOfferAndSetLocalSDP(pc[droneID]);
         // console.log('offer: ', offer)
         // setLogs("Create offer & set offer becomes local SDP");
@@ -244,57 +251,57 @@ export default {
         // setLogs("Send offer");
         // console.log(`****startPeerNegotiation(${droneID})**END*****`)
       }
-    };
+    }
 
-    socket.on("webrtc-topic", async (data) => {
+    socket.on('webrtc-topic', async (data) => {
       // console.log("接收的資料 = ", data, "data.id=", data.id);
 
-      if (data.type === "offer") {
-        console.log("■■■■■■ Received offer");
-        setLogs("Received offer");
+      if (data.type === 'offer') {
+        console.log('■■■■■■ Received offer')
+        setLogs('Received offer')
         // initPeerConnection(data.id)
         // await startPeerNegotiation(data.id)
 
-        await pc[data.id].setRemoteDescription(data.payload);
-        setLogs("Set offer becomes remote SDP");
-        const answer = await createAnswerAndSetLocalSDP(pc[data.id]);
-        setLogs("Create answer & set answer becomes local SDP");
-        socket.emit("send-webrtc", {
+        await pc[data.id].setRemoteDescription(data.payload)
+        setLogs('Set offer becomes remote SDP')
+        const answer = await createAnswerAndSetLocalSDP(pc[data.id])
+        setLogs('Create answer & set answer becomes local SDP')
+        socket.emit('send-webrtc', {
           droneID: data.id,
-          type: "answer",
-          payload: answer,
-        });
-        setLogs("Send answer");
-        console.log("■■ Send answer");
+          type: 'answer',
+          payload: answer
+        })
+        setLogs('Send answer')
+        console.log('■■ Send answer')
       }
 
-      if (data.type === "answer") {
-        console.log("■■■■■■ Received answer");
-        setLogs("Received answer");
-        await pc[data.id].setRemoteDescription(data.payload);
-        setLogs("Set answer becomes remote SDP");
+      if (data.type === 'answer') {
+        console.log('■■■■■■ Received answer')
+        setLogs('Received answer')
+        await pc[data.id].setRemoteDescription(data.payload)
+        setLogs('Set answer becomes remote SDP')
       }
 
-      if (data.type === "candidate") {
-        console.log("■■■■■■ Received candidate");
-        await pc[data.id].addIceCandidate(data.payload);
-        setLogs("Add received candidate");
-        console.log("Add received candidate answer");
+      if (data.type === 'candidate') {
+        console.log('■■■■■■ Received candidate')
+        await pc[data.id].addIceCandidate(data.payload)
+        setLogs('Add received candidate')
+        console.log('Add received candidate answer')
       }
-    });
+    })
 
     onBeforeUnmount(() => {
-      console.log("------ onBeforeUnmount , setRabbitmqIsInit', false----");
-      store.dispatch("setRabbitmqIsInit", false);
+      console.log("------ onBeforeUnmount , setRabbitmqIsInit', false----")
+      store.dispatch('setRabbitmqIsInit', false)
       // 離開網頁時，會觸發端的disconnect，後端會清除所有消費者訂閱，所以將setRabbitmqIsInit狀態更新為init
 
       // Remove listener to prevent multiple listening
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("queue-created");
-      socket.off("webrtc-topic");
-      socket.off("drone-topic");
-    });
+      socket.off('connect')
+      socket.off('disconnect')
+      socket.off('queue-created')
+      socket.off('webrtc-topic')
+      socket.off('drone-topic')
+    })
 
     return {
       remoteMainVideoEl,
@@ -308,10 +315,10 @@ export default {
       startPeerNegotiation,
 
       VideoSrcObject,
-      select_droneID,
-    };
-  },
-};
+      select_droneID
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

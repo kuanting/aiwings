@@ -95,11 +95,11 @@
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { GithubFilled } from '@ant-design/icons-vue'
-import { onMounted } from '@vue/runtime-core'
+import { onMounted } from 'vue'
 export default {
   name: 'Introduction',
   components: {
-    GithubFilled,
+    GithubFilled
     // Header
   },
   setup() {

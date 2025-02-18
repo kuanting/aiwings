@@ -17,10 +17,10 @@ export default {
   //origin
   getDroneInfo(state) {
     return {
-      ...state.drone,
+      ...state.drone
 
       //改成在 drone["id"].isArmed 做操作
-      
+
       // isArmed:
       //   state.drone.isArmed === '' || state.drone.isArmed === 'null'
       //     ? ''
@@ -31,8 +31,8 @@ export default {
   },
 
   //特定drone的INFO
-  getSpecificDroneInfo(state){
-    return function(droneID){
+  getSpecificDroneInfo(state) {
+    return function (droneID) {
       return state.drone[droneID]
     }
   },
@@ -48,7 +48,7 @@ export default {
   getAltitude(state) {
     //state.drone["droneID"].status.altitudeㄌ
     // return state.status.altitude
-    return function(droneID){
+    return function (droneID) {
       return state.drone[droneID].status.altitude
     }
   },
@@ -61,7 +61,7 @@ export default {
   getTakeoffStatus(state) {
     //state.drone["droneID"].status.isTakeoff
     // return state.status.isTakeoff
-    return function(droneId){
+    return function (droneId) {
       return state.drone[droneId].status.isTakeoff
     }
   },
@@ -69,7 +69,7 @@ export default {
   getDestination(state) {
     //state.drone["droneID"].status.isTakeoff
     // return state.destination
-    return function(droneID){
+    return function (droneID) {
       return state.drone[droneID].destination
     }
   }

@@ -7,12 +7,12 @@ export const createPeerConnection = () => {
     // iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
     iceServers: [
       {
-        urls: "stun:stun.l.google.com:19302" //// google提供的免費的地址
+        urls: 'stun:stun.l.google.com:19302' //// google提供的免費的地址
       },
       {
-        urls: "turn:relay1.expressturn.com:3478",          //STUN or TURN URI
-        username: "efJOQ1TXPNAJYW2V54",   //TURN username
-        credential: "BQ8uDasm0AkaePjZ"                //TURN password
+        urls: 'turn:relay1.expressturn.com:3478', //STUN or TURN URI
+        username: 'efJOQ1TXPNAJYW2V54', //TURN username
+        credential: 'BQ8uDasm0AkaePjZ' //TURN password
       }
     ]
   })
