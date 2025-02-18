@@ -33,8 +33,6 @@
     "@types/mapbox-gl": "^2.7.19",
     "@vitejs/plugin-vue": "^4.5.0",
     "@vue/eslint-config-prettier": "^8.0.0",
-    "babel-eslint": "^10.1.0",
-    "babel-plugin-import": "^1.13.8",
     "eslint": "^8.54.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-vue": "^9.19.1",
