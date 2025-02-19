@@ -8,9 +8,6 @@ module.exports = {
     'eslint:recommended',
     '@vue/prettier'
   ],
-  parserOptions: {
-    parser: 'babel-eslint'
-  },
   rules: {
     'prettier/prettier': ['error', {}, { usePrettierrc: true }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
