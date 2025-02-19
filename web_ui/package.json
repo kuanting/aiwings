@@ -17,7 +17,7 @@
     "@tensorflow/tfjs-backend-webgpu": "^4.13.0",
     "@turf/turf": "^7.2.0",
     "@vitejs/plugin-vue": "^5.2.1",
-    "ant-design-vue": "^2.2.0-rc.1",
+    "ant-design-vue": "^4.2.6",
     "aos": "^2.3.4",
     "axios": "^1.6.2",
     "core-js": "^3.33.3",
