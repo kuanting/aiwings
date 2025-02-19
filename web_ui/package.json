@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
+    "lint": "eslint --fix"
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
@@ -32,9 +32,8 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@vue/eslint-config-prettier": "^8.0.0",
-    "eslint": "^8.54.0",
-    "eslint-plugin-prettier": "^5.0.1",
+    "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-vue": "^9.19.1",
     "prettier": "^3.1.0"
   }
