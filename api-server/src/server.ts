@@ -78,11 +78,8 @@ useDatabase();
 
 useRabbitmq();
 
-server.listen(Number(process.env.BACKEND_SERVICE_SERVICE_PORT), () => {
-  logger.info(
-    `Server is listening on port ${process.env.BACKEND_SERVICE_SERVICE_PORT}`
-  );
-  // console.log("server is on http://localhost:3080/api/v1")
+server.listen(3080, () => {
+  logger.info( `Server is listening on port 3080`);
 });
 
 export { logger, io };

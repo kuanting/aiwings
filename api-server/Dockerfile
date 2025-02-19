@@ -10,7 +10,6 @@ COPY ./ /app/
 
 # ------------------------------------------------------------------
 # 設定默認環境變數
-ENV BACKEND_SERVICE_SERVICE_PORT=3080
 
 # # for 測試用
 # ENV FRONTEND_URL=http://localhost:5173
@@ -30,9 +29,9 @@ ENV TLS_KEY="for_production_use(no need to set during dev)"
 ENV TLS_CERT="for_production_use(no need to set during dev)"
 # ------------------------------------------------------------------
 
-EXPOSE 3080
 
 
 CMD [ "npm", "run", "dev" ]
+EXPOSE 80
 
 # CMD [ "npm",  "start" ]
