@@ -23,6 +23,7 @@
     "dayjs": "^1.11.10",
     "mapbox-gl": "^3.0.0",
     "register-service-worker": "^1.7.2",
+    "sass-embedded": "^1.85.0",
     "socket.io-client": "^4.7.2",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5",
@@ -37,8 +38,6 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-vue": "^9.19.1",
     "prettier": "^3.1.0",
-    "sass": "^1.69.5",
-    "sass-loader": "^13.3.2",
     "vite": "^5.3.3"
   }
 }
