@@ -20,13 +20,9 @@
 </template>
 
 <script>
-import { reactive, ref } from 'vue'
 import { useStore } from 'vuex'
-import { computed, nextTick, watch } from 'vue'
-import socket from '../../lib/websocket'
-import user from '../../services/user'
+import { computed, watch } from 'vue'
 import Button from '../UI/Button.vue'
-import { notification } from 'ant-design-vue'
 
 import Enroll from '../Enroll_drones/Enroll.vue'
 import DroneIdEditor from './DroneIdEditor.vue'

@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { CameraOutlined, VideoCameraOutlined } from '@ant-design/icons-vue'
 
 export default {
@@ -31,7 +31,7 @@ export default {
       return props.isStart
     })
 
-    watch(isStart, (newValue, oldValue) => {
+    watch(isStart, (newValue) => {
       console.log('變更後：', newValue)
       if (newValue == true && props.method == 'camera') {
         iconBoxRef.value.classList.add('continuous')

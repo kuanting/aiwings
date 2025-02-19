@@ -33,14 +33,12 @@
 
 <script>
 import { useStore } from 'vuex'
-import { onBeforeUnmount, onMounted, ref, computed } from 'vue'
+import { onBeforeUnmount, ref, computed } from 'vue'
 import socket from '../../lib/websocket'
 // import detection from '../../lib/detection'
 import {
   createPeerConnection,
-  createAnswerAndSetLocalSDP,
-  createOfferAndSetLocalSDP,
-  getLocalStream
+  createAnswerAndSetLocalSDP
 } from '../../lib/webRTC'
 import { message } from 'ant-design-vue'
 import MainVideoArea from './MainVideoArea.vue'

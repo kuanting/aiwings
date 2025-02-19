@@ -52,7 +52,7 @@
 
 <script>
 import { useStore } from 'vuex'
-import { computed, reactive, ref } from 'vue'
+import { computed } from 'vue'
 import { droneInfoInit } from '../../lib/transformDataFormat'
 
 export default {
