@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { ref } from '@vue/reactivity'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   ControlOutlined,
@@ -52,7 +52,7 @@ import {
   VideoCameraOutlined,
   PlusCircleOutlined
 } from '@ant-design/icons-vue'
-import { computed, watch } from '@vue/runtime-core'
+import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
 export default {
   name: 'Header',
@@ -89,7 +89,6 @@ export default {
   }
 }
 </script>
-
 
 <style lang="scss" scope>
 .ant-menu {

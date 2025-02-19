@@ -14,7 +14,7 @@ export default createStore({
       email: '',
       droneId: '',
       isAdmin: false
-    },
+    }
   },
   actions: {
     setLogs({ commit }, payload) {
@@ -93,7 +93,7 @@ export default createStore({
       return state.rabbitmqAdminIsInit
     },
     getUserDroneIdNames(state) {
-      return state.user.droneId.map(item => item.id);
+      return state.user.droneId.map((item) => item.id)
     }
   },
   modules: {

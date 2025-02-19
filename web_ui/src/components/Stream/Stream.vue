@@ -6,8 +6,8 @@
       label-in-value
       style="width: 120px"
       :options="options"
-      @change="handleChange"
       class="dropdown-style"
+      @change="handleChange"
     >
     </a-select>
 
@@ -57,7 +57,7 @@ import {
   getLocalStream
 } from '../../lib/webRTC'
 import { ApiOutlined, CameraOutlined } from '@ant-design/icons-vue'
-import { onBeforeUnmount, reactive, ref } from '@vue/runtime-core'
+import { onBeforeUnmount, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import { message } from 'ant-design-vue'
 export default {

@@ -28,107 +28,107 @@
 </template>
 
 <script>
-import Mapbox from "../components/Mapbox/Mapbox.vue";
-import ManagementTitle from "../components/Header/ManagementTitle.vue";
-import ManagementHeader from "../components/Header/ManagementHeader.vue";
-import Control from "../components/Control/Control.vue";
-import Stream from "../components/Stream/Stream.vue";
-import DroneInfoDashBoardVue from "../components/Drone_Dashboard/DroneInfoDashBoard.vue";
-import socket from "../lib/websocket";
-import { useStore } from "vuex";
-import { message } from "ant-design-vue";
-import { computed, onBeforeUnmount } from "@vue/runtime-core";
+import Mapbox from '../components/Mapbox/Mapbox.vue'
+import ManagementTitle from '../components/Header/ManagementTitle.vue'
+import ManagementHeader from '../components/Header/ManagementHeader.vue'
+import Control from '../components/Control/Control.vue'
+import Stream from '../components/Stream/Stream.vue'
+import DroneInfoDashBoardVue from '../components/Drone_Dashboard/DroneInfoDashBoard.vue'
+import socket from '../lib/websocket'
+import { useStore } from 'vuex'
+import { message } from 'ant-design-vue'
+import { computed, onBeforeUnmount } from 'vue'
 
-import { transformDataFormat } from "../lib/transformDataFormat";
+import { transformDataFormat } from '../lib/transformDataFormat'
 
 export default {
-  name: "Drone",
+  name: 'Drone',
   components: {
     Mapbox,
     ManagementTitle,
     ManagementHeader,
     Stream,
     Control,
-    DroneInfoDashBoardVue,
+    DroneInfoDashBoardVue
   },
   setup() {
-    const store = useStore();
-    const rabbitmqIsInit = computed(() => store.getters.getRabbitmqIsInit);
-    const user = computed(() => store.getters.getUserInfo);
-    const saveLogs = (log) => store.dispatch("setLogs", log);
+    const store = useStore()
+    const rabbitmqIsInit = computed(() => store.getters.getRabbitmqIsInit)
+    const user = computed(() => store.getters.getUserInfo)
+    const saveLogs = (log) => store.dispatch('setLogs', log)
 
     /*************** rabbitmqInit *****************/
     const rabbitmqInit = () => {
       // console.log('user: ', user.value.droneId[0])
       // console.log("rabbitmqInit() \n socket.id = ", socket.id);
-      saveLogs(`Websocket connected: ${socket.id}`);
+      saveLogs(`Websocket connected: ${socket.id}`)
       for (let i in user.value.droneId) {
-        saveLogs(`Drone ID: ${user.value.droneId[i]}`);
+        saveLogs(`Drone ID: ${user.value.droneId[i]}`)
       }
-      socket.emit("establish-rabbitmq-connection-drone", user.value.droneId); //傳送此事件到後端，後端webSocket監聽到此事件後，會建立所有droneId的 rabbitMq Queue
-    };
+      socket.emit('establish-rabbitmq-connection-drone', user.value.droneId) //傳送此事件到後端，後端webSocket監聽到此事件後，會建立所有droneId的 rabbitMq Queue
+    }
 
     // Trigger RabbitMQ when the first come or refresh pages
-    console.log("rabbitmqIsInit.value = ", rabbitmqIsInit.value);
+    console.log('rabbitmqIsInit.value = ', rabbitmqIsInit.value)
     if (!rabbitmqIsInit.value) {
-      rabbitmqInit();
-      store.dispatch("setRabbitmqIsInit", true);
+      rabbitmqInit()
+      store.dispatch('setRabbitmqIsInit', true)
     }
 
     /************ Websocket event listening *************/
-    socket.on("connect", () => rabbitmqInit());
-    socket.on("disconnect", (reason) => {
-      saveLogs(`Websocket disconnected: ${reason}`);
-    });
-    socket.on("queue-created", (queueName) => {
+    socket.on('connect', () => rabbitmqInit())
+    socket.on('disconnect', (reason) => {
+      saveLogs(`Websocket disconnected: ${reason}`)
+    })
+    socket.on('queue-created', (queueName) => {
       // console.log(`Queue created: ${queueName}`);
-      saveLogs(`Queue created: ${queueName}`);
-    });
+      saveLogs(`Queue created: ${queueName}`)
+    })
 
-    socket.on("drone-topic", (data) => {
+    socket.on('drone-topic', (data) => {
       // console.log("監聽無人機傳遞的資訊")
-      if (data.type === "message") {
+      if (data.type === 'message') {
         // console.log('Here: ', data.drone_info.drone_id)
         // console.log('droneInfo from backend: ', data)
-        let droneInfo = transformDataFormat(data); // 轉換資料格式為適用於多台無人機的格式
+        let droneInfo = transformDataFormat(data) // 轉換資料格式為適用於多台無人機的格式
         // 轉換後的資料格式為：droneInfo = {[drone_id]: {......}}
-        store.dispatch("drone/setDroneInfo", droneInfo);
+        store.dispatch('drone/setDroneInfo', droneInfo)
       }
-      if (data.type === "cmd_ack") {
-        if (data.cmd_result.includes("ACCEPTED")) {
-          message.success(data.cmd_result);
+      if (data.type === 'cmd_ack') {
+        if (data.cmd_result.includes('ACCEPTED')) {
+          message.success(data.cmd_result)
         } else {
-          message.error(data.cmd_result);
+          message.error(data.cmd_result)
         }
-        saveLogs(data.cmd);
+        saveLogs(data.cmd)
       }
 
-      if (data.type === "mission_ack") {
-        if (data.mission_result.includes("ACCEPTED")) {
-          message.success(data.mission_result);
+      if (data.type === 'mission_ack') {
+        if (data.mission_result.includes('ACCEPTED')) {
+          message.success(data.mission_result)
         } else {
-          message.error(data.mission_result);
+          message.error(data.mission_result)
         }
-        saveLogs(data.mission_result);
+        saveLogs(data.mission_result)
       }
 
-      if (data.type === "apm_text") {
-        saveLogs(data.text);
+      if (data.type === 'apm_text') {
+        saveLogs(data.text)
       }
-    });
+    })
 
     // Remove listener to prevent multiple listening
     onBeforeUnmount(() => {
-      console.log("------ onBeforeUnmount ----");
-      store.dispatch("setRabbitmqIsInit", false);
+      console.log('------ onBeforeUnmount ----')
+      store.dispatch('setRabbitmqIsInit', false)
 
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("queue-created");
-      socket.off("drone-topic");
-    });
-  },
-};
+      socket.off('connect')
+      socket.off('disconnect')
+      socket.off('queue-created')
+      socket.off('drone-topic')
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>

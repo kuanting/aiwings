@@ -12,24 +12,17 @@
       type="email"
     />
     <!-- 顯示所有droneID的編輯組件 -->
-    <div v-for="droneId in userDroneIdNames" :key="droneId" style="width: 100%;">
-      <DroneIdEditor :droneId="droneId"/>
+    <div v-for="droneId in userDroneIdNames" :key="droneId" style="width: 100%">
+      <DroneIdEditor :drone-id="droneId" />
     </div>
     <a-divider />
   </div>
-
-  
-
 </template>
 
 <script>
-import { reactive, ref } from '@vue/reactivity'
 import { useStore } from 'vuex'
-import { computed, nextTick, watch } from '@vue/runtime-core'
-import socket from '../../lib/websocket'
-import user from '../../services/user'
+import { computed, watch } from 'vue'
 import Button from '../UI/Button.vue'
-import { notification } from 'ant-design-vue'
 
 import Enroll from '../Enroll_drones/Enroll.vue'
 import DroneIdEditor from './DroneIdEditor.vue'
@@ -48,27 +41,26 @@ export default {
       return store.getters.getUserInfo
     })
 
-    const userDroneIdNames = computed(()=>{ 
-       return store.getters.getUserDroneIdNames
+    const userDroneIdNames = computed(() => {
+      return store.getters.getUserDroneIdNames
     })
 
     // 使用watch深度監聽，讓store中數據不論在全局中的哪裡進行變更，這裡都能跟著響應式變化
     watch(
       () => store.getters.getUserDroneIdNames,
       (newValue, oldValue) => {
-        console.log("新值:", newValue);
-        console.log("旧值:", oldValue);
+        console.log('新值:', newValue)
+        console.log('旧值:', oldValue)
       },
-      {deep: true}
+      { deep: true }
     )
     const unsubscribe = store.subscribe((mutation, state) => {
-      console.log("mutation.type")
+      console.log('mutation.type')
     })
 
-         
-    return {      
-      userDroneIdNames,      
-      userInfo,
+    return {
+      userDroneIdNames,
+      userInfo
     }
   }
 }
@@ -86,6 +78,5 @@ export default {
   .content__input {
     margin-bottom: 2rem;
   }
-
 }
 </style>

@@ -8,7 +8,7 @@
       :max="props.max"
       :min="props.min"
       @change="props.changeHandler"
-      @pressEnter="props.enterHandler"
+      @press-enter="props.enterHandler"
     />
   </div>
 </template>

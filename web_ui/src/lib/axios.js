@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { notification } from 'ant-design-vue'
 
-console.log("------./lib/axios.js--------")
+console.log('------./lib/axios.js--------')
 
 axios.defaults.baseURL =
   import.meta.env.NODE_ENV === 'production'
@@ -10,8 +10,9 @@ axios.defaults.baseURL =
 axios.defaults.withCredentials = true
 
 axios.interceptors.response.use(
-  (res) => res, // 第一個函式:  // Do something 
-  (error) => {  // 第二個函式: // Do something with request error
+  (res) => res, // 第一個函式:  // Do something
+  (error) => {
+    // 第二個函式: // Do something with request error
     if (error.response.status === 500) {
       notification.error({
         message: 'Error',

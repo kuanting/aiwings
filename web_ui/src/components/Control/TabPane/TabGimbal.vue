@@ -42,7 +42,7 @@ import { message } from 'ant-design-vue'
 import socket from '../../../lib/websocket'
 import { ref } from 'vue'
 import { useStore } from 'vuex'
-import { computed } from '@vue/runtime-core'
+import { computed } from 'vue'
 
 export default {
   name: 'TabGimbal',
@@ -64,15 +64,12 @@ export default {
     // let defaultSelected = userInfo.value.droneId[0].id
     const defaultSelected = ref(false)
 
-    
     // new add
-    if (userInfo.value.droneId[0]){
+    if (userInfo.value.droneId[0]) {
       defaultSelected.value = userInfo.value.droneId[0].id
-    }else{
+    } else {
       defaultSelected.value = 'No droone'
     }
-
-
 
     let droneList = []
     for (let i in droneArr) {

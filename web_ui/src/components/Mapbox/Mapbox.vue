@@ -30,11 +30,8 @@
 
 <script>
 import CustomMap from '../../lib/mapbox'
-//update 
-// import useMapbox from '../../hooks/useMapbox'
-// console.log(a)
 import DroneDashBoard from './DroneDashBoard.vue'
-import { computed, ref, watch } from '@vue/runtime-core'
+import { computed, ref, watch } from 'vue'
 import { getUserCurrentLocation } from '../../lib/geolocation'
 import droneService from '../../services/drone'
 import socket from '../../lib/websocket'
@@ -131,7 +128,8 @@ export default {
 
     //FIXEDME: 這邊要改
     getUserCurrentLocation()
-      .then(([lng, lat]) => {//取得設備的經緯度
+      .then(([lng, lat]) => {
+        //取得設備的經緯度
         longitude = lng
         latitude = lat
       })
@@ -147,7 +145,7 @@ export default {
         // map_instnace = mapbox
         // console.log("here: ", map_instnace)
         mapbox.initMapbox()
-        mapbox.map.dragRotate.disable()//禁用了地圖的拖動旋轉功能
+        mapbox.map.dragRotate.disable() //禁用了地圖的拖動旋轉功能
         mapbox.map.on('load', () => {
           mapbox.createGeoJsonSource('real-time-record', geoJsonFormatData)
           mapbox.createLineLayer('real-time-path', 'real-time-record')
@@ -168,7 +166,7 @@ export default {
           const droneElement = document.createElement('img')
           droneElement.width = 100
           droneElement.src = droneImgSrc
-          droneElement.id = droneID          
+          droneElement.id = droneID
           drones_marker[droneID] = mapbox.createMarker({
             color: 'red',
             scale: '0.7',
@@ -207,8 +205,7 @@ export default {
               console.log(lngLat)
 
               cacheTarget = lngLat
-              mapbox.flyTo([lngLat.lng, lngLat.
-              lat])
+              mapbox.flyTo([lngLat.lng, lngLat.lat])
               popEl.value.click()
               return
             }

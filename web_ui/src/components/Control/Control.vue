@@ -1,6 +1,6 @@
 <template>
   <a-tabs class="tabs" size="small">
-    <a-tab-pane key="1" class="tabs__pane" tab="Control" >
+    <a-tab-pane key="1" class="tabs__pane" tab="Control">
       <TabControl />
     </a-tab-pane>
     <a-tab-pane key="2" class="tabs__pane" tab="Tweak">

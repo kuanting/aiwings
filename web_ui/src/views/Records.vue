@@ -4,13 +4,13 @@
       <Map :flight-id="flight.id" :flight-record="flight.record" />
     </div>
     <div class="item-list">
-      <ItemList @RecordSelect="handleRecordSelect" />
+      <ItemList @record-select="handleRecordSelect" />
     </div>
   </div>
 </template>
 
 <script>
-import { reactive } from '@vue/reactivity'
+import { reactive } from 'vue'
 import ItemList from '../components/Records/ItemList.vue'
 import Map from '../components/Records/Map.vue'
 import droneService from '../services/drone'

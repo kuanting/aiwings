@@ -20,8 +20,8 @@ export default {
   },
   watch: {
     $route(v) {
-      console.log("v =",v)
-      this.headerVisible = !["/drone", "/drone01"].includes(v.path);
+      console.log('v =', v)
+      this.headerVisible = !['/drone', '/drone01'].includes(v.path)
     }
   }
 }

@@ -6,8 +6,8 @@
       label-in-value
       style="width: 120px"
       :options="options"
-      @change="handleChange"
       class="select"
+      @change="handleChange"
     ></a-select>
     <!--  -->
     <Button
@@ -55,7 +55,7 @@ import socket from '../../../lib/websocket'
 import { message } from 'ant-design-vue'
 import { ref } from 'vue'
 import { useStore } from 'vuex'
-import { computed } from '@vue/runtime-core'
+import { computed } from 'vue'
 export default {
   name: 'TabServo',
   components: {
@@ -72,15 +72,12 @@ export default {
     // let defaultSelected = userInfo.value.droneId[0].id
     const defaultSelected = ref(false)
 
-    
     // new add
-    if (userInfo.value.droneId[0]){
+    if (userInfo.value.droneId[0]) {
       defaultSelected.value = userInfo.value.droneId[0].id
-    }else{
+    } else {
       defaultSelected.value = 'No drone'
     }
-
-
 
     let droneList = []
     for (let i in droneArr) {

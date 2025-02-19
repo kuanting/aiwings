@@ -38,29 +38,29 @@ export function transformDataFormat(data) {
       latitude,
       longitude,
       altitude,
-      speed,
+      speed
     }
   }
-  return transformData;
+  return transformData
 }
 
 // 定義 drone 的訊息預設格式
-export const droneInfoInit = { 
-  timeStamp: '', 
-  roll: null, 
-  yaw: null, 
-  pitch: null, 
-  voltage: null, 
-  percentage: null, 
-  hpop: null, 
-  gpsCount: null, 
-  mode: '', 
-  isArmed: '', 
-  heading: null, 
-  latitude: null, 
-  longitude: null, 
-  altitude: null, 
-  speed: null, 
+export const droneInfoInit = {
+  timeStamp: '',
+  roll: null,
+  yaw: null,
+  pitch: null,
+  voltage: null,
+  percentage: null,
+  hpop: null,
+  gpsCount: null,
+  mode: '',
+  isArmed: '',
+  heading: null,
+  latitude: null,
+  longitude: null,
+  altitude: null,
+  speed: null,
   status: { altitude: 3, isTakeoff: false }, //isTakeoff 預設要改成false
-  destination: { lng: null, lat: null} 
+  destination: { lng: null, lat: null }
 }

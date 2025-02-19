@@ -7,7 +7,7 @@
 <script>
 import Enroll from '../components/Enroll_drones/Enroll.vue'
 export default {
-  name: 'enroll',
+  name: 'Enroll',
   components: { Enroll }
 }
 </script>

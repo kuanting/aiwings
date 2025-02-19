@@ -5,7 +5,7 @@
 <script>
 import socket from '@/lib/websocket'
 import Map from '../components/Management/Map.vue'
-import { computed, onBeforeUnmount, reactive } from '@vue/runtime-core'
+import { computed, onBeforeUnmount, reactive } from 'vue'
 import { useStore } from 'vuex'
 
 export default {

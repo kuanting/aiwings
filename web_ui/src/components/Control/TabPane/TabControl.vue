@@ -7,8 +7,8 @@
         label-in-value
         style="width: 120px"
         :options="options"
+        dropdown-class-name=""
         @change="handleChange"
-        dropdownClassName=""
       ></a-select>
       <!-- end -->
       <a-row justify="space-around">
@@ -77,9 +77,9 @@ import Switch from '../../UI/Switch.vue'
 import InputNumber from '../../UI/InputNumber.vue'
 import RadioGroup from '../../UI/RadioGroup.vue'
 import Button from '../../UI/Button.vue'
-import { ref } from '@vue/reactivity'
+import { ref } from 'vue'
 import { useStore } from 'vuex'
-import { computed, watch } from '@vue/runtime-core'
+import { computed, watch } from 'vue'
 import socket from '../../../lib/websocket'
 import { message } from 'ant-design-vue'
 export default {
@@ -92,12 +92,10 @@ export default {
   },
   setup() {
     const isArm = ref(false)
-    const isTakeoff = computed(
-      () => {
-        return drone.value[defaultSelected.value]?.altitude > 0.5
-      }
-    )
-    
+    const isTakeoff = computed(() => {
+      return drone.value[defaultSelected.value]?.altitude > 0.5
+    })
+
     const isLanding = ref(false)
     const alt_byUser = ref(3)
     const speed = ref(3)
@@ -113,15 +111,13 @@ export default {
     )
     const defaultSelected = ref(false) //用戶所選的ID
 
-
     // new add
-    if (userInfo.value.droneId[0]){
+    if (userInfo.value.droneId[0]) {
       defaultSelected.value = userInfo.value.droneId[0].id
       // console.log("defaultSelected.value = ",defaultSelected.value)
-    }else{
+    } else {
       defaultSelected.value = 'No drone'
     }
-
 
     let droneList = []
     for (let i in droneArr) {
@@ -134,7 +130,7 @@ export default {
       //且socket.emit("send-drone") 的時候 要回傳dorneID
 
       // console.log("value = ",value) // 選擇test2無人機： value = {value: 'test2', label: 'test2', key: 'test2'}
-      
+
       defaultSelected.value = value.value
       const drone_selected = computed(() =>
         store.getters['drone/getSpecificDroneInfo'](defaultSelected.value)
@@ -192,7 +188,8 @@ export default {
       }
 
       flightMode.value = drone[defaultSelected.value].mode
-      isArm.value = drone[defaultSelected.value].isArmed === 'ARM' ? true : false
+      isArm.value =
+        drone[defaultSelected.value].isArmed === 'ARM' ? true : false
       // isTakeoff.value =
       //   drone[defaultSelected].isArmed === 'ARM' &&
       //   drone[defaultSelected].altitude >= 0.5
@@ -216,10 +213,13 @@ export default {
     const sendDroneCommand = (command) => socket.emit('send-drone', command)
 
     const flightHandler = () => {
-      if (isTakeoff.value || drone.value[defaultSelected.value].altitude > 0.5) {
+      if (
+        isTakeoff.value ||
+        drone.value[defaultSelected.value].altitude > 0.5
+      ) {
         sendDroneCommand({ droneID: defaultSelected.value, cmd: 'LAND' }) // LAND 降落
         message.success('LANDING')
-        console.log("LAND")
+        console.log('LAND')
         isTakeoff.value = false
         return
       }
@@ -232,9 +232,9 @@ export default {
           altitude: alt_byUser.value
         })
         message.success('TAKEOFF')
-        console.log("TAKEOFF")
+        console.log('TAKEOFF')
         isTakeoff.value = true
-      }, 2000)     
+      }, 2000)
     }
 
     const altitudeChangeHandler = (value) => {
@@ -243,10 +243,10 @@ export default {
       alt_byUser.value = value
     }
 
-
     /* 在高度框中按下enter時觸發，將更改無人機高度 */
     const altitudeEnterHandler = () => {
-      if (isTakeoff.value) {//如果已經起飛
+      if (isTakeoff.value) {
+        //如果已經起飛
         sendDroneCommand({
           droneID: defaultSelected.value,
           cmd: 'GOTO',
@@ -284,13 +284,16 @@ export default {
     const flightModeChangeHandler = (mode) => {
       if (typeof mode === 'object') {
         mode = mode.target.value
-        console.log("mode.target.value =",mode
-                    ,"\n___flightModeChangeHandler()__mode = ",mode)
+        console.log(
+          'mode.target.value =',
+          mode,
+          '\n___flightModeChangeHandler()__mode = ',
+          mode
+        )
       }
       sendDroneCommand({ droneID: defaultSelected.value, cmd: mode })
       message.success(`Change MODE to ${mode}`)
     }
-
 
     const emergencyStopHandler = () => {
       // sendDroneCommand({
@@ -301,8 +304,6 @@ export default {
       //   lat: drone.value[defaultSelected].latitude
       // })
       sendDroneCommand({ droneID: defaultSelected.value, cmd: 'LAND' })
-
-
 
       store.dispatch('drone/updateDestination', {
         droneID: defaultSelected.value, //++

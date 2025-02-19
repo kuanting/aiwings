@@ -10,7 +10,7 @@ import { message } from 'ant-design-vue'
 import { getUserCurrentLocation } from '../../lib/geolocation'
 import CustomMap from '../../lib/mapbox'
 import * as turf from '@turf/turf'
-import { reactive, watch } from '@vue/runtime-core'
+import { reactive, watch } from 'vue'
 export default {
   name: 'Map',
   components: {
