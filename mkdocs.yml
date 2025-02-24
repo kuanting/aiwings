@@ -5,7 +5,7 @@ nav:
   - Server: server.md
   - Web UI: web_ui.md
   - Onboard App: onboard_app.md
-  
+
 theme:
     name: readthedocs
     highlightjs: true
@@ -14,4 +14,4 @@ theme:
         - java
         - python
 
-use_directory_urls: false 
+use_directory_urls: false
