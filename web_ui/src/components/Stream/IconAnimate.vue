@@ -54,6 +54,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
+
 $Camera-icon-init-color: #a19bff;
 $Camera-icon-recording-color: #ff8578;
 $box-size: 55px;
@@ -90,14 +92,14 @@ $box-size: 55px;
 @keyframes Screenshot {
   0% {
     transform: scale(0.95);
-    outline: 0rem solid darken($Camera-icon-init-color, 10%);
-    background-color: darken($Camera-icon-init-color, 10%); /* 變成深色 */
-  }
-  20% {
+    outline: 0rem solid color.adjust($Camera-icon-init-color, $lightness: -10%);
+    background-color: color.adjust($Camera-icon-init-color, $lightness: -10%); /* 變成深色 */
+    }
+    20% {
     transform: scale(1);
-    background-color: darken(
+    background-color: color.adjust(
       $Camera-icon-init-color,
-      10%
+      $lightness: -10%
     ); /* 維持深色20%時間 */
   }
   20% {

@@ -42,7 +42,7 @@ export default {
       mapbox.updateGeoJsonSource('real-time-record', geoJsonFormatData)
 
       let start
-      const distance = turf.lineDistance(turf.lineString(flight.flightRecord))
+      const distance = turf.length(turf.lineString(flight.flightRecord))
 
       function frame(time) {
         if (!start) start = time

@@ -10,7 +10,6 @@ import './registerServiceWorker'
 import router from './router'
 import vuex from 'vuex'
 import store from './store'
-import 'ant-design-vue/dist/antd.css'
 import {
   Button,
   Menu,
