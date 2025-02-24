@@ -1,13 +1,3 @@
-# Shared env_file configuration for all services
-# Learn more about extentions at https://docs.docker.com/reference/compose-file/extension/
-x-env_file: &env_file
-  # Set default variables with .env.example
-  - path: .env.example
-
-  # Override variables with .env
-  - path: .env
-    required: false
-
 services:
   rabbitmq:
     container_name: aiwings-rabbitmq
@@ -16,7 +6,9 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-    env_file: *env_file
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
   mysql:
     container_name: aiwings-mysql
@@ -25,7 +17,11 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     ports:
       - "3306:3306"
-    env_file: *env_file
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: drone_cloud_test
+      MYSQL_USER: user
+      MYSQL_PASSWORD: mysql
 
   server:
     container_name: aiwings-server
@@ -36,13 +32,21 @@ services:
       - mysql
     ports:
       - "3080:3080"
-    env_file: *env_file
+    environment:
+      FRONTEND_URL: http://localhost:5173
+      MYSQL_SERVICE_SERVICE_HOST: mysql
+      MYSQL_SERVICE_SERVICE_PORT: 3306
+      MYSQL_SERVICE_USER: user
+      MYSQL_SERVICE_PASSWORD: mysql
+      RABBITMQ_SERVICE_SERVICE_HOST: rabbitmq
+      RABBITMQ_SERVICE_SERVICE_PORT: 5672
+      RABBITMQ_SERVICE_USER: guest
+      RABBITMQ_SERVICE_PASSWORD: guest
+      JWT_TOKEN_SECRET: littleSecret
 
   web:
     container_name: aiwings-web
     build: web_ui
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-    env_file: *env_file
+      - "3000:80"

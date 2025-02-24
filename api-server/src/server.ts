@@ -3,14 +3,12 @@ if (process.env.NODE_ENV !== 'production') config();
 import express from 'express';
 import cors from 'cors';
 import http from 'http';
-import https from 'https';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { createLogger, format, transports } from 'winston';
 import { Server } from 'socket.io';
 import routes from './routes';
 import useSocketIO from './services/websocket';
-// import { connectToDatabase as useDatabase } from './services/database';
 import {connectToDatabase, createTable, closeConnect} from './services/database'
 import { connectToRabbitmq as useRabbitmq } from './services/rabbitmq';
 
@@ -20,15 +18,7 @@ const app = express();
 app.set('trust proxy', process.env.NODE_ENV === 'production');
 
 // Create server
-const fs = require('fs');
-const server =
-  process.env.NODE_ENV === 'production'
-    ? https.createServer(
-        { key: fs.readFileSync(process.env.TLS_KEY), cert: fs.readFileSync(process.env.TLS_CERT) },
-        app
-      )
-    : http.createServer(app);
-// const server = http.createServer(app);
+const server = http.createServer(app);
 
 // Logger
 const { combine, timestamp, printf } = format;
@@ -78,11 +68,8 @@ useDatabase();
 
 useRabbitmq();
 
-server.listen(Number(process.env.BACKEND_SERVICE_SERVICE_PORT), () => {
-  logger.info(
-    `Server is listening on port ${process.env.BACKEND_SERVICE_SERVICE_PORT}`
-  );
-  // console.log("server is on http://localhost:3080/api/v1")
+server.listen(3080, () => {
+  logger.info( `Server is listening on port 3080`);
 });
 
 export { logger, io };
