@@ -37,9 +37,9 @@
 </template>
 
 <script>
-import { reactive, ref } from '@vue/reactivity'
+import { reactive, ref } from 'vue'
 import Button from '../UI/Button.vue'
-import { computed, onMounted } from '@vue/runtime-core'
+import { computed, onMounted } from 'vue'
 import { notification } from 'ant-design-vue'
 import auth from '../../services/auth'
 import { useRouter } from 'vue-router'
@@ -100,11 +100,10 @@ export default {
         //FIXME:
         // 如果已經註冊droneID, 那就直接進入操作介面， 如果沒有那就跳出提示，然後進入註冊畫面
         // if (data.isEnrolled === true) {
-        console.log("登入成功，前往操控介面")
+        console.log('登入成功，前往操控介面')
         router.push({ path: '/drone' })
-        
       } catch ({ response }) {
-        console.log("登入error")
+        console.log('登入error')
         notification.error({
           message: response.data.msg
         })

@@ -5,7 +5,7 @@
         placement="topLeft"
         title="Drone Information"
         trigger="click"
-        overlayClassName="popover"
+        overlay-class-name="popover"
       >
         <template #content>
           <h3>
@@ -18,24 +18,32 @@
             {{ dronesInfo[userDrone.id].latitude }}
           </li>
           <li><span>HEADING:</span> {{ dronesInfo[userDrone.id].heading }}</li>
-          <li><span>ALTITUDE(m):</span> {{ dronesInfo[userDrone.id].altitude }}</li>
-          <li><span>SPEED(m/s): </span> {{ dronesInfo[userDrone.id].speed }}</li>
+          <li>
+            <span>ALTITUDE(m):</span> {{ dronesInfo[userDrone.id].altitude }}
+          </li>
+          <li>
+            <span>SPEED(m/s): </span> {{ dronesInfo[userDrone.id].speed }}
+          </li>
           <li><span>STATUS:</span> {{ dronesInfo[userDrone.id].isArmed }}</li>
           <li><span>MODE:</span> {{ dronesInfo[userDrone.id].mode }}</li>
           <li><span>VOLTAGE:</span> {{ dronesInfo[userDrone.id].voltage }}</li>
-          <li><span>BATTERY:</span> {{ dronesInfo[userDrone.id].percentage }}</li>
+          <li>
+            <span>BATTERY:</span> {{ dronesInfo[userDrone.id].percentage }}
+          </li>
           <li><span>ROLL:</span> {{ dronesInfo[userDrone.id].roll }}</li>
           <li><span>PITCH:</span> {{ dronesInfo[userDrone.id].pitch }}</li>
-          <li><span>GPS COUNTS:</span> {{ dronesInfo[userDrone.id].gpsCount }}</li>
+          <li>
+            <span>GPS COUNTS:</span> {{ dronesInfo[userDrone.id].gpsCount }}
+          </li>
           <li><span>GPS HPOP:</span> {{ dronesInfo[userDrone.id].hpop }}</li>
         </template>
         <img
           src="../../assets/drone1.gif"
           alt="drone_gif"
+          class="cover-fit"
           @click="showSelected(userDrone.id)"
           @mouseover="mouseOverEvent(userDrone.id)"
           @mouseout="mouseOutEvent(userDrone.id)"
-          class="cover-fit"
         />
       </a-popover>
     </div>
@@ -43,48 +51,47 @@
 </template>
 
 <script>
-import { useStore } from "vuex";
-import { computed, reactive, ref } from "@vue/runtime-core";
-// import useMapbox from '../../hooks/useMapbox'
-import { droneInfoInit } from "../../lib/transformDataFormat";
+import { useStore } from 'vuex'
+import { computed } from 'vue'
+import { droneInfoInit } from '../../lib/transformDataFormat'
 
 export default {
-  name: "droneInfoDashBoard",
+  name: 'DroneInfoDashBoard',
 
   setup() {
-    const store = useStore();
-    const user = computed(() => store.getters.getUserInfo);
-    const dronesInfo = computed(() => store.getters["drone/getDroneInfo"]);
+    const store = useStore()
+    const user = computed(() => store.getters.getUserInfo)
+    const dronesInfo = computed(() => store.getters['drone/getDroneInfo'])
 
     /****** 初始化 所有drone 的狀態資訊欄 *****/
     // const userDrones = computed(()=> { return user.value.droneId })
-    const userDrones = user.value.droneId;
+    const userDrones = user.value.droneId
     for (let i in userDrones) {
       const droneInfo = {
-        [userDrones[i].id]: droneInfoInit,
-      };
-      store.dispatch("drone/setDroneInfo", droneInfo);
+        [userDrones[i].id]: droneInfoInit
+      }
+      store.dispatch('drone/setDroneInfo', droneInfo)
     }
     /********************************** */
 
     const showSelected = (id) => {
-      const droneInfo = store.getters["drone/getSpecificDroneInfo"](id);
+      const droneInfo = store.getters['drone/getSpecificDroneInfo'](id)
       if (droneInfo === undefined) {
-        console.log("Need to open your drone to get info");
+        console.log('Need to open your drone to get info')
       } else {
-        console.log("Show information of the drone");
+        console.log('Show information of the drone')
       }
-    };
+    }
     const mouseOverEvent = (droneID) => {
       // console.log('mouseover')
-      let droneGIF = document.getElementById(droneID);
-      droneGIF.style.width = "150px";
-    };
+      let droneGIF = document.getElementById(droneID)
+      droneGIF.style.width = '150px'
+    }
 
     const mouseOutEvent = (droneID) => {
-      let droneGIF = document.getElementById(droneID);
-      droneGIF.style.width = "100px";
-    };
+      let droneGIF = document.getElementById(droneID)
+      droneGIF.style.width = '100px'
+    }
 
     return {
       dronesInfo,
@@ -92,10 +99,10 @@ export default {
 
       showSelected,
       mouseOverEvent,
-      mouseOutEvent,
-    };
-  },
-};
+      mouseOutEvent
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -185,7 +192,7 @@ export default {
   }
 
   &::before {
-    content: "";
+    content: '';
     width: 100%;
     height: 100%;
     position: absolute;

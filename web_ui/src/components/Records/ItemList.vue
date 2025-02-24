@@ -28,8 +28,8 @@
 import droneService from '../../services/drone'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-tw'
-import { ref } from '@vue/reactivity'
-import { onMounted } from '@vue/runtime-core'
+import { ref } from 'vue'
+import { onMounted } from 'vue'
 export default {
   name: 'ItemList',
   emits: ['RecordSelect'],

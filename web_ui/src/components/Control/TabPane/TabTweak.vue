@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { computed } from '@vue/reactivity'
+import { computed } from 'vue'
 import Button from '../../UI/Button.vue'
 import { useStore } from 'vuex'
 import socket from '../../../lib/websocket'
@@ -62,9 +62,9 @@ export default {
     const defaultSelected = ref(false)
 
     // new add
-    if (userInfo.value.droneId[0]){
+    if (userInfo.value.droneId[0]) {
       defaultSelected.value = userInfo.value.droneId[0].id
-    }else{
+    } else {
       defaultSelected.value = 'No drone'
     }
 
@@ -97,7 +97,7 @@ export default {
       // let latitude = +coords.value[1]
       let longitude = Number(drone.value[defaultSelected.value].longitude)
       let latitude = Number(drone.value[defaultSelected.value].latitude)
-      console.log("latitude = ",latitude)
+      console.log('latitude = ', latitude)
       if (axis === 'X') {
         longitude += direction * 0.00003
       }
@@ -115,7 +115,7 @@ export default {
         lat: latitude
       })
 
-      message.success(`Change lng, lat to (${longitude, latitude}m`)
+      message.success(`Change lng, lat to (${(longitude, latitude)}m`)
     }
 
     return {
@@ -168,35 +168,28 @@ export default {
 </style>
 
 <style lang="scss">
-
-  .ant-select-dropdown {
-    border-radius: 0 0 10px 10px; /* 圆角 */
-    overflow: hidden;
-    .ant-select-dropdown-menu,
-    .ant-select-dropdown-menu-root,
-    .ant-select-dropdown-menu-vertical {
-      li:hover {
-        /* // 鼠标 hover 效果 */
-        background-color: rgba(132, 63, 255, 0.4);
-      }
-      background-color: #fff; /* 背景色 */
+.ant-select-dropdown {
+  border-radius: 0 0 10px 10px; /* 圆角 */
+  overflow: hidden;
+  .ant-select-dropdown-menu,
+  .ant-select-dropdown-menu-root,
+  .ant-select-dropdown-menu-vertical {
+    li:hover {
+      /* // 鼠标 hover 效果 */
+      background-color: rgba(132, 63, 255, 0.4);
     }
-    .ant-select-dropdown-menu-item-active {
-      background-color: rgba(
-        132,
-        63,
-        255,
-        0.4
-      );
-       /* // 展开时。默认选中option的背景色 */
-    }
+    background-color: #fff; /* 背景色 */
   }
-  /* // 聚焦时 边线颜色为背景色   失焦时蓝色高亮颜色替换成紫色 */
-  .ant-select-focused .ant-select-selection,
-  .ant-select-selection:focus,
-  .ant-select-selection:active {
-    border-color: transparent;
-    box-shadow: 0 0 2px rgba(132, 63, 255, 1);
+  .ant-select-dropdown-menu-item-active {
+    background-color: rgba(132, 63, 255, 0.4);
+    /* // 展开时。默认选中option的背景色 */
   }
-
+}
+/* // 聚焦时 边线颜色为背景色   失焦时蓝色高亮颜色替换成紫色 */
+.ant-select-focused .ant-select-selection,
+.ant-select-selection:focus,
+.ant-select-selection:active {
+  border-color: transparent;
+  box-shadow: 0 0 2px rgba(132, 63, 255, 1);
+}
 </style>

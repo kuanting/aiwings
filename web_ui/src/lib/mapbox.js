@@ -25,13 +25,13 @@ export default class CustomMap {
 
     this.map.on('load', () => {
       this._loadBuildingLayer() // 載入建築物圖層
-      this._addMapControls()  // 添加地圖控制元件
+      this._addMapControls() // 添加地圖控制元件
     })
   }
 
   _loadBuildingLayer() {
     // Get label layer ID
-    
+
     const layers = this.map.getStyle().layers // 獲取當前地圖樣式的所有圖層
     let labelLayerId
     for (let i = 0; i < layers.length; i++) {
@@ -82,7 +82,7 @@ export default class CustomMap {
       new mapboxgl.NavigationControl({
         visualizePitch: true,
         showZoom: true,
-        showCompass: true,
+        showCompass: true
       }),
       'top-right'
     )
@@ -164,7 +164,6 @@ export default class CustomMap {
     this.map.getSource(sourceId)?.setData(geoJsonData)
   }
 
-  
   createMarker({
     color = 'blue',
     scale = '1',
@@ -175,7 +174,8 @@ export default class CustomMap {
     popup,
     element
   }) {
-    return new mapboxgl.Marker({  // 創建標記點
+    return new mapboxgl.Marker({
+      // 創建標記點
       element,
       color,
       scale,

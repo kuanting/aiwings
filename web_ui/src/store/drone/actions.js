@@ -16,11 +16,9 @@ export default {
   updateFlightStatus({ commit }, payload) {
     commit('setFlightStatus', payload)
   },
-  
+
   //原始
   updateDestination({ commit }, payload) {
     commit('setDestination', payload)
   }
-  
-
 }

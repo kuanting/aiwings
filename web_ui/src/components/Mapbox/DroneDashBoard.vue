@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { computed } from '@vue/runtime-core'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 export default {
   name: 'DroneDashBoard',
@@ -38,7 +38,7 @@ export default {
 .info__wrapper {
   width: 220px;
   height: 110px;
-  background-color:#545353ca;
+  background-color: #545353ca;
   overflow-y: auto;
   top: 0.5rem;
   left: 0.5rem;

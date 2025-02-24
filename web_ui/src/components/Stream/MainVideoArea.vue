@@ -1,5 +1,9 @@
 <template>
-  <div class="MainVideoComponent" ref="MainVideoComponent" style="padding-bottom: 60px">
+  <div
+    ref="MainVideoComponent"
+    class="MainVideoComponent"
+    style="padding-bottom: 60px"
+  >
     <!-- MainVideoComponent框的padding-bottom高度是要留給info_dashboard的 -->
 
     <div class="mainV">
@@ -8,28 +12,29 @@
     </div>
 
     <p style="position: absolute; background-color: rgba(255, 255, 255, 0.2)">
-      {{ select_droneID || "Please select drone." }}
+      {{ select_droneID || 'Please select drone.' }}
     </p>
 
     <div class="info_dashboard" style="height: 60px; font-size: 13px">
       <!-- 這個info_dashboard框的height要小於等於MainVideoComponent框的padding-bottom高度 -->
       <p>
-        <span>TIME:</span>{{ SpecificDroneInfo.timeStamp }}, <span>GPS:</span>({{
-          SpecificDroneInfo.longitude
-        }}
-        , {{ SpecificDroneInfo.latitude }}), <span>HEADING:</span
+        <span>TIME:</span>{{ SpecificDroneInfo.timeStamp }},
+        <span>GPS:</span>({{ SpecificDroneInfo.longitude }} ,
+        {{ SpecificDroneInfo.latitude }}), <span>HEADING:</span
         >{{ SpecificDroneInfo.heading }}, <span>ALTITUDE:</span
         >{{ SpecificDroneInfo.latitude }} m, <span>SPEED:</span
         >{{ SpecificDroneInfo.speed }} m/s, <span>STATUS:</span
-        >{{ SpecificDroneInfo.isArmed }}, <span>MODE:</span>{{ SpecificDroneInfo.mode }},
-        <span>VOLTAGE:</span> {{ SpecificDroneInfo.voltage }}, <span>BATTERY:</span>
+        >{{ SpecificDroneInfo.isArmed }}, <span>MODE:</span
+        >{{ SpecificDroneInfo.mode }}, <span>VOLTAGE:</span>
+        {{ SpecificDroneInfo.voltage }}, <span>BATTERY:</span>
         {{ SpecificDroneInfo.percentage }}, <span>ROLL:</span
-        >{{ SpecificDroneInfo.roll }}, <span>PITCH:</span>{{ SpecificDroneInfo.pitch }},
-        <span>GPS COUNTS:</span>{{ SpecificDroneInfo.gpsCount }}, <span>GPS HPOP:</span
+        >{{ SpecificDroneInfo.roll }}, <span>PITCH:</span
+        >{{ SpecificDroneInfo.pitch }}, <span>GPS COUNTS:</span
+        >{{ SpecificDroneInfo.gpsCount }}, <span>GPS HPOP:</span
         >{{ SpecificDroneInfo.hpop }}
       </p>
       <button @click="clickBtn()">{{ DetectionBtnText }}</button>
-      <button @click="isCocoSsd = !isCocoSsd" :disabled="Detection">
+      <button :disabled="Detection" @click="isCocoSsd = !isCocoSsd">
         {{ usingModelText }}
       </button>
       <button @click="RotateVideo()">Rotate Video</button>
@@ -38,92 +43,93 @@
 </template>
 
 <script>
-import { useStore } from "vuex";
-import { ref, computed } from "@vue/runtime-core";
-import detection from "../../lib/detection";
-import { droneInfoInit } from "../../lib/transformDataFormat";
+import { useStore } from 'vuex'
+import { ref, computed } from 'vue'
+import detection from '../../lib/detection'
+import { droneInfoInit } from '../../lib/transformDataFormat'
 
 export default {
-  name: "MainVideoArea",
+  name: 'MainVideoArea',
   props: {
     /* srcObject：來自父組件的媒體流 */
     srcObject: MediaStream,
-    select_droneID: String,
+    select_droneID: String
   },
 
   setup(props) {
     /*********************************/
-    const MainVideoComponent = ref(null);
-    const mainVideoRef = ref(null);
-    const mainCanvasRef = ref(null); // for 顯示偵測結果
+    const MainVideoComponent = ref(null)
+    const mainVideoRef = ref(null)
+    const mainCanvasRef = ref(null) // for 顯示偵測結果
 
     /************************************* */
-    const isCocoSsd = ref(false);
+    const isCocoSsd = ref(false)
     const usingModelText = computed(() => {
-      return isCocoSsd.value ? "cocoSsd model" : "yolov8n model";
-    });
+      return isCocoSsd.value ? 'cocoSsd model' : 'yolov8n model'
+    })
     /*********************************/
-    const Detection = ref(false);
+    const Detection = ref(false)
     const DetectionBtnText = computed(() => {
-      return Detection.value ? "停止偵測" : "開始偵測";
-    });
+      return Detection.value ? '停止偵測' : '開始偵測'
+    })
     const clickBtn = () => {
-      if (mainVideoRef.value.srcObject) Detection.value = !Detection.value;
+      if (mainVideoRef.value.srcObject) Detection.value = !Detection.value
       if (Detection.value) {
         // 把 640 x 640 的畫布，縮放延展為原始圖片大小
-        mainCanvasRef.value.style.height = `${mainVideoRef.value.offsetHeight}px`;
-        mainCanvasRef.value.style.width = `${mainVideoRef.value.offsetWidth}px`;
+        mainCanvasRef.value.style.height = `${mainVideoRef.value.offsetHeight}px`
+        mainCanvasRef.value.style.width = `${mainVideoRef.value.offsetWidth}px`
         detection.startDetection(
           mainVideoRef.value,
           mainCanvasRef.value,
           isCocoSsd.value
-        );
+        )
       } else {
-        detection.stopDetection(mainCanvasRef.value);
+        detection.stopDetection(mainCanvasRef.value)
       }
-    };
+    }
     /************************************* */
-    const rotate = ref(0);
+    const rotate = ref(0)
     const RotateVideo = () => {
-      console.log("RotateVideo");
+      console.log('RotateVideo')
       // 旋轉影像與畫布方向
-      rotate.value = rotate.value + 90;
-      mainVideoRef.value.style.transform = `rotate(${rotate.value}deg)`;
-      mainCanvasRef.value.style.transform = `rotate(${rotate.value}deg)`;
+      rotate.value = rotate.value + 90
+      mainVideoRef.value.style.transform = `rotate(${rotate.value}deg)`
+      mainCanvasRef.value.style.transform = `rotate(${rotate.value}deg)`
 
       if (rotate.value % 180) {
         // 轉為橫向時，變更最大寬高
         const rotatedMaxWidth =
           MainVideoComponent.value.clientHeight -
-          parseFloat(MainVideoComponent.value.style.paddingBottom); // 最大寬度變成容器的高度
-        const rotatedMaxHeight = MainVideoComponent.value.clientWidth; // 最大高度變成容器的寬度
-        mainVideoRef.value.style.maxWidth = `${rotatedMaxWidth}px`;
-        mainVideoRef.value.style.maxHeight = `${rotatedMaxHeight}px`;
+          parseFloat(MainVideoComponent.value.style.paddingBottom) // 最大寬度變成容器的高度
+        const rotatedMaxHeight = MainVideoComponent.value.clientWidth // 最大高度變成容器的寬度
+        mainVideoRef.value.style.maxWidth = `${rotatedMaxWidth}px`
+        mainVideoRef.value.style.maxHeight = `${rotatedMaxHeight}px`
       } else {
         // 直向時，還原最大寬高
-        mainVideoRef.value.style.maxWidth = `100%`;
-        mainVideoRef.value.style.maxHeight = `100%`;
+        mainVideoRef.value.style.maxWidth = `100%`
+        mainVideoRef.value.style.maxHeight = `100%`
       }
 
       // 調整畫布大小同影像大小
-      mainCanvasRef.value.style.height = `${mainVideoRef.value.offsetHeight}px`;
-      mainCanvasRef.value.style.width = `${mainVideoRef.value.offsetWidth}px`;
-    };
+      mainCanvasRef.value.style.height = `${mainVideoRef.value.offsetHeight}px`
+      mainCanvasRef.value.style.width = `${mainVideoRef.value.offsetWidth}px`
+    }
 
     /**************** 取得指定droneId的狀態資料 ********************* */
-    const store = useStore();
+    const store = useStore()
     // 取得當前select_droneID的無人機資訊，如果 undefined 則顯示 droneInfoInit
 
-    const dronesInfo = computed(() => store.getters["drone/getDroneInfo"]);
+    const dronesInfo = computed(() => store.getters['drone/getDroneInfo'])
     const test = computed(() => {
-      return dronesInfo["airsim_simulation"] || droneInfoInit;
-    });
+      return dronesInfo.value['airsim_simulation'] || droneInfoInit
+    })
 
     const SpecificDroneInfo = computed(() => {
       return (
-        store.getters["drone/getSpecificDroneInfo"](props.select_droneID) || droneInfoInit
-      );
-    });
+        store.getters['drone/getSpecificDroneInfo'](props.select_droneID) ||
+        droneInfoInit
+      )
+    })
     /**************************************************************** */
 
     return {
@@ -140,10 +146,10 @@ export default {
       usingModelText,
       RotateVideo,
 
-      SpecificDroneInfo,
-    };
-  },
-};
+      SpecificDroneInfo
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

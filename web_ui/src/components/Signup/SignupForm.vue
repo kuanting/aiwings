@@ -56,9 +56,9 @@
 </template>
 
 <script>
-import { reactive, ref } from '@vue/reactivity'
+import { reactive, ref } from 'vue'
 import Button from '../UI/Button.vue'
-import { computed, onMounted } from '@vue/runtime-core'
+import { computed, onMounted } from 'vue'
 import auth from '../../services/auth'
 import { notification } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -141,7 +141,7 @@ export default {
 
     const submitFromHandler = async function (formData) {
       isSubmmited.value = true
-      console.log("用戶輸入的signup資料: ",formData)
+      console.log('用戶輸入的signup資料: ', formData)
       try {
         const { data } = await auth.signup(formData)
         //FIX
@@ -150,10 +150,10 @@ export default {
           message: data.msg
         })
         isSubmmited.value = false
-        console.log("註冊成功，前往登入頁面")
+        console.log('註冊成功，前往登入頁面')
         router.push({ path: '/login' })
       } catch ({ response }) {
-        console.log("註冊失敗\n失敗原因: ",response.data.msg)
+        console.log('註冊失敗\n失敗原因: ', response.data.msg)
         notification.error({
           message: response.data.msg
         })
