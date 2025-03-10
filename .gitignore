@@ -96,3 +96,6 @@ key/
 # SSL certificate
 *.crt
 *.key
+
+# MKDocs output
+/site
