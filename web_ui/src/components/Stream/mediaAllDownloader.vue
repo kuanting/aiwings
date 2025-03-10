@@ -282,6 +282,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
+
 button {
   font-size: 10px;
   border: none; /* 去除邊框 */
@@ -295,10 +297,10 @@ button {
   color: #fff;
 
   &:hover {
-    background-color: darken(
+    background-color: color.adjust(
       $primary-color,
-      10%
-    ); // darken($color, 10%) 將顏色變暗 10%
+      $lightness: -10%
+    );
   }
 }
 .btn-Stop {
@@ -307,10 +309,10 @@ button {
   color: #000000; /* 文字顏色 */
 
   &:hover {
-    background-color: darken(
+    background-color: color.adjust(
       $primary-color,
-      10%
-    ); // darken($color, 10%) 將顏色變暗 10%
+      $lightness: -10%
+    );
   }
 }
 .feature-box {
